@@ -1105,7 +1105,7 @@
             <span>Life, Travel & Open Questions</span>
           </div>
           <ul class="insight-list" id="list-life">
-            <li class="insight-item">Personal tasks, travel plans, and open questions will appear here.</li>
+            <li class="insight-item">Personal tasks, travel plans, and open questions will be tracked here.</li>
           </ul>
         </div>
 
@@ -1155,15 +1155,11 @@
             </button>
           </div>
         </div>
-
-        <div style="font-size:11px; color:var(--text-muted); line-height:1.4; border-top:1px solid var(--card-border-subtle); padding-top:10px;">
-          * Note: Your PIN is stored strictly inside your browser's private storage. If you ever forget it, you can clear browser site data for this file.
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- EXPLANATORY ONBOARDING WIZARD MODAL -->
+  <!-- ONBOARDING WIZARD MODAL -->
   <div class="modal-backdrop" id="wizard-modal" onclick="closeWizardModal(event)">
     <div class="modal-window" onclick="event.stopPropagation()" style="max-width:540px;">
       <div class="modal-head">
@@ -1181,7 +1177,7 @@
     </div>
   </div>
 
-  <!-- PLAIN-ENGLISH USER GUIDE & FAQ MODAL -->
+  <!-- GUIDE & FAQ MODAL -->
   <div class="modal-backdrop" id="faq-modal" onclick="closeFaqModal(event)">
     <div class="modal-window" onclick="event.stopPropagation()" style="max-width:680px;">
       <div class="modal-head">
@@ -1189,61 +1185,23 @@
         <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="closeFaqModal()">Close</button>
       </div>
       <div class="modal-body">
-        
         <div class="faq-item">
           <div class="faq-q">What is Panorama in simple words?</div>
-          <div class="faq-a">
-            Panorama is a private, zero-friction daily scratchpad with a personal analyst built into it. During the week, you dump raw, messy thoughts—bugs, sudden travel plans, work friction, or random ideas. Whenever you're ready (usually Friday), the AI reads everything at once to show you recurring patterns, connect related ideas, and suggest simple next steps.
-          </div>
+          <div class="faq-a">Panorama is a private daily scratchpad with a personal analyst built into it. Dump raw thoughts during the week, and hit Connect The Dots on Friday to see patterns, connect ideas, and get clear action steps.</div>
         </div>
-
         <div class="faq-item">
-          <div class="faq-q">Where are my thoughts stored? Is this private?</div>
-          <div class="faq-a">
-            100% private and local. Everything is saved directly in your browser's private computer memory (LocalStorage). Your thoughts never go to any remote server or cloud database unless you run an AI review using your own personal Google AI Studio key.
-          </div>
+          <div class="faq-q">Where are my thoughts stored?</div>
+          <div class="faq-a">100% locally in your browser memory (LocalStorage). Nothing leaves your machine unless you run an AI review.</div>
         </div>
-
         <div class="faq-item">
-          <div class="faq-q">Do I have to organize or tag my notes manually?</div>
-          <div class="faq-a">
-            No! You can simply type a thought and hit Enter (or press the microphone button to dictate). While you can click a quick tag like "Annoyance" or "Work", the AI understands the meaning of your notes regardless of tags.
-          </div>
+          <div class="faq-q">What if Google AI shows a "High Demand" error?</div>
+          <div class="faq-a">Panorama automatically retries once after a brief pause. If servers stay busy, you can instantly click "Use in Claude / ChatGPT (Copy Prompt)" to run the synthesis for free.</div>
         </div>
-
-        <div class="faq-item">
-          <div class="faq-q">What happens when I click "Finish Week & Start Fresh"?</div>
-          <div class="faq-a">
-            It snapshots your current week and saves it safely into your "Past Weeks" archive. To make sure you don't drop important balls, any open action steps or unanswered questions are automatically carried forward into Monday's scratchpad.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-q">How does the "PIN Security" feature work?</div>
-          <div class="faq-a">
-            Click "PIN Security" in the top bar to set a 4 to 8 digit number code. If enabled, whenever you open or refresh Panorama, the page blurs and blocks access until the PIN is entered.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-q">Do I need to pay for Google Gemini?</div>
-          <div class="faq-a">
-            No. Google AI Studio provides a free Gemini API key for personal prototyping. Simply click "Get Free Key ↗" in the top bar, copy your key, and paste it once into the top bar. Panorama runs on the high-speed Flash tier which is fast and completely free under normal personal limits.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-q">Can I use this without any API key at all?</div>
-          <div class="faq-a">
-            Yes! Click "Use in Claude / ChatGPT (Copy Prompt)". It compiles all your active thoughts into a formatted request that you can paste directly into Claude, ChatGPT, or any other assistant for free. Then paste the reply back in to display it visually.
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
 
-  <!-- Past Weeks Modal -->
+  <!-- PAST WEEKS MODAL -->
   <div class="modal-backdrop" id="history-modal" onclick="closeHistoryModal(event)">
     <div class="modal-window" onclick="event.stopPropagation()">
       <div class="modal-head">
@@ -1254,7 +1212,7 @@
     </div>
   </div>
 
-  <!-- Action-to-Draft Deep Dive Modal -->
+  <!-- ACTION PLAN MODAL -->
   <div class="modal-backdrop" id="draft-modal" onclick="closeDraftModal(event)">
     <div class="modal-window" onclick="event.stopPropagation()">
       <div class="modal-head">
@@ -1271,7 +1229,7 @@
     </div>
   </div>
 
-  <!-- The Vault (Backup & Restore Modal) -->
+  <!-- VAULT MODAL -->
   <div class="modal-backdrop" id="vault-modal" onclick="closeVaultModal(event)">
     <div class="modal-window" onclick="event.stopPropagation()">
       <div class="modal-head">
@@ -1280,27 +1238,14 @@
       </div>
       <div class="modal-body">
         <div class="vault-box">
-          <strong style="font-size:14px; color:var(--text);">1. Export Complete Vault</strong>
-          <p style="font-size:12px; color:var(--text-secondary);">
-            Download a single, timestamped JSON backup file containing all your active thoughts, archived weeks, dossiers, and daily focus notes.
-          </p>
-          <div>
-            <button class="btn-action btn-action-accent" onclick="downloadVaultBackup()">
-              <span>📥 Download Vault Backup (.json)</span>
-            </button>
-          </div>
+          <strong style="font-size:14px; color:var(--text);">Export Complete Vault</strong>
+          <button class="btn-action btn-action-accent" onclick="downloadVaultBackup()">📥 Download Vault Backup (.json)</button>
         </div>
-
         <div class="vault-box">
-          <strong style="font-size:14px; color:var(--text);">2. Restore / Sync from File</strong>
-          <p style="font-size:12px; color:var(--text-secondary);">
-            Restore or merge a Panorama JSON backup from another computer or browser.
-          </p>
-          <div class="vault-drop-zone" onclick="document.getElementById('vault-file-input').click()" ondragover="event.preventDefault()" ondrop="handleVaultDrop(event)">
+          <strong style="font-size:14px; color:var(--text);">Restore from File</strong>
+          <div class="vault-drop-zone" onclick="document.getElementById('vault-file-input').click()">
             <input type="file" id="vault-file-input" style="display:none;" accept=".json" onchange="handleVaultFileSelect(event)">
-            <span style="font-size:24px; display:block; margin-bottom:4px;">📂</span>
-            <strong style="font-size:12.5px; color:var(--primary-blue);">Click to select or drag & drop a backup JSON here</strong>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Safe restore: merges past weeks and updates current notes.</div>
+            <strong style="font-size:12.5px; color:var(--primary-blue);">Click to select or drop backup JSON here</strong>
           </div>
         </div>
       </div>
@@ -1328,7 +1273,6 @@
     function checkSecurityLock() {
       const pin = localStorage.getItem('3sci_panorama_pin');
       const lockBtn = document.getElementById('btn-lock-status');
-      
       if (pin && pin.trim().length >= 4) {
         lockBtn.innerHTML = `<span>🔒 PIN Active</span>`;
         document.getElementById('pin-lock-screen').style.display = 'flex';
@@ -1345,7 +1289,6 @@
       const savedPin = localStorage.getItem('3sci_panorama_pin') || '';
       const enteredPin = document.getElementById('pin-entry-input').value.trim();
       const err = document.getElementById('pin-error-msg');
-
       if (enteredPin === savedPin) {
         document.getElementById('pin-lock-screen').style.display = 'none';
         document.getElementById('app-layout-main').classList.remove('locked');
@@ -1358,289 +1301,123 @@
       }
     }
 
-    function handlePinKey(e) {
-      if (e.key === 'Enter') {
-        verifyPin();
-      }
-    }
-
+    function handlePinKey(e) { if (e.key === 'Enter') verifyPin(); }
     function openSecuritySettingsModal() {
-      const savedPin = localStorage.getItem('3sci_panorama_pin') || '';
-      document.getElementById('security-new-pin').value = savedPin;
+      document.getElementById('security-new-pin').value = localStorage.getItem('3sci_panorama_pin') || '';
       document.getElementById('security-modal').style.display = 'flex';
     }
-
-    function closeSecurityModal() {
-      document.getElementById('security-modal').style.display = 'none';
-    }
-
+    function closeSecurityModal() { document.getElementById('security-modal').style.display = 'none'; }
     function saveNewPin() {
       const val = document.getElementById('security-new-pin').value.trim();
-      if (!/^\d{4,8}$/.test(val)) {
-        alert("Please enter a numeric string between 4 and 8 digits (e.g. 1234 or 987654).");
-        return;
-      }
+      if (!/^\d{4,8}$/.test(val)) { alert("Please enter 4 to 8 digits."); return; }
       localStorage.setItem('3sci_panorama_pin', val);
-      alert(`PIN successfully set to ${val}. Panorama is now protected.`);
+      alert("PIN saved.");
       closeSecurityModal();
       checkSecurityLock();
     }
-
     function removePin() {
-      if (confirm("Disable numeric PIN security? Anyone with access to this browser will be able to read your notes directly.")) {
+      if (confirm("Disable PIN security?")) {
         localStorage.removeItem('3sci_panorama_pin');
         closeSecurityModal();
         checkSecurityLock();
-        alert("PIN removed.");
       }
     }
 
-    /* Explanatory Onboarding Wizard */
+    /* Onboarding Wizard */
     const WIZARD_STEPS = [
-      {
-        badge: "STEP 1 OF 4",
-        title: "Zero-Friction Daily Brain Dump",
-        body: "Whenever an annoying bug hits, an errand pops into your head, or a creative spark strikes, jot it down in 5 seconds on the left. Type or hit Dictate (Alt+V). You don't need folders or hierarchies—just get the thought out of your head.",
-        icon: "✍️"
-      },
-      {
-        badge: "STEP 2 OF 4",
-        title: "Live Ambient Headspace Meter",
-        body: "Look at the colorful bar at the top of your desk. As you log thoughts throughout Monday to Thursday, Panorama shows what is truly taking up your mental bandwidth (Work vs. Everyday Annoyances vs. Personal Life). Pin today's main goal in the North Star box.",
-        icon: "📊"
-      },
-      {
-        badge: "STEP 3 OF 4",
-        title: "Friday: Connect The Dots",
-        body: "At the end of your week, click 'Connect The Dots'. Instead of chatting back and forth, Gemini reads your entire week at once: highlighting repeating trouble, connecting unrelated sparks into opportunities, and generating simple action moves.",
-        icon: "🧠"
-      },
-      {
-        badge: "STEP 4 OF 4",
-        title: "Finish Week & Start Fresh",
-        body: "Once reviewed, export your moves to your Calendar (.ICS) or copy your Todo list. Then hit 'Finish Week & Start Fresh'. It archives the week and automatically brings forward any open questions into Monday's scratchpad so you never drop a ball.",
-        icon: "🚀"
-      }
+      { badge: "STEP 1 OF 4", title: "Zero-Friction Brain Dump", body: "Jot down bugs, errands, or ideas instantly on the left without organizing them.", icon: "✍️" },
+      { badge: "STEP 2 OF 4", title: "Live Headspace Meter", body: "The color bar shows what is dominating your mental bandwidth during the week.", icon: "📊" },
+      { badge: "STEP 3 OF 4", title: "Connect The Dots", body: "On Friday, click Connect The Dots to synthesize your week into smart action steps.", icon: "🧠" },
+      { badge: "STEP 4 OF 4", title: "Start Fresh", body: "Archive your week and carry open questions into Monday automatically.", icon: "🚀" }
     ];
 
-    function openWizardModal() {
-      wizardCurrentStep = 0;
-      renderWizardStep();
-      document.getElementById('wizard-modal').style.display = 'flex';
-    }
-
-    function closeWizardModal() {
-      document.getElementById('wizard-modal').style.display = 'none';
-      localStorage.setItem('3sci_panorama_tour_seen', 'true');
-    }
-
+    function openWizardModal() { wizardCurrentStep = 0; renderWizardStep(); document.getElementById('wizard-modal').style.display = 'flex'; }
+    function closeWizardModal() { document.getElementById('wizard-modal').style.display = 'none'; localStorage.setItem('3sci_panorama_tour_seen', 'true'); }
     function renderWizardStep() {
       const step = WIZARD_STEPS[wizardCurrentStep];
-      const bodyEl = document.getElementById('wizard-body');
-      document.getElementById('wizard-step-counter').innerText = `Step ${wizardCurrentStep + 1} of ${WIZARD_STEPS.length}`;
-
-      bodyEl.innerHTML = `
-        <div class="wizard-card">
-          <span style="font-size:36px;">${step.icon}</span>
-          <span class="wizard-step-badge">${step.badge}</span>
-          <h3 style="font-family:'Space Grotesk', sans-serif; font-size:16px; color:var(--text);">${step.title}</h3>
-          <p style="font-size:13px; color:var(--text-secondary); line-height:1.55;">${step.body}</p>
-        </div>
-      `;
-
+      document.getElementById('wizard-step-counter').innerText = `Step ${wizardCurrentStep + 1} of 4`;
+      document.getElementById('wizard-body').innerHTML = `<div class="wizard-card"><span style="font-size:36px;">${step.icon}</span><span class="wizard-step-badge">${step.badge}</span><h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;">${step.title}</h3><p style="font-size:13px;color:var(--text-secondary);">${step.body}</p></div>`;
       document.getElementById('btn-wizard-prev').disabled = (wizardCurrentStep === 0);
       document.getElementById('btn-wizard-next').innerText = (wizardCurrentStep === WIZARD_STEPS.length - 1) ? "Got It!" : "Next";
     }
+    function wizardNextStep() { if (wizardCurrentStep < WIZARD_STEPS.length - 1) { wizardCurrentStep++; renderWizardStep(); } else { closeWizardModal(); } }
+    function wizardPrevStep() { if (wizardCurrentStep > 0) { wizardCurrentStep--; renderWizardStep(); } }
 
-    function wizardNextStep() {
-      if (wizardCurrentStep < WIZARD_STEPS.length - 1) {
-        wizardCurrentStep++;
-        renderWizardStep();
-      } else {
-        closeWizardModal();
-      }
-    }
-
-    function wizardPrevStep() {
-      if (wizardCurrentStep > 0) {
-        wizardCurrentStep--;
-        renderWizardStep();
-      }
-    }
-
-    /* FAQ & User Guide */
-    function openFaqModal() {
-      document.getElementById('faq-modal').style.display = 'flex';
-    }
-
-    function closeFaqModal() {
-      document.getElementById('faq-modal').style.display = 'none';
-    }
+    function openFaqModal() { document.getElementById('faq-modal').style.display = 'flex'; }
+    function closeFaqModal() { document.getElementById('faq-modal').style.display = 'none'; }
 
     /* Voice Capture */
     function initSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return null;
-
       const recognizer = new SpeechRecognition();
       recognizer.continuous = true;
       recognizer.interimResults = true;
       recognizer.lang = 'en-US';
-
-      recognizer.onstart = function() {
-        isRecording = true;
-        const btn = document.getElementById('btn-voice-dictate');
-        btn.classList.add('recording');
-        document.getElementById('voice-icon').innerText = '🔴';
-        document.getElementById('voice-label').innerText = 'Listening...';
-      };
-
-      recognizer.onresult = function(event) {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript;
-        }
-        
+      recognizer.onstart = () => { isRecording = true; document.getElementById('btn-voice-dictate').classList.add('recording'); document.getElementById('voice-icon').innerText = '🔴'; document.getElementById('voice-label').innerText = 'Listening...'; };
+      recognizer.onresult = (e) => {
+        let t = '';
+        for (let i = e.resultIndex; i < e.results.length; ++i) t += e.results[i][0].transcript;
         const input = document.getElementById('note-input');
-        if (event.results[event.results.length - 1].isFinal) {
-          const currentVal = input.value.trim();
-          input.value = currentVal ? currentVal + ' ' + transcript.trim() : transcript.trim();
-        }
+        if (e.results[e.results.length - 1].isFinal) input.value = input.value ? input.value + ' ' + t.trim() : t.trim();
       };
-
-      recognizer.onerror = function() { stopVoiceDictation(); };
-      recognizer.onend = function() { stopVoiceDictation(); };
+      recognizer.onerror = () => stopVoiceDictation();
+      recognizer.onend = () => stopVoiceDictation();
       return recognizer;
     }
-
     function toggleVoiceDictation() {
-      if (!recognition) {
-        recognition = initSpeechRecognition();
-        if (!recognition) {
-          alert("Your browser does not support voice input. Please try Google Chrome or Microsoft Edge.");
-          return;
-        }
-      }
-
-      if (isRecording) {
-        recognition.stop();
-      } else {
-        try { recognition.start(); } catch (e) { recognition.stop(); }
-      }
+      if (!recognition) { recognition = initSpeechRecognition(); if (!recognition) { alert("Voice input not supported in this browser."); return; } }
+      if (isRecording) recognition.stop(); else try { recognition.start(); } catch(e) { recognition.stop(); }
     }
-
     function stopVoiceDictation() {
       isRecording = false;
       const btn = document.getElementById('btn-voice-dictate');
-      if (btn) {
-        btn.classList.remove('recording');
-        document.getElementById('voice-icon').innerText = '🎙️';
-        document.getElementById('voice-label').innerText = 'Dictate';
-      }
+      if (btn) { btn.classList.remove('recording'); document.getElementById('voice-icon').innerText = '🎙️'; document.getElementById('voice-label').innerText = 'Dictate'; }
     }
 
     /* Storage & Telemetry */
     function selectTag(tag) {
       activeTag = tag;
-      document.querySelectorAll('.tag-chip').forEach(el => {
-        el.classList.toggle('active', el.dataset.tag === tag);
-      });
+      document.querySelectorAll('.tag-chip').forEach(el => el.classList.toggle('active', el.dataset.tag === tag));
     }
-
     function setFeedFilter(filter) {
       feedFilter = filter;
-      document.querySelectorAll('.filter-pill').forEach(el => {
-        el.classList.toggle('active', el.dataset.filter === filter);
-      });
+      document.querySelectorAll('.filter-pill').forEach(el => el.classList.toggle('active', el.dataset.filter === filter));
       renderNotes();
     }
-
-    function syncKey(val) {
-      localStorage.setItem('3sci_panorama_key', val.trim());
-    }
-
-    function getKey() {
-      return document.getElementById('top-gemini-key').value.trim() || localStorage.getItem('3sci_panorama_key') || '';
-    }
-
-    function saveNorthStar(val) {
-      localStorage.setItem('3sci_panorama_north_star', val);
-    }
+    function syncKey(val) { localStorage.setItem('3sci_panorama_key', val.trim()); }
+    function getKey() { return document.getElementById('top-gemini-key').value.trim() || localStorage.getItem('3sci_panorama_key') || ''; }
+    function saveNorthStar(val) { localStorage.setItem('3sci_panorama_north_star', val); }
 
     function loadNotes() {
-      const stored = localStorage.getItem('3sci_panorama_notes');
-      notes = stored ? JSON.parse(stored) : SAMPLE_NOTES;
-      
+      notes = JSON.parse(localStorage.getItem('3sci_panorama_notes') || JSON.stringify(SAMPLE_NOTES));
       const storedDossier = localStorage.getItem('3sci_panorama_active_dossier');
-      if (storedDossier) {
-        try {
-          currentDossier = JSON.parse(storedDossier);
-          renderDossier(currentDossier);
-        } catch (e) {}
-      }
-
-      const northStar = localStorage.getItem('3sci_panorama_north_star') || '';
-      document.getElementById('north-star-input').value = northStar;
-
+      if (storedDossier) { try { currentDossier = JSON.parse(storedDossier); renderDossier(currentDossier); } catch(e){} }
+      document.getElementById('north-star-input').value = localStorage.getItem('3sci_panorama_north_star') || '';
       renderNotes();
       updateTelemetry();
     }
-
-    function saveNotes() {
-      localStorage.setItem('3sci_panorama_notes', JSON.stringify(notes));
-      renderNotes();
-      updateTelemetry();
-      compilePrompt();
-    }
-
+    function saveNotes() { localStorage.setItem('3sci_panorama_notes', JSON.stringify(notes)); renderNotes(); updateTelemetry(); compilePrompt(); }
     function addNote() {
       const input = document.getElementById('note-input');
       const text = input.value.trim();
       if (!text) return;
-
       if (isRecording && recognition) recognition.stop();
-
       const now = new Date();
-      const timeStr = now.toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      notes.unshift({
-        id: Date.now(),
-        tag: activeTag,
-        text: text,
-        date: timeStr
-      });
-
+      notes.unshift({ id: Date.now(), tag: activeTag, text: text, date: now.toLocaleDateString(undefined, {weekday:'short'}) + ' ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) });
       input.value = '';
       saveNotes();
     }
-
-    function deleteNote(id) {
-      notes = notes.filter(n => n.id !== id);
-      saveNotes();
-    }
-
-    function clearAllNotes() {
-      if (confirm("Clear all thoughts currently in your scratchpad? (Past weeks stay safe)")) {
-        notes = [];
-        saveNotes();
-      }
-    }
+    function deleteNote(id) { notes = notes.filter(n => n.id !== id); saveNotes(); }
+    function clearAllNotes() { if (confirm("Clear active scratchpad?")) { notes = []; saveNotes(); } }
 
     function updateTelemetry() {
       const total = notes.length;
       const bar = document.getElementById('telemetry-bar');
       const legend = document.getElementById('telemetry-legend');
-      const footprint = document.getElementById('storage-footprint');
+      document.getElementById('storage-footprint').innerText = (JSON.stringify(localStorage).length / 1024).toFixed(1) + ' KB in Vault';
 
-      const rawBytes = JSON.stringify(localStorage).length;
-      footprint.innerText = (rawBytes / 1024).toFixed(1) + ' KB in Vault';
-
-      if (total === 0) {
-        bar.innerHTML = `<div class="meter-slice other" style="width: 100%;"></div>`;
-        legend.innerHTML = `<span>No active thoughts</span>`;
-        return;
-      }
-
+      if (total === 0) { bar.innerHTML = `<div class="meter-slice other" style="width: 100%;"></div>`; legend.innerHTML = `<span>No thoughts</span>`; return; }
       const counts = { work: 0, annoyance: 0, personal: 0, spark: 0, other: 0 };
       notes.forEach(n => {
         if (n.tag === 'work') counts.work++;
@@ -1649,234 +1426,87 @@
         else if (n.tag === 'spark') counts.spark++;
         else counts.other++;
       });
-
-      const pWork = ((counts.work / total) * 100).toFixed(0);
-      const pAnnoy = ((counts.annoyance / total) * 100).toFixed(0);
-      const pPers = ((counts.personal / total) * 100).toFixed(0);
-      const pSpark = ((counts.spark / total) * 100).toFixed(0);
-      const pOther = ((counts.other / total) * 100).toFixed(0);
-
-      bar.innerHTML = `
-        <div class="meter-slice work" style="width: ${pWork}%;" title="Work: ${pWork}%"></div>
-        <div class="meter-slice annoyance" style="width: ${pAnnoy}%;" title="Annoyances: ${pAnnoy}%"></div>
-        <div class="meter-slice personal" style="width: ${pPers}%;" title="Life: ${pPers}%"></div>
-        <div class="meter-slice spark" style="width: ${pSpark}%;" title="Sparks: ${pSpark}%"></div>
-        <div class="meter-slice other" style="width: ${pOther}%;" title="Other: ${pOther}%"></div>
-      `;
-
-      legend.innerHTML = `
-        <span class="legend-item"><span class="legend-dot" style="background:var(--primary-blue);"></span>Work ${pWork}%</span>
-        <span class="legend-item"><span class="legend-dot" style="background:var(--accent-rose);"></span>Snags ${pAnnoy}%</span>
-        <span class="legend-item"><span class="legend-dot" style="background:var(--accent-emerald);"></span>Life ${pPers}%</span>
-        <span class="legend-item"><span class="legend-dot" style="background:var(--accent-purple);"></span>Sparks ${pSpark}%</span>
-      `;
+      const pw = ((counts.work/total)*100).toFixed(0), pa = ((counts.annoyance/total)*100).toFixed(0), pp = ((counts.personal/total)*100).toFixed(0), ps = ((counts.spark/total)*100).toFixed(0);
+      bar.innerHTML = `<div class="meter-slice work" style="width:${pw}%"></div><div class="meter-slice annoyance" style="width:${pa}%"></div><div class="meter-slice personal" style="width:${pp}%"></div><div class="meter-slice spark" style="width:${ps}%"></div>`;
+      legend.innerHTML = `<span class="legend-item"><span class="legend-dot" style="background:var(--primary-blue)"></span>Work ${pw}%</span><span class="legend-item"><span class="legend-dot" style="background:var(--accent-rose)"></span>Snags ${pa}%</span><span class="legend-item"><span class="legend-dot" style="background:var(--accent-emerald)"></span>Life ${pp}%</span><span class="legend-item"><span class="legend-dot" style="background:var(--accent-purple)"></span>Sparks ${ps}%</span>`;
     }
 
     function renderNotes() {
       const container = document.getElementById('stream-container');
-      const countEl = document.getElementById('notes-count');
       const searchTerm = (document.getElementById('feed-search')?.value || '').toLowerCase().trim();
-
       let filtered = notes;
-      if (feedFilter !== 'all') {
-        filtered = filtered.filter(n => n.tag === feedFilter);
-      }
-      if (searchTerm) {
-        filtered = filtered.filter(n => n.text.toLowerCase().includes(searchTerm));
-      }
+      if (feedFilter !== 'all') filtered = filtered.filter(n => n.tag === feedFilter);
+      if (searchTerm) filtered = filtered.filter(n => n.text.toLowerCase().includes(searchTerm));
+      document.getElementById('notes-count').innerText = `${notes.length} Thought${notes.length===1?'':'s'} Active`;
 
-      countEl.innerText = `${notes.length} Thought${notes.length === 1 ? '' : 's'} Active`;
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:12px;">No matching thoughts.</div>`;
-        return;
-      }
-
+      if (filtered.length === 0) { container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No matching thoughts.</div>`; return; }
       container.innerHTML = filtered.map(n => `
         <div class="stream-item ${n.tag}">
-          <div class="stream-meta">
-            <span class="stream-tag">${n.tag}</span>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span>${n.date}</span>
-              <button class="btn-del-note" onclick="deleteNote(${n.id})" title="Delete thought">×</button>
-            </div>
-          </div>
+          <div class="stream-meta"><span class="stream-tag">${n.tag}</span><div style="display:flex;align-items:center;gap:8px;"><span>${n.date}</span><button class="btn-del-note" onclick="deleteNote(${n.id})">×</button></div></div>
           <div class="stream-text">${n.text}</div>
         </div>
       `).join('');
     }
 
-    /* Fast, Crisp Prompt Builder */
+    /* Prompt Builder */
     function compilePrompt() {
-      const notesDump = notes.map((n, i) => `[Thought ${i+1}] (${n.tag.toUpperCase()} - ${n.date}): ${n.text}`).join('\n');
-      
+      const notesDump = notes.map((n, i) => `[Thought ${i+1}] (${n.tag.toUpperCase()}): ${n.text}`).join('\n');
       const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
-      const recentArchives = history.slice(0, 3);
-      
-      let historyContext = "None";
-      if (recentArchives.length > 0) {
-        historyContext = recentArchives.map((h) => `[Past Week: ${h.theme}] Snags: ${(h.dossier?.recurringSnags || []).join('; ') || 'None'}`).join('\n');
-      }
+      const recent = history.slice(0, 3).map(h => `[Past Week: ${h.theme}] Snags: ${(h.dossier?.recurringSnags||[]).join('; ')}`).join('\n') || 'None';
 
-      const prompt = `You are a trusted, grounded thinking partner. Review all thoughts simultaneously.
-CRITICAL INSTRUCTION: Return tight, concise, punchy JSON. No long essays. Zero buzzwords.
+      const prompt = `You are a grounded thinking partner. Review all thoughts simultaneously. Return strict JSON only. No markdown formatting, no backticks.
 
-PAST WEEKS HISTORY:
-${historyContext}
-
-CURRENT THOUGHTS:
+PAST WEEKS: ${recent}
+CURRENT NOTES:
 ${notesDump}
 
-OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
+SCHEMA:
 {
-  "theme": "Sharp 4-6 word title",
-  "summary": "Exactly 2 short sentences summarizing the week.",
-  "repeatingSnag": {
-    "detected": true,
-    "name": "Short name",
-    "explanation": "One sentence explaining why it repeats and the simple fix."
-  },
-  "recurringSnags": [
-    "Root issue 1 (under 12 words)",
-    "Root issue 2 (under 12 words)"
-  ],
-  "connectedSparks": [
-    {
-      "connection": "Note A + Note B",
-      "idea": "One crisp sentence explaining the smart connection."
-    }
-  ],
-  "workMoves": [
-    {
-      "step": "Specific practical work move",
-      "why": "One sentence rationale"
-    }
-  ],
-  "lifeMoves": [
-    {
-      "step": "Personal task or travel move",
-      "why": "One sentence rationale"
-    }
-  ]
+  "theme": "4-6 word title",
+  "summary": "2 concise sentences summarizing focus.",
+  "repeatingSnag": { "detected": true, "name": "Name", "explanation": "One sentence." },
+  "recurringSnags": ["Root issue 1", "Root issue 2"],
+  "connectedSparks": [{ "connection": "A + B", "idea": "One crisp sentence." }],
+  "workMoves": [{ "step": "Action", "why": "Rationale" }],
+  "lifeMoves": [{ "step": "Action", "why": "Rationale" }]
 }`;
-
       document.getElementById('prompt-preview-box').innerText = prompt;
       return prompt;
     }
 
-    function togglePromptStudio() {
-      compilePrompt();
-      const el = document.getElementById('prompt-studio-drawer');
-      el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
-    }
-
+    function togglePromptStudio() { compilePrompt(); const el = document.getElementById('prompt-studio-drawer'); el.style.display = el.style.display === 'flex' ? 'none' : 'flex'; }
     function copyCompiledPrompt(btn) {
-      const text = document.getElementById('prompt-preview-box').innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        const orig = btn.innerText;
-        btn.innerText = "Copied!";
-        setTimeout(() => btn.innerText = orig, 1500);
+      navigator.clipboard.writeText(document.getElementById('prompt-preview-box').innerText).then(() => {
+        const orig = btn.innerText; btn.innerText = "Copied!"; setTimeout(() => btn.innerText = orig, 1500);
       });
     }
 
     function renderDossier(data) {
       currentDossier = data;
       localStorage.setItem('3sci_panorama_active_dossier', JSON.stringify(data));
-
-      document.getElementById('dossier-eyebrow').innerText = "The Full Picture";
-      document.getElementById('dossier-theme').innerText = data.theme || "Patterns & Insights";
+      document.getElementById('dossier-theme').innerText = data.theme || "Insights";
       document.getElementById('dossier-narrative').innerHTML = (data.summary || "").replace(/\n/g, '<br><br>');
 
-      const chronicBanner = document.getElementById('chronic-friction-banner');
-      if (data.repeatingSnag && data.repeatingSnag.detected) {
-        chronicBanner.style.display = 'flex';
-        document.getElementById('chronic-badge-label').innerText = data.repeatingSnag.name || "REPEATING ISSUE";
-        document.getElementById('chronic-body-text').innerHTML = `<strong>Why it keeps coming up:</strong> ${data.repeatingSnag.explanation}`;
-      } else {
-        chronicBanner.style.display = 'none';
-      }
+      const banner = document.getElementById('chronic-friction-banner');
+      if (data.repeatingSnag?.detected) {
+        banner.style.display = 'flex';
+        document.getElementById('chronic-badge-label').innerText = data.repeatingSnag.name;
+        document.getElementById('chronic-body-text').innerHTML = `<strong>Why:</strong> ${data.repeatingSnag.explanation}`;
+      } else { banner.style.display = 'none'; }
 
-      // 1. Snags
-      const fList = document.getElementById('list-friction');
-      const snags = data.recurringSnags || [];
-      fList.innerHTML = snags.map(f => `
-        <li class="insight-item">
-          <div><strong>Problem:</strong> ${f}</div>
-          <div class="card-actions-row">
-            <button class="btn-card-action" onclick="generateActionPlan('Fix Problem', '${escapeQuotes(f)}')">
-              <span>Draft Solution Sheet</span> ↗
-            </button>
-          </div>
-        </li>
-      `).join('') || '<li class="insight-item">No repeating trouble detected.</li>';
-
-      // 2. Sparks
-      const bList = document.getElementById('list-bridges');
-      const sparks = data.connectedSparks || [];
-      bList.innerHTML = sparks.map(b => `
-        <div class="bridge-box">
-          <span class="bridge-link">${b.connection}</span>
-          <div>${b.idea}</div>
-          <div class="card-actions-row">
-            <button class="btn-card-action" onclick="generateActionPlan('Explore Connected Idea', '${escapeQuotes(b.connection + ': ' + b.idea)}')">
-              <span>Outline This Idea</span> ↗
-            </button>
-          </div>
-        </div>
-      `).join('') || '<div class="bridge-box">No connected sparks yet.</div>';
-
-      // 3. Work
-      const vList = document.getElementById('list-venture');
-      const work = data.workMoves || [];
-      vList.innerHTML = work.map(v => `
-        <li class="insight-item">
-          <div><strong>${v.step}:</strong> ${v.why}</div>
-          <div class="card-actions-row">
-            <button class="btn-card-action" onclick="generateActionPlan('Work Action Plan', '${escapeQuotes(v.step + ' - ' + v.why)}')">
-              <span>Draft 1-Page Plan</span> ↗
-            </button>
-            <button class="btn-card-action calendar" onclick="exportSingleEventICS('${escapeQuotes(v.step)}', '${escapeQuotes(v.why)}')">
-              <span>📅 Add to Calendar</span>
-            </button>
-          </div>
-        </li>
-      `).join('') || '<li class="insight-item">No immediate work steps.</li>';
-
-      // 4. Life
-      const lList = document.getElementById('list-life');
-      const life = data.lifeMoves || [];
-      lList.innerHTML = life.map(l => `
-        <li class="insight-item">
-          <div><strong>${l.step}:</strong> ${l.why}</div>
-          <div class="card-actions-row">
-            <button class="btn-card-action" onclick="generateActionPlan('Personal Plan', '${escapeQuotes(l.step + ' - ' + l.why)}')">
-              <span>Break Down Steps</span> ↗
-            </button>
-            <button class="btn-card-action calendar" onclick="exportSingleEventICS('${escapeQuotes(l.step)}', '${escapeQuotes(l.why)}')">
-              <span>📅 Add to Calendar</span>
-            </button>
-          </div>
-        </li>
-      `).join('') || '<li class="insight-item">Life and travel lists are clear.</li>';
+      document.getElementById('list-friction').innerHTML = (data.recurringSnags || []).map(f => `<li class="insight-item"><div>${f}</div><button class="btn-card-action" onclick="generateActionPlan('Fix', '${escapeQuotes(f)}')">Draft Solution ↗</button></li>`).join('') || '<li class="insight-item">None.</li>';
+      document.getElementById('list-bridges').innerHTML = (data.connectedSparks || []).map(b => `<div class="bridge-box"><span class="bridge-link">${b.connection}</span><div>${b.idea}</div><button class="btn-card-action" onclick="generateActionPlan('Idea', '${escapeQuotes(b.connection+': '+b.idea)}')">Outline ↗</button></div>`).join('') || '<div class="bridge-box">None.</div>';
+      document.getElementById('list-venture').innerHTML = (data.workMoves || []).map(w => `<li class="insight-item"><div><strong>${w.step}:</strong> ${w.why}</div><div class="card-actions-row"><button class="btn-card-action" onclick="generateActionPlan('Work', '${escapeQuotes(w.step)}')">Draft Plan ↗</button><button class="btn-card-action calendar" onclick="exportSingleEventICS('${escapeQuotes(w.step)}', '${escapeQuotes(w.why)}')">📅 Calendar</button></div></li>`).join('') || '<li class="insight-item">None.</li>';
+      document.getElementById('list-life').innerHTML = (data.lifeMoves || []).map(l => `<li class="insight-item"><div><strong>${l.step}:</strong> ${l.why}</div><div class="card-actions-row"><button class="btn-card-action" onclick="generateActionPlan('Life', '${escapeQuotes(l.step)}')">Break Down ↗</button><button class="btn-card-action calendar" onclick="exportSingleEventICS('${escapeQuotes(l.step)}', '${escapeQuotes(l.why)}')">📅 Calendar</button></div></li>`).join('') || '<li class="insight-item">None.</li>';
     }
 
-    function escapeQuotes(str) {
-      return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    }
+    function escapeQuotes(str) { return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
-    /* Ultra-Fast Synthesis Engine (gemini-3.8-flash with thinkingBudget: 0) */
+    /* Ultra-Fast Synthesis with Auto-Retry for High Demand Spikes */
     async function runHolisticSynthesis() {
       const apiKey = getKey();
-      if (!apiKey) {
-        alert("Please paste your Google AI key in the top bar, or click 'Use in Claude / ChatGPT' to copy the prompt for free.");
-        document.getElementById('top-gemini-key').focus();
-        return;
-      }
-
-      if (notes.length === 0) {
-        alert("Please jot down at least one thought on the left first.");
-        return;
-      }
+      if (!apiKey) { alert("Please paste your Google AI key in the top bar."); document.getElementById('top-gemini-key').focus(); return; }
+      if (notes.length === 0) { alert("Please add at least one note first."); return; }
 
       const promptText = compilePrompt();
       const btn = document.getElementById('btn-run-synth');
@@ -1884,510 +1514,165 @@ OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
 
       btn.disabled = true;
       const startTime = Date.now();
-      
       const timerInterval = setInterval(() => {
-        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        statusText.innerText = `Connecting thoughts (${elapsed}s)...`;
+        statusText.innerText = `Connecting thoughts (${((Date.now() - startTime)/1000).toFixed(1)}s)...`;
       }, 200);
 
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 18000);
 
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }],
-            generationConfig: {
-              response_mime_type: "application/json",
-              temperature: 0.1,
-              maxOutputTokens: 1024,
-              thinkingConfig: {
-                thinkingBudget: 0
+      async function attemptFetch(retryCount = 0) {
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: promptText }] }],
+              generationConfig: { response_mime_type: "application/json", temperature: 0.1, maxOutputTokens: 1024, thinkingConfig: { thinkingBudget: 0 } }
+            })
+          });
+          const json = await res.json();
+          if (json.error) {
+            // Check if it's a high demand overload error
+            if (json.error.code === 503 || json.error.message?.includes("high demand") || json.error.status === "RESOURCE_EXHAUSTED") {
+              if (retryCount < 1) {
+                statusText.innerText = `Server busy, retrying...`;
+                await new Promise(r => setTimeout(r, 2000));
+                return attemptFetch(retryCount + 1);
               }
             }
-          })
-        });
-
-        clearTimeout(timeoutId);
-        clearInterval(timerInterval);
-
-        const data = await response.json();
-        if (data.error) {
-          alert(`Google AI Notice: ${data.error.message}`);
-        } else if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-          const raw = data.candidates[0].content.parts[0].text;
-          const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-          const parsed = JSON.parse(clean);
-          renderDossier(parsed);
+            throw new Error(json.error.message);
+          }
+          return json;
+        } catch (err) {
+          throw err;
         }
+      }
+
+      try {
+        const data = await attemptFetch();
+        const raw = data.candidates[0].content.parts[0].text;
+        const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+        renderDossier(JSON.parse(clean));
       } catch (err) {
-        clearTimeout(timeoutId);
-        clearInterval(timerInterval);
-        if (err.name === 'AbortError') {
-          alert("Request timed out. Please check your internet connection or use Option 2: Copy Prompt.");
-        } else {
-          alert(`Could not complete review: ${err.message}`);
-        }
+        alert(`Synthesis failed due to high server demand: ${err.message}\n\nTip: Click 'Use in Claude / ChatGPT (Copy Prompt)' in the sidebar to run this instantly for free.`);
       } finally {
-        clearTimeout(timeoutId);
         clearInterval(timerInterval);
         btn.disabled = false;
         statusText.innerText = "Connect The Dots";
       }
     }
 
-    /* Fast Action Plan Drafter */
     async function generateActionPlan(title, context) {
       const modal = document.getElementById('draft-modal');
-      const titleEl = document.getElementById('draft-modal-title');
-      const labelEl = document.getElementById('draft-context-label');
+      document.getElementById('draft-modal-title').innerText = title.toUpperCase();
+      document.getElementById('draft-context-label').innerText = context;
       const outputEl = document.getElementById('draft-output-area');
-
-      titleEl.innerText = title.toUpperCase();
-      labelEl.innerText = context;
       outputEl.innerText = "Drafting practical steps...";
       modal.style.display = 'flex';
 
       const apiKey = getKey();
-      if (!apiKey) {
-        outputEl.innerText = `To draft this plan automatically, paste your Google AI key into the header bar.\n\nAlternatively, copy this prompt into Claude or ChatGPT:\n\n"Break down the following into a simple, grounded, 1-page action plan with step-by-step instructions and any ready-to-use message drafts:\n\n${context}"`;
-        return;
-      }
+      if (!apiKey) { outputEl.innerText = `Please paste your Google AI key in the top bar.`; return; }
 
-      const prompt = `You are a practical, grounded assistant.
-Take this specific goal or problem:
-"${context}"
-
-Draft a clear, human, immediately useful 1-page plan.
-Include:
-1. THE BOTTOM LINE: What needs to happen in 1-2 sentences.
-2. IMMEDIATE 3 STEPS: Concrete actions to do today or tomorrow.
-3. READY-TO-SEND DRAFT: If this involves a person/vendor, write a polite ready-to-send message. Otherwise, write a checklist of what to avoid.
-
-Strictly NO corporate buzzwords. Write plainly and directly.`;
-
+      const prompt = `Take this goal/problem: "${context}". Draft a short, grounded 1-page action plan with 3 immediate steps and a ready-to-send message if applicable. No buzzwords.`;
       const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$){apiKey}`;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 14000);
 
       try {
-        const response = await fetch(endpoint, {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.2,
-              maxOutputTokens: 800,
-              thinkingConfig: {
-                thinkingBudget: 0
-              }
-            }
-          })
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 600, thinkingConfig: { thinkingBudget: 0 } } })
         });
-
-        clearTimeout(timeoutId);
-        const data = await response.json();
-        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-          outputEl.innerText = data.candidates[0].content.parts[0].text;
-        } else {
-          outputEl.innerText = "Could not generate draft. Please try again.";
-        }
-      } catch (e) {
-        clearTimeout(timeoutId);
-        if (e.name === 'AbortError') {
-          outputEl.innerText = "Request timed out. Please try again.";
-        } else {
-          outputEl.innerText = "Error contacting AI: " + e.message;
-        }
-      }
+        const data = await res.json();
+        outputEl.innerText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate draft.";
+      } catch (e) { outputEl.innerText = "Error: " + e.message; }
     }
 
-    function closeDraftModal() {
-      document.getElementById('draft-modal').style.display = 'none';
-    }
-
+    function closeDraftModal() { document.getElementById('draft-modal').style.display = 'none'; }
     function copyDraftText(btn) {
-      const text = document.getElementById('draft-output-area').innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        const orig = btn.innerText;
-        btn.innerText = "Copied!";
-        setTimeout(() => btn.innerText = orig, 1500);
+      navigator.clipboard.writeText(document.getElementById('draft-output-area').innerText).then(() => {
+        const orig = btn.innerText; btn.innerText = "Copied!"; setTimeout(() => btn.innerText = orig, 1500);
       });
     }
 
-    /* Calendar (.ICS) & Task Export */
-    function formatICSDate(date) {
-      const pad = (n) => (n < 10 ? '0' + n : n);
-      return (
-        date.getUTCFullYear() +
-        pad(date.getUTCMonth() + 1) +
-        pad(date.getUTCDate()) +
-        'T' +
-        pad(date.getUTCHours()) +
-        pad(date.getUTCMinutes()) +
-        pad(date.getUTCSeconds()) +
-        'Z'
-      );
+    /* ICS & Vault Helpers */
+    function formatICSDate(d) {
+      const pad = n => n < 10 ? '0' + n : n;
+      return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
     }
-
-    function escapeICS(str) {
-      return (str || '')
-        .replace(/\\/g, '\\\\')
-        .replace(/;/g, '\\;')
-        .replace(/,/g, '\\,')
-        .replace(/\n/g, '\\n');
-    }
-
     function downloadFile(content, filename, type) {
       const blob = new Blob([content], { type });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     }
-
-    function exportSingleEventICS(title, description) {
-      const now = new Date();
-      const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 10, 0, 0);
-      const endDate = new Date(startDate.getTime() + 45 * 60 * 1000);
-
-      const icsData = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//3Sci Labs//Panorama Synthesizer//EN',
-        'CALSCALE:GREGORIAN',
-        'METHOD:PUBLISH',
-        'BEGIN:VEVENT',
-        `UID:${Date.now()}@3sci.panorama`,
-        `DTSTAMP:${formatICSDate(now)}`,
-        `DTSTART:${formatICSDate(startDate)}`,
-        `DTEND:${formatICSDate(endDate)}`,
-        `SUMMARY:${escapeICS('Focus: ' + title)}`,
-        `DESCRIPTION:${escapeICS(description + '\n\nOrganized by Panorama from 3Sci Labs')}`,
-        'STATUS:CONFIRMED',
-        'END:VEVENT',
-        'END:VCALENDAR'
-      ].join('\r\n');
-
-      const safeTitle = (title || 'Action').replace(/[^a-zA-Z0-9]/g, '_').slice(0, 25);
-      downloadFile(icsData, `Focus_${safeTitle}.ics`, 'text/calendar;charset=utf-8');
+    function exportSingleEventICS(title, desc) {
+      const now = new Date(), start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 10, 0, 0), end = new Date(start.getTime() + 45*60000);
+      const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'BEGIN:VEVENT', `DTSTAMP:${formatICSDate(now)}`, `DTSTART:${formatICSDate(start)}`, `DTEND:${formatICSDate(end)}`, `SUMMARY:Focus: ${title}`, `DESCRIPTION:${desc}`, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+      downloadFile(ics, `Focus.ics`, 'text/calendar');
     }
-
     function exportFullCalendarICS() {
-      if (!currentDossier) {
-        alert("Please click 'Connect The Dots' first to generate your action moves.");
-        return;
-      }
-
-      const allMoves = [];
-      (currentDossier.workMoves || []).forEach(w => allMoves.push({ type: 'Work Project', title: w.step, why: w.why }));
-      (currentDossier.lifeMoves || []).forEach(l => allMoves.push({ type: 'Personal & Life', title: l.step, why: l.why }));
-
-      if (allMoves.length === 0) {
-        alert("No action moves available to export.");
-        return;
-      }
-
-      const now = new Date();
-      const events = [];
-
-      allMoves.forEach((move, idx) => {
-        const dayOffset = Math.floor(idx / 2) + 1;
-        const hour = (idx % 2 === 0) ? 10 : 14;
-        
-        const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dayOffset, hour, 0, 0);
-        const endDate = new Date(startDate.getTime() + 45 * 60 * 1000);
-
-        events.push([
-          'BEGIN:VEVENT',
-          `UID:${Date.now()}_${idx}@3sci.panorama`,
-          `DTSTAMP:${formatICSDate(now)}`,
-          `DTSTART:${formatICSDate(startDate)}`,
-          `DTEND:${formatICSDate(endDate)}`,
-          `SUMMARY:${escapeICS(`[${move.type}]${move.title}`)}`,
-          `DESCRIPTION:${escapeICS(`${move.why}\n\nGenerated by Panorama from 3Sci Labs`)}`,
-          'STATUS:CONFIRMED',
-          'END:VEVENT'
-        ].join('\r\n'));
+      if (!currentDossier) { alert("Run Connect The Dots first."); return; }
+      const now = new Date(); let events = [];
+      (currentDossier.workMoves || []).forEach((w, i) => {
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + Math.floor(i/2) + 1, (i%2===0?10:14), 0, 0), end = new Date(start.getTime() + 45*60000);
+        events.push(['BEGIN:VEVENT', `DTSTAMP:${formatICSDate(now)}`, `DTSTART:${formatICSDate(start)}`, `DTEND:${formatICSDate(end)}`, `SUMMARY:[Work] ${w.step}`, `DESCRIPTION:${w.why}`, 'END:VEVENT'].join('\r\n'));
       });
-
-      const icsData = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//3Sci Labs//Panorama Synthesizer//EN',
-        'CALSCALE:GREGORIAN',
-        'METHOD:PUBLISH',
-        ...events,
-        'END:VCALENDAR'
-      ].join('\r\n');
-
-      const dateTag = new Date().toISOString().slice(0, 10);
-      downloadFile(icsData, `Panorama_Schedule_${dateTag}.ics`, 'text/calendar;charset=utf-8');
+      const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', ...events, 'END:VCALENDAR'].join('\r\n');
+      downloadFile(ics, `Panorama_Schedule.ics`, 'text/calendar');
     }
-
     function copyTaskChecklist(btn) {
-      if (!currentDossier) {
-        alert("Please click 'Connect The Dots' first to create your task list.");
-        return;
-      }
-
-      const lines = [
-        `# Action Checklist: ${currentDossier.theme || 'Weekly Focus'}`,
-        `Generated: ${new Date().toLocaleDateString()}`,
-        '',
-        '## Work & Projects'
-      ];
-
-      (currentDossier.workMoves || []).forEach(w => {
-        lines.push(`- [ ] ${w.step} — ${w.why}`);
-      });
-
-      lines.push('', '## Personal, Travel & Errands');
-      (currentDossier.lifeMoves || []).forEach(l => {
-        lines.push(`- [ ] ${l.step} — ${l.why}`);
-      });
-
-      if (currentDossier.repeatingSnag?.detected) {
-        lines.push('', '## Repeating Trouble to Fix');
-        lines.push(`- [ ] Systemic Fix: ${currentDossier.repeatingSnag.explanation}`);
-      }
-
-      navigator.clipboard.writeText(lines.join('\n')).then(() => {
-        const orig = btn.innerText;
-        btn.innerText = "Copied Todo List!";
-        setTimeout(() => btn.innerText = orig, 1800);
-      });
+      if (!currentDossier) { alert("Run Connect The Dots first."); return; }
+      const lines = [`# Action Checklist`, '## Work'];
+      (currentDossier.workMoves || []).forEach(w => lines.push(`- [ ] ${w.step}`));
+      lines.push('## Life');
+      (currentDossier.lifeMoves || []).forEach(l => lines.push(`- [ ] ${l.step}`));
+      navigator.clipboard.writeText(lines.join('\n')).then(() => { const o = btn.innerText; btn.innerText = "Copied Checklist!"; setTimeout(() => btn.innerText = o, 1500); });
     }
 
-    /* Vault (Backup & Restore) */
-    function openVaultModal() {
-      document.getElementById('vault-modal').style.display = 'flex';
-    }
-
-    function closeVaultModal() {
-      document.getElementById('vault-modal').style.display = 'none';
-    }
-
+    function openVaultModal() { document.getElementById('vault-modal').style.display = 'flex'; }
+    function closeVaultModal() { document.getElementById('vault-modal').style.display = 'none'; }
     function downloadVaultBackup() {
-      const vaultData = {
-        app: "Panorama from 3Sci Labs",
-        version: "3.8",
-        exportedAt: new Date().toISOString(),
-        notes: notes,
-        activeDossier: currentDossier,
-        history: JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]'),
-        northStar: localStorage.getItem('3sci_panorama_north_star') || ''
-      };
-
-      const dateStr = new Date().toISOString().slice(0, 10);
-      downloadFile(JSON.stringify(vaultData, null, 2), `Panorama_Vault_Backup_${dateStr}.json`, 'application/json');
+      const data = { notes, activeDossier: currentDossier, history: JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]'), northStar: localStorage.getItem('3sci_panorama_north_star') || '' };
+      downloadFile(JSON.stringify(data, null, 2), `Panorama_Backup.json`, 'application/json');
     }
-
     function handleVaultFileSelect(e) {
-      const file = e.target.files[0];
-      if (file) processVaultFile(file);
-    }
-
-    function handleVaultDrop(e) {
-      e.preventDefault();
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        processVaultFile(e.dataTransfer.files[0]);
-      }
-    }
-
-    function processVaultFile(file) {
-      const reader = new FileReader();
-      reader.onload = function(evt) {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = (evt) => {
         try {
-          const data = JSON.parse(evt.target.result);
-          if (!data.notes && !data.history) {
-            alert("Unrecognized file format. Please provide a valid Panorama Vault JSON.");
-            return;
-          }
-
-          if (confirm(`Restore vault backup from ${data.exportedAt ? data.exportedAt.slice(0, 10) : 'file'}?\n\n- Active thoughts: ${data.notes?.length || 0}\n- Past archived weeks: ${data.history?.length || 0}`)) {
-            if (data.notes) {
-              notes = data.notes;
-              localStorage.setItem('3sci_panorama_notes', JSON.stringify(notes));
-            }
-            if (data.history) {
-              localStorage.setItem('3sci_panorama_history', JSON.stringify(data.history));
-            }
-            if (data.activeDossier) {
-              currentDossier = data.activeDossier;
-              localStorage.setItem('3sci_panorama_active_dossier', JSON.stringify(currentDossier));
-              renderDossier(currentDossier);
-            }
-            if (data.northStar) {
-              localStorage.setItem('3sci_panorama_north_star', data.northStar);
-              document.getElementById('north-star-input').value = data.northStar;
-            }
-
-            renderNotes();
-            updateTelemetry();
-            closeVaultModal();
-            alert("Vault restored successfully!");
-          }
-        } catch (err) {
-          alert("Error reading JSON file: " + err.message);
-        }
+          const d = JSON.parse(evt.target.result);
+          if (d.notes) notes = d.notes;
+          if (d.history) localStorage.setItem('3sci_panorama_history', JSON.stringify(d.history));
+          if (d.northStar) localStorage.setItem('3sci_panorama_north_star', d.northStar);
+          saveNotes(); closeVaultModal(); alert("Vault restored!");
+        } catch(err) { alert("Invalid backup file."); }
       };
-      reader.readAsText(file);
-    }
-
-    /* Archive & History */
-    function loadExternalJson() {
-      const raw = document.getElementById('external-json-input').value.trim();
-      if (!raw) return;
-      try {
-        const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
-        const parsed = JSON.parse(clean);
-        renderDossier(parsed);
-        document.getElementById('external-json-input').value = '';
-        alert("Loaded successfully!");
-      } catch (e) {
-        alert("Could not read JSON. Make sure you copied valid text.");
-      }
+      r.readAsText(f);
     }
 
     function archiveWeekAndStartFresh() {
-      if (notes.length === 0 && !currentDossier) {
-        alert("Nothing to archive yet.");
-        return;
-      }
-
-      const themeLabel = currentDossier ? currentDossier.theme : "Past Week";
-      if (!confirm(`Save this week ("${themeLabel}") to your archive?\n\n- All notes and the summary will be saved to your history.\n- Any open errands or work steps will automatically copy over into next week's scratchpad so you don't lose track of them.`)) {
-        return;
-      }
-
+      if (notes.length === 0 && !currentDossier) return;
+      if (!confirm("Archive this week and start fresh?")) return;
       const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
-      const archiveRecord = {
-        id: Date.now(),
-        date: new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }),
-        theme: themeLabel,
-        summary: currentDossier?.summary || "No summary run.",
-        notesCount: notes.length,
-        notes: [...notes],
-        dossier: currentDossier
-      };
-      history.unshift(archiveRecord);
+      history.unshift({ id: Date.now(), date: new Date().toLocaleDateString(), theme: currentDossier?.theme || "Week", summary: currentDossier?.summary || "", notes: [...notes], dossier: currentDossier });
       localStorage.setItem('3sci_panorama_history', JSON.stringify(history));
-
-      let carriedItems = [];
-      if (currentDossier) {
-        if (currentDossier.lifeMoves) {
-          currentDossier.lifeMoves.forEach(item => {
-            carriedItems.push({
-              id: Date.now() + Math.random(),
-              tag: 'personal',
-              text: `[Carried from last week]: ${item.step}`,
-              date: 'Pinned'
-            });
-          });
-        }
-        if (currentDossier.workMoves) {
-          currentDossier.workMoves.forEach(item => {
-            carriedItems.push({
-              id: Date.now() + Math.random(),
-              tag: 'work',
-              text: `[Carried from last week]: ${item.step}`,
-              date: 'Pinned'
-            });
-          });
-        }
-      }
-
-      notes = carriedItems;
-      currentDossier = null;
-      localStorage.removeItem('3sci_panorama_active_dossier');
-      saveNotes();
-
-      document.getElementById('dossier-eyebrow').innerText = "The Full Picture";
-      document.getElementById('dossier-theme').innerText = "Fresh Week Started";
-      document.getElementById('dossier-narrative').innerText = "Past week saved to archive. Open items were carried over into your scratchpad on the left. Ready for new thoughts.";
-      document.getElementById('chronic-friction-banner').style.display = 'none';
-      document.getElementById('list-friction').innerHTML = '<li class="insight-item">No snags recorded yet this week.</li>';
-      document.getElementById('list-bridges').innerHTML = '<div class="bridge-box"><span class="bridge-link">Connected Idea</span><span>Waiting for new thoughts to link.</span></div>';
-      document.getElementById('list-venture').innerHTML = '<li class="insight-item">Work list ready for Monday.</li>';
-      document.getElementById('list-life').innerHTML = '<li class="insight-item">Personal list clean and ready.</li>';
-
-      alert("Week saved! Open items have been pinned to your scratchpad.");
+      notes = []; currentDossier = null; localStorage.removeItem('3sci_panorama_active_dossier');
+      saveNotes(); alert("Week archived successfully.");
     }
 
     function openHistoryModal() {
       const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
-      const container = document.getElementById('history-content');
-
-      if (history.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">No past weeks saved yet. Click "Finish Week & Start Fresh" at the end of the week to save snapshots.</div>`;
-      } else {
-        container.innerHTML = history.map((h) => `
-          <div class="history-card">
-            <div style="display:flex; justify-content:space-between; align-items:baseline;">
-              <strong style="color:var(--primary); font-size:14px;">${h.theme}</strong>
-              <span style="font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;">${h.date} (${h.notesCount} thoughts)</span>
-            </div>
-            <p style="font-size:12px; color:var(--text-secondary); line-height:1.45;">${h.summary ? h.summary.slice(0, 190) + '...' : 'Saved snapshot'}</p>
-            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
-              <button class="btn-action" style="padding:4px 10px; font-size:11px;" onclick="restoreHistoricalDossier(${h.id})">View This Week</button>
-            </div>
-          </div>
-        `).join('');
-      }
-
+      document.getElementById('history-content').innerHTML = history.length === 0 ? '<div style="text-align:center;padding:20px;color:var(--text-muted)">No past weeks saved.</div>' : history.map(h => `<div class="history-card"><strong>${h.theme}</strong><span style="font-size:11px;color:var(--text-muted)">${h.date}</span><p style="font-size:12px;">${h.summary}</p></div>`).join('');
       document.getElementById('history-modal').style.display = 'flex';
     }
-
-    function closeHistoryModal() {
-      document.getElementById('history-modal').style.display = 'none';
+    function closeHistoryModal() { document.getElementById('history-modal').style.display = 'none'; }
+    function exportDossierMarkdown() {
+      if (!currentDossier) { alert("Run Connect The Dots first."); return; }
+      const md = `# PANORAMA SUMMARY\n\n## Summary\n${currentDossier.summary}\n\n## Work Moves\n${(currentDossier.workMoves||[]).map(w=>`- ${w.step}`).join('\n')}`;
+      downloadFile(md, `Panorama_Summary.md`, 'text/markdown');
     }
 
-    function restoreHistoricalDossier(archiveId) {
-      const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
-      const target = history.find(h => h.id === archiveId);
-      if (target && target.dossier) {
-        renderDossier(target.dossier);
-        document.getElementById('dossier-status-pill').innerText = `PAST: ${target.date}`;
-        document.getElementById('history-modal').style.display = 'none';
-      }
-    }
-
-    /* Hotkeys & Init */
-    document.getElementById('note-input').addEventListener('keydown', function(e) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        e.preventDefault();
-        addNote();
-      }
-    });
-
-    window.addEventListener('keydown', function(e) {
-      if (e.altKey && (e.key === 'v' || e.key === 'V')) {
-        e.preventDefault();
-        toggleVoiceDictation();
-      }
-    });
-
-    window.onload = function() {
-      checkSecurityLock();
-      const savedKey = localStorage.getItem('3sci_panorama_key') || '';
-      if (savedKey) document.getElementById('top-gemini-key').value = savedKey;
-      loadNotes();
-
-      if (!localStorage.getItem('3sci_panorama_tour_seen')) {
-        setTimeout(openWizardModal, 600);
-      }
-    };
+    document.getElementById('note-input').addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); addNote(); } });
+    window.onload = () => { checkSecurityLock(); const k = localStorage.getItem('3sci_panorama_key'); if(k) document.getElementById('top-gemini-key').value = k; loadNotes(); if(!localStorage.getItem('3sci_panorama_tour_seen')) setTimeout(openWizardModal, 500); };
   </script>
 </body>
 </html>
