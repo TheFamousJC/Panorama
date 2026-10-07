@@ -1170,9 +1170,7 @@
         <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;" id="wizard-title">WELCOME TO PANORAMA</strong>
         <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="closeWizardModal()">Close</button>
       </div>
-      <div class="modal-body" id="wizard-body">
-        <!-- Wizard step injected by JS -->
-      </div>
+      <div class="modal-body" id="wizard-body"></div>
       <div style="padding:12px 20px; background:#f8fafc; border-top:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
         <span style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--text-muted);" id="wizard-step-counter">Step 1 of 4</span>
         <div style="display:flex; gap:6px;">
@@ -1230,14 +1228,14 @@
         <div class="faq-item">
           <div class="faq-q">Do I need to pay for Google Gemini?</div>
           <div class="faq-a">
-            No. Google AI Studio provides a free Gemini API key for personal prototyping. Simply click "Get Free Key ↗" in the top bar, copy your key, and paste it once into the top bar. Panorama uses `gemini-3.8-flash` which is fast and completely free under normal personal limits.
+            No. Google AI Studio provides a free Gemini API key for personal prototyping. Simply click "Get Free Key ↗" in the top bar, copy your key, and paste it once into the top bar. Panorama runs on the high-speed Flash tier which is fast and completely free under normal personal limits.
           </div>
         </div>
 
         <div class="faq-item">
           <div class="faq-q">Can I use this without any API key at all?</div>
           <div class="faq-a">
-            Yes! Click "Use in Claude / ChatGPT (Copy Prompt)". It compiles all your active thoughts into a perfectly formatted request that you can paste directly into Claude, ChatGPT, or any other assistant for free. Then paste the reply back in to display it visually.
+            Yes! Click "Use in Claude / ChatGPT (Copy Prompt)". It compiles all your active thoughts into a formatted request that you can paste directly into Claude, ChatGPT, or any other assistant for free. Then paste the reply back in to display it visually.
           </div>
         </div>
 
@@ -1326,16 +1324,13 @@
       { id: 5, tag: 'spark', text: "Holiday planning and project troubleshooting have the same problem: too many disconnected apps and no single overview.", date: "Friday 08:50" }
     ];
 
-    /* -------------------------------------------------------------
-       SECURITY PIN LOCK SYSTEM
-       ------------------------------------------------------------- */
+    /* Security PIN Lock System */
     function checkSecurityLock() {
       const pin = localStorage.getItem('3sci_panorama_pin');
       const lockBtn = document.getElementById('btn-lock-status');
       
       if (pin && pin.trim().length >= 4) {
         lockBtn.innerHTML = `<span>🔒 PIN Active</span>`;
-        // Show lock screen on startup
         document.getElementById('pin-lock-screen').style.display = 'flex';
         document.getElementById('app-layout-main').classList.add('locked');
         setTimeout(() => document.getElementById('pin-entry-input').focus(), 100);
@@ -1400,9 +1395,7 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       EXPLANATORY ONBOARDING WIZARD
-       ------------------------------------------------------------- */
+    /* Explanatory Onboarding Wizard */
     const WIZARD_STEPS = [
       {
         badge: "STEP 1 OF 4",
@@ -1475,9 +1468,7 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       FAQ & USER GUIDE
-       ------------------------------------------------------------- */
+    /* FAQ & User Guide */
     function openFaqModal() {
       document.getElementById('faq-modal').style.display = 'flex';
     }
@@ -1486,9 +1477,7 @@
       document.getElementById('faq-modal').style.display = 'none';
     }
 
-    /* -------------------------------------------------------------
-       CORE LOGIC, VOICE & STORAGE
-       ------------------------------------------------------------- */
+    /* Voice Capture */
     function initSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return null;
@@ -1550,6 +1539,7 @@
       }
     }
 
+    /* Storage & Telemetry */
     function selectTag(tag) {
       activeTag = tag;
       document.querySelectorAll('.tag-chip').forEach(el => {
@@ -1890,6 +1880,7 @@ JSON STRUCTURE:
       return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
+    /* Fast Synthesis Engine */
     async function runHolisticSynthesis() {
       const apiKey = getKey();
       if (!apiKey) {
@@ -1908,17 +1899,30 @@ JSON STRUCTURE:
       const statusText = document.getElementById('synth-status');
 
       btn.disabled = true;
-      statusText.innerText = "Connecting thoughts (Gemini 3.8 Flash)...";
+      statusText.innerText = "Analyzing notes...";
+
+      // Targeted high-speed flash endpoint
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s safety limit
 
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
             contents: [{ parts: [{ text: promptText }] }],
-            generationConfig: { response_mime_type: "application/json" }
+            generationConfig: {
+              response_mime_type: "application/json",
+              temperature: 0.2,
+              maxOutputTokens: 2048
+            }
           })
         });
+
+        clearTimeout(timeoutId);
 
         const data = await response.json();
         if (data.error) {
@@ -1930,14 +1934,20 @@ JSON STRUCTURE:
           renderDossier(parsed);
         }
       } catch (err) {
-        alert(`Could not complete review: ${err.message}`);
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          alert("Request timed out. Please check your connection or use the external copy prompt option.");
+        } else {
+          alert(`Could not complete review: ${err.message}`);
+        }
       } finally {
+        clearTimeout(timeoutId);
         btn.disabled = false;
         statusText.innerText = "Connect The Dots";
       }
     }
 
-    /* Action Draft Generator */
+    /* Fast Action Draft Generator */
     async function generateActionPlan(title, context) {
       const modal = document.getElementById('draft-modal');
       const titleEl = document.getElementById('draft-modal-title');
@@ -1951,7 +1961,7 @@ JSON STRUCTURE:
 
       const apiKey = getKey();
       if (!apiKey) {
-        outputEl.innerText = `To draft this plan automatically, please paste your Google AI key into the top header bar.\n\nAlternatively, you can copy this prompt into Claude or ChatGPT:\n\n"Break down the following item into a simple, grounded, 1-page action plan with step-by-step instructions and any ready-to-use message drafts:\n\n${context}"`;
+        outputEl.innerText = `To draft this plan automatically, please paste your Google AI key into the top header bar.\n\nAlternatively, copy this prompt into Claude or ChatGPT:\n\n"Break down the following item into a simple, grounded, 1-page action plan with step-by-step instructions and any ready-to-use message drafts:\n\n${context}"`;
         return;
       }
 
@@ -1967,15 +1977,25 @@ Include:
 
 Strictly NO corporate buzzwords, NO business school fluff. Write plainly and directly.`;
 
+      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$){apiKey}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       try {
-        const response = await fetch(`[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$){apiKey}`, {
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 1024
+            }
           })
         });
 
+        clearTimeout(timeoutId);
         const data = await response.json();
         if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
           outputEl.innerText = data.candidates[0].content.parts[0].text;
@@ -1983,7 +2003,12 @@ Strictly NO corporate buzzwords, NO business school fluff. Write plainly and dir
           outputEl.innerText = "Could not generate draft. Please try again.";
         }
       } catch (e) {
-        outputEl.innerText = "Error contacting AI: " + e.message;
+        clearTimeout(timeoutId);
+        if (e.name === 'AbortError') {
+          outputEl.innerText = "Draft request timed out. Please try again or copy the prompt into Claude/ChatGPT.";
+        } else {
+          outputEl.innerText = "Error contacting AI: " + e.message;
+        }
       }
     }
 
@@ -2363,7 +2388,6 @@ Strictly NO corporate buzzwords, NO business school fluff. Write plainly and dir
       if (savedKey) document.getElementById('top-gemini-key').value = savedKey;
       loadNotes();
 
-      // Auto-trigger tour on brand-new setup
       if (!localStorage.getItem('3sci_panorama_tour_seen')) {
         setTimeout(openWizardModal, 600);
       }
