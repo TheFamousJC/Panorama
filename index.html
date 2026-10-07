@@ -148,7 +148,7 @@
       user-select: none;
     }
 
-    /* Left Sidebar: Scratchpad */
+    /* Left Sidebar */
     .scratchpad-sidebar {
       background: #ffffff;
       border-right: 1.5px solid var(--card-border);
@@ -269,7 +269,7 @@
       100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
 
-    /* Filter & Search Bar */
+    /* Filter & Search */
     .feed-controls {
       display: flex;
       flex-direction: column;
@@ -809,7 +809,7 @@
       width: 100%;
     }
 
-    /* Guide & FAQ Modal Styles */
+    /* Guide & FAQ */
     .faq-item {
       background: #f8fafc;
       border: 1px solid var(--card-border);
@@ -1114,7 +1114,7 @@
     </div>
   </div>
 
-  <!-- PIN LOCK OVERLAY (Security Screen) -->
+  <!-- PIN LOCK OVERLAY -->
   <div class="pin-lock-overlay" id="pin-lock-screen">
     <div class="pin-box">
       <div style="font-size:32px;">🔐</div>
@@ -1706,7 +1706,7 @@
       `).join('');
     }
 
-    /* Fast, Concise Prompt Builder */
+    /* Fast, Crisp Prompt Builder */
     function compilePrompt() {
       const notesDump = notes.map((n, i) => `[Thought ${i+1}] (${n.tag.toUpperCase()} - ${n.date}): ${n.text}`).join('\n');
       
@@ -1718,9 +1718,8 @@
         historyContext = recentArchives.map((h) => `[Past Week: ${h.theme}] Snags: ${(h.dossier?.recurringSnags || []).join('; ') || 'None'}`).join('\n');
       }
 
-      const prompt = `You are a trusted, grounded thinking partner. Review all notes simultaneously.
-Produce concise, highly actionable JSON.
-CRITICAL FOR SPEED: Keep sentences crisp and short. No fluff, no essays, no buzzwords.
+      const prompt = `You are a trusted, grounded thinking partner. Review all thoughts simultaneously.
+CRITICAL INSTRUCTION: Return tight, concise, punchy JSON. No long essays. Zero buzzwords.
 
 PAST WEEKS HISTORY:
 ${historyContext}
@@ -1731,7 +1730,7 @@ ${notesDump}
 OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
 {
   "theme": "Sharp 4-6 word title",
-  "summary": "Exactly 2 concise sentences summarizing where focus went and what needs clearing.",
+  "summary": "Exactly 2 short sentences summarizing the week.",
   "repeatingSnag": {
     "detected": true,
     "name": "Short name",
@@ -1744,7 +1743,7 @@ OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
   "connectedSparks": [
     {
       "connection": "Note A + Note B",
-      "idea": "One crisp sentence explaining how these link into a smart shortcut."
+      "idea": "One crisp sentence explaining the smart connection."
     }
   ],
   "workMoves": [
@@ -1865,7 +1864,7 @@ OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
       return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
-    /* High-Speed Synthesis Engine */
+    /* Ultra-Fast Synthesis Engine (gemini-3.8-flash with thinkingBudget: 0) */
     async function runHolisticSynthesis() {
       const apiKey = getKey();
       if (!apiKey) {
@@ -1891,9 +1890,7 @@ OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
         statusText.innerText = `Connecting thoughts (${elapsed}s)...`;
       }, 200);
 
-      // gemini-1.5-flash is the fastest endpoint on Google AI Studio with zero thinking overhead
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 18000);
 
@@ -1907,7 +1904,10 @@ OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
             generationConfig: {
               response_mime_type: "application/json",
               temperature: 0.1,
-              maxOutputTokens: 1024
+              maxOutputTokens: 1024,
+              thinkingConfig: {
+                thinkingBudget: 0
+              }
             }
           })
         });
@@ -1940,7 +1940,7 @@ OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
       }
     }
 
-    /* High-Speed Action Plan Drafter */
+    /* Fast Action Plan Drafter */
     async function generateActionPlan(title, context) {
       const modal = document.getElementById('draft-modal');
       const titleEl = document.getElementById('draft-modal-title');
@@ -1970,9 +1970,9 @@ Include:
 
 Strictly NO corporate buzzwords. Write plainly and directly.`;
 
-      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){apiKey}`;
+      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$){apiKey}`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const timeoutId = setTimeout(() => controller.abort(), 14000);
 
       try {
         const response = await fetch(endpoint, {
@@ -1983,7 +1983,10 @@ Strictly NO corporate buzzwords. Write plainly and directly.`;
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
               temperature: 0.2,
-              maxOutputTokens: 800
+              maxOutputTokens: 800,
+              thinkingConfig: {
+                thinkingBudget: 0
+              }
             }
           })
         });
