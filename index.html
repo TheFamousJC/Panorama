@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panorama from 3Sci Labs | Daily Thoughts & Ideas Synthesizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --card-border: #cbd5e1;
+      --card-border-subtle: #e2e8f0;
+      
+      --primary: #0f172a;
+      --primary-accent: #1e3a8a;
+      --primary-blue: #2563eb;
+      --blue-subtle: #eff6ff;
+      
+      --accent-purple: #7c3aed;
+      --purple-subtle: #f5f3ff;
+      --accent-rose: #e11d48;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      
+      --text: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --dark-header: #090e17;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Command Bar */
+    header {
+      background: var(--dark-header);
+      border-bottom: 1px solid #1e293b;
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand-group { display: flex; align-items: center; gap: 12px; }
+    .brand-logo-frame {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .brand-logo { height: 26px; width: auto; object-fit: contain; }
+    .brand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-tag { font-size: 10.5px; font-weight: 600; color: #94a3b8; }
+
+    .top-api-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #131d2e;
+      border: 1px solid #24344d;
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
+    .top-api-label { font-size: 11px; font-weight: 700; color: #38bdf8; white-space: nowrap; }
+    .top-api-input {
+      background: #090e17;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 11.5px;
+      padding: 4px 8px;
+      width: 170px;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .top-api-input:focus { border-color: #38bdf8; }
+    .top-api-link { font-size: 10.5px; color: #93c5fd; text-decoration: none; white-space: nowrap; }
+    .top-api-link:hover { text-decoration: underline; }
+
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .btn-action {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      padding: 6px 11px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .btn-action:hover { background: #334155; border-color: #64748b; color: #fff; }
+    .btn-action-accent {
+      background: #2563eb;
+      color: #ffffff;
+      border: 1px solid #3b82f6;
+    }
+    .btn-action-accent:hover { background: #1d4ed8; border-color: #60a5fa; color: #fff; }
+    .btn-action-lock {
+      background: #1e1b4b;
+      color: #c7d2fe;
+      border: 1px solid #4338ca;
+    }
+    .btn-action-lock:hover { background: #312e81; color: #fff; }
+
+    /* Layout */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      flex-grow: 1;
+      min-height: calc(100vh - 54px);
+      transition: filter 0.3s ease;
+    }
+    .app-layout.locked {
+      filter: blur(8px) grayscale(50%);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Left Sidebar: Scratchpad */
+    .scratchpad-sidebar {
+      background: #ffffff;
+      border-right: 1.5px solid var(--card-border);
+      padding: 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: calc(100vh - 54px);
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--primary-accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .quick-entry-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1.5px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .entry-textarea {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 13px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+      outline: none;
+      line-height: 1.45;
+    }
+    .entry-textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
+
+    .tag-row {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .tag-chip {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--card-border);
+      background: #ffffff;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .tag-chip.active {
+      background: var(--primary-accent);
+      border-color: var(--primary-accent);
+      color: #ffffff;
+    }
+
+    .entry-button-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn-add-entry {
+      flex: 1;
+      background: var(--primary-accent);
+      color: #ffffff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .btn-add-entry:hover { background: #172554; }
+
+    /* Voice Button */
+    .btn-voice {
+      background: #ffffff;
+      color: var(--primary-blue);
+      border: 1px solid var(--card-border);
+      padding: 7px 11px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .btn-voice:hover { background: var(--blue-subtle); border-color: var(--primary-blue); }
+    .btn-voice.recording {
+      background: #fef2f2;
+      border-color: #ef4444;
+      color: #ef4444;
+      animation: pulseRecord 1.5s infinite;
+    }
+    @keyframes pulseRecord {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Filter & Search Bar */
+    .feed-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .feed-search-input {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      outline: none;
+      font-family: inherit;
+    }
+    .feed-search-input:focus { border-color: var(--primary-blue); }
+    .filter-pills {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .filter-pill {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      color: var(--text-muted);
+      border: 1px solid var(--card-border-subtle);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .filter-pill.active {
+      background: #e2e8f0;
+      color: var(--text);
+      border-color: #cbd5e1;
+    }
+
+    /* Note Feed */
+    .stream-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2px;
+    }
+    .stream-count {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stream-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      max-height: 230px;
+      padding-right: 4px;
+    }
+    .stream-item {
+      background: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-left: 3.5px solid var(--primary-blue);
+      border-radius: 6px;
+      padding: 9px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stream-item.annoyance { border-left-color: var(--accent-rose); }
+    .stream-item.work { border-left-color: var(--primary-blue); }
+    .stream-item.personal { border-left-color: var(--accent-emerald); }
+    .stream-item.question { border-left-color: var(--accent-amber); }
+    .stream-item.chores { border-left-color: #0ea5e9; }
+    .stream-item.spark { border-left-color: var(--accent-purple); }
+
+    .stream-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stream-tag {
+      font-size: 8.5px;
+      font-weight: 800;
+      padding: 1.5px 5px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+    .stream-text {
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+    .btn-del-note {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 2px;
+    }
+    .btn-del-note:hover { color: #ef4444; }
+
+    /* Bottom Action Controls */
+    .synthesis-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      border-top: 1.5px solid var(--card-border);
+      padding-top: 12px;
+      margin-top: auto;
+    }
+    .btn-synthesize-ai {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      border: none;
+      padding: 11px 14px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      transition: opacity 0.15s;
+    }
+    .btn-synthesize-ai:hover { opacity: 0.94; }
+    .btn-synthesize-ai:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-rollover {
+      background: #eff6ff;
+      color: #1e3a8a;
+      border: 1px solid #bfdbfe;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-rollover:hover { background: #dbeafe; }
+
+    .btn-copy-prompt {
+      background: #ffffff;
+      color: var(--text-secondary);
+      border: 1px solid var(--card-border);
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-copy-prompt:hover { background: #f8fafc; color: var(--text); }
+
+    /* Prompt Drawer */
+    .prompt-studio {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 10px;
+    }
+    .prompt-preview {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 8px;
+      max-height: 120px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: var(--text-secondary);
+    }
+
+    /* Right Main Desk Stage */
+    .dossier-stage {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      max-height: calc(100vh - 54px);
+    }
+
+    /* Telemetry & Daily North Star */
+    .desk-telemetry-panel {
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .telemetry-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .telemetry-meter-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      display: flex;
+      overflow: hidden;
+      width: 100%;
+    }
+    .meter-slice { height: 100%; transition: width 0.3s ease; }
+    .meter-slice.work { background: var(--primary-blue); }
+    .meter-slice.annoyance { background: var(--accent-rose); }
+    .meter-slice.personal { background: var(--accent-emerald); }
+    .meter-slice.spark { background: var(--accent-purple); }
+    .meter-slice.other { background: #94a3b8; }
+
+    .telemetry-legend {
+      display: flex;
+      gap: 12px;
+      font-size: 10.5px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+    /* Daily North Star Strip */
+    .north-star-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .north-star-icon { font-size: 14px; }
+    .north-star-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: inherit;
+    }
+    .north-star-input::placeholder { color: #94a3b8; font-weight: 500; }
+
+    /* Summary Header Card */
+    .macro-card {
+      background: #ffffff;
+      border: 1.5px solid var(--card-border);
+      border-left: 5px solid var(--accent-purple);
+      border-radius: 8px;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .macro-eyebrow {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--accent-purple);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .macro-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .macro-narrative {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* Repeating Snag Card */
+    .chronic-alert {
+      display: none;
+      background: #fff1f2;
+      border: 1.5px solid #fecdd3;
+      border-left: 5px solid #e11d48;
+      border-radius: 8px;
+      padding: 14px 18px;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chronic-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .chronic-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #9f1239;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chronic-badge {
+      font-size: 9.5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      background: #ffe4e6;
+      color: #be123c;
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid #f43f5e;
+    }
+    .chronic-body {
+      font-size: 12.5px;
+      color: #881337;
+      line-height: 1.45;
+    }
+
+    /* 4-Section Grid */
+    .quantum-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .quadrant-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top-width: 4px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+    .quadrant-card.friction { border-top-color: var(--accent-rose); }
+    .quadrant-card.bridges { border-top-color: var(--accent-purple); }
+    .quadrant-card.venture { border-top-color: var(--primary-blue); }
+    .quadrant-card.life { border-top-color: var(--accent-emerald); }
+
+    .quadrant-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .insight-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .insight-item {
+      padding: 9px 11px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid var(--card-border-subtle);
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .insight-item strong { color: var(--text); }
+
+    .card-actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 3px;
+    }
+
+    .bridge-box {
+      background: #fdf4ff;
+      border: 1px solid #f5d0fe;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .bridge-link { font-size: 10.5px; font-weight: 800; color: #a21caf; }
+
+    /* Action Buttons */
+    .btn-card-action {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .btn-card-action:hover {
+      background: var(--blue-subtle);
+      border-color: var(--primary-blue);
+      color: var(--primary-blue);
+    }
+    .btn-card-action.calendar:hover {
+      background: #f0fdf4;
+      border-color: #22c55e;
+      color: #15803d;
+    }
+
+    /* Modal Windows */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-window {
+      background: #ffffff;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 780px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+      border: 1.5px solid var(--card-border);
+    }
+    .modal-head {
+      background: var(--dark-header);
+      color: #fff;
+      padding: 13px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Security PIN Lock Overlay */
+    .pin-lock-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 14, 23, 0.95);
+      backdrop-filter: blur(12px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .pin-box {
+      background: #0f172a;
+      border: 1.5px solid #334155;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 360px;
+      padding: 28px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .pin-input {
+      background: #020617;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      font-size: 28px;
+      letter-spacing: 12px;
+      text-align: center;
+      color: #fff;
+      padding: 10px;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      width: 100%;
+    }
+
+    /* Guide & FAQ Modal Styles */
+    .faq-item {
+      background: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .faq-q { font-weight: 800; font-size: 13px; color: var(--primary); }
+    .faq-a { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
+
+    /* Wizard Slide Styles */
+    .wizard-card {
+      background: #f8fafc;
+      border: 1.5px solid var(--card-border);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .wizard-step-badge {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      background: var(--blue-subtle);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Vault Modal Styles */
+    .vault-box {
+      background: #f8fafc;
+      border: 1.5px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .vault-drop-zone {
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .vault-drop-zone:hover {
+      border-color: var(--primary-blue);
+      background: var(--blue-subtle);
+    }
+
+    .plan-text-area {
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      background: #f8fafc;
+      border: 1px solid var(--card-border);
+      padding: 16px;
+      border-radius: 8px;
+      min-height: 280px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand-group">
+      <div class="brand-logo-frame">
+        <img src="templates/logo_white.png" class="brand-logo" alt="3Sci" onerror="this.src='logo_white.png'; this.onerror=null;">
+      </div>
+      <div>
+        <div class="brand-title">PANORAMA</div>
+        <div class="brand-tag">Daily Thoughts & Ideas Synthesizer | 3Sci Labs</div>
+      </div>
+    </div>
+
+    <!-- Google AI Key -->
+    <div class="top-api-container">
+      <span class="top-api-label">Google AI Key:</span>
+      <input type="password" class="top-api-input" id="top-gemini-key" placeholder="Paste your API key..." oninput="syncKey(this.value)">
+      <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="top-api-link">Get Free Key ↗</a>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button class="btn-action btn-action-lock" onclick="openSecuritySettingsModal()" id="btn-lock-status" title="Set or manage numeric PIN protection">
+        <span>🔒 PIN Security</span>
+      </button>
+      <button class="btn-action" onclick="openWizardModal()" title="How Panorama works step by step">
+        <span>💡 Tour</span>
+      </button>
+      <button class="btn-action" onclick="openFaqModal()" title="Plain-English User Guide and FAQs">
+        <span>❓ Guide & FAQ</span>
+      </button>
+      <button class="btn-action" onclick="openVaultModal()" title="Local JSON Backup and Restore">
+        <span>📦 Vault</span>
+      </button>
+      <button class="btn-action" onclick="openHistoryModal()">Past Weeks</button>
+      <button class="btn-action btn-action-accent" onclick="exportFullCalendarICS()" title="Download universal .ICS focus blocks">
+        <span>📅 Calendar</span>
+      </button>
+      <button class="btn-action" onclick="copyTaskChecklist(this)">Copy Todo List</button>
+    </div>
+  </header>
+
+  <!-- Main View -->
+  <div class="app-layout" id="app-layout-main">
+    
+    <!-- Left: Scratchpad -->
+    <div class="scratchpad-sidebar">
+      <div class="section-title">
+        <span>Quick Brain Dump</span>
+        <button class="btn-action" style="padding:2px 6px; font-size:10px; color:#ef4444;" onclick="clearAllNotes()">Clear Scratchpad</button>
+      </div>
+
+      <!-- Input Box -->
+      <div class="quick-entry-box">
+        <textarea class="entry-textarea" id="note-input" placeholder="Jot down anything: an annoying snag, a trip note, a tool idea, an errand, or a quick question... (Press Ctrl+Enter to save)"></textarea>
+        
+        <div class="tag-row">
+          <span class="tag-chip active" data-tag="annoyance" onclick="selectTag('annoyance')">Annoyance</span>
+          <span class="tag-chip" data-tag="work" onclick="selectTag('work')">Work & Projects</span>
+          <span class="tag-chip" data-tag="personal" onclick="selectTag('personal')">Life & Travel</span>
+          <span class="tag-chip" data-tag="question" onclick="selectTag('question')">Question</span>
+          <span class="tag-chip" data-tag="chores" onclick="selectTag('chores')">Chores & Errands</span>
+          <span class="tag-chip" data-tag="spark" onclick="selectTag('spark')">Idea / Spark</span>
+        </div>
+
+        <div class="entry-button-row">
+          <button class="btn-add-entry" onclick="addNote()">
+            <span>Save Thought</span>
+            <span style="font-size:10px; opacity:0.8;">(Ctrl+Enter)</span>
+          </button>
+          
+          <button class="btn-voice" id="btn-voice-dictate" onclick="toggleVoiceDictation()" title="Click or press Alt+V to talk">
+            <span id="voice-icon">🎙️</span>
+            <span id="voice-label">Dictate</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Feed Filter & Search -->
+      <div class="feed-controls">
+        <input type="text" class="feed-search-input" id="feed-search" placeholder="Search saved thoughts..." oninput="renderNotes()">
+        <div class="filter-pills">
+          <span class="filter-pill active" data-filter="all" onclick="setFeedFilter('all')">All</span>
+          <span class="filter-pill" data-filter="annoyance" onclick="setFeedFilter('annoyance')">Annoyance</span>
+          <span class="filter-pill" data-filter="work" onclick="setFeedFilter('work')">Work</span>
+          <span class="filter-pill" data-filter="personal" onclick="setFeedFilter('personal')">Life</span>
+          <span class="filter-pill" data-filter="spark" onclick="setFeedFilter('spark')">Spark</span>
+        </div>
+      </div>
+
+      <!-- Feed of Notes -->
+      <div class="stream-header">
+        <span class="stream-count" id="notes-count">0 Thoughts Active</span>
+        <span style="font-size:10px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;" id="storage-footprint">0.0 KB</span>
+      </div>
+      <div class="stream-list" id="stream-container"></div>
+
+      <!-- Bottom Controls -->
+      <div class="synthesis-controls">
+        <button class="btn-synthesize-ai" id="btn-run-synth" onclick="runHolisticSynthesis()">
+          <span id="synth-status">Connect The Dots</span>
+        </button>
+
+        <button class="btn-rollover" onclick="archiveWeekAndStartFresh()" title="Saves this week to history and copies open questions into Monday">
+          <span>Finish Week & Start Fresh</span>
+        </button>
+
+        <button class="btn-copy-prompt" onclick="togglePromptStudio()">
+          <span>Use in Claude / ChatGPT (Copy Prompt)</span>
+        </button>
+
+        <div class="prompt-studio" id="prompt-studio-drawer">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:11px; font-weight:700; color:var(--primary-blue);">Copy prompt for external LLM:</span>
+            <button class="btn-action" style="padding:2px 8px; font-size:10.5px;" onclick="copyCompiledPrompt(this)">Copy Prompt</button>
+          </div>
+          <div class="prompt-preview" id="prompt-preview-box"></div>
+          
+          <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
+            <span style="font-size:10px; font-weight:700; color:var(--text-secondary);">Paste the reply here:</span>
+            <textarea class="entry-textarea" id="external-json-input" placeholder="Paste the reply here..." style="min-height:50px; font-size:11px; font-family:'JetBrains Mono', monospace;"></textarea>
+            <button class="btn-action" style="justify-content:center; background:var(--primary); color:#fff;" onclick="loadExternalJson()">Load & Show</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Synthesized Picture -->
+    <div class="dossier-stage">
+      
+      <!-- Live Desk Telemetry: Cognitive Load Meter & Daily North Star -->
+      <div class="desk-telemetry-panel">
+        <div class="telemetry-row">
+          <span class="telemetry-label">Active Headspace Telemetry</span>
+          <div class="telemetry-legend" id="telemetry-legend"></div>
+        </div>
+        <div class="telemetry-meter-bar" id="telemetry-bar">
+          <div class="meter-slice work" style="width: 20%;"></div>
+          <div class="meter-slice annoyance" style="width: 20%;"></div>
+          <div class="meter-slice personal" style="width: 20%;"></div>
+          <div class="meter-slice spark" style="width: 20%;"></div>
+          <div class="meter-slice other" style="width: 20%;"></div>
+        </div>
+
+        <!-- Sticky North Star -->
+        <div class="north-star-box">
+          <span class="north-star-icon">⭐</span>
+          <input type="text" class="north-star-input" id="north-star-input" placeholder="Today's non-negotiable focus or main priority (saves automatically)..." oninput="saveNorthStar(this.value)">
+        </div>
+      </div>
+
+      <!-- Big Picture Summary Card -->
+      <div class="macro-card">
+        <div class="macro-eyebrow">
+          <span id="dossier-eyebrow">The Full Picture</span>
+          <span id="dossier-status-pill" style="font-size:10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace;">THIS WEEK</span>
+        </div>
+        <h2 class="macro-title" id="dossier-theme">Your Connected Thoughts Will Show Up Here</h2>
+        <p class="macro-narrative" id="dossier-narrative">
+          Jot down quick thoughts on the left whenever they pop into your head—daily snags, travel logistics, work ideas, or open questions.
+          When you're ready, click <strong>Connect The Dots</strong> to see recurring patterns, hidden links between your ideas, and simple ways forward.
+        </p>
+      </div>
+
+      <!-- Recurring Snag Alert -->
+      <div class="chronic-alert" id="chronic-friction-banner">
+        <div class="chronic-head">
+          <div class="chronic-title">
+            <span>⚠️ Repeating Snag Alert</span>
+          </div>
+          <span class="chronic-badge" id="chronic-badge-label">KEEPS HAPPENING</span>
+        </div>
+        <div class="chronic-body" id="chronic-body-text"></div>
+      </div>
+
+      <!-- 4 Natural Sections -->
+      <div class="quantum-grid">
+        
+        <!-- 1. Recurring Snags -->
+        <div class="quadrant-card friction">
+          <div class="quadrant-title">
+            <span style="color:var(--accent-rose);">●</span>
+            <span>Recurring Snags & Drains</span>
+          </div>
+          <ul class="insight-list" id="list-friction">
+            <li class="insight-item">No snags analyzed yet.</li>
+          </ul>
+        </div>
+
+        <!-- 2. Connected Sparks -->
+        <div class="quadrant-card bridges">
+          <div class="quadrant-title">
+            <span style="color:var(--accent-purple);">●</span>
+            <span>Connected Sparks (Ideas Linking Together)</span>
+          </div>
+          <div class="insight-list" id="list-bridges">
+            <div class="bridge-box">
+              <span class="bridge-link">Connected Idea</span>
+              <span>When unrelated thoughts link together into a practical opportunity, they show up here.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Projects & Work Moves -->
+        <div class="quadrant-card venture">
+          <div class="quadrant-title">
+            <span style="color:var(--primary-blue);">●</span>
+            <span>Projects & Work Moves</span>
+          </div>
+          <ul class="insight-list" id="list-venture">
+            <li class="insight-item">Practical next steps for work will appear here.</li>
+          </ul>
+        </div>
+
+        <!-- 4. Life & Errands -->
+        <div class="quadrant-card life">
+          <div class="quadrant-title">
+            <span style="color:var(--accent-emerald);">●</span>
+            <span>Life, Travel & Open Questions</span>
+          </div>
+          <ul class="insight-list" id="list-life">
+            <li class="insight-item">Personal tasks, travel plans, and open questions will appear here.</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PIN LOCK OVERLAY (Security Screen) -->
+  <div class="pin-lock-overlay" id="pin-lock-screen">
+    <div class="pin-box">
+      <div style="font-size:32px;">🔐</div>
+      <div>
+        <h3 style="color:#f8fafc; font-family:'Space Grotesk', sans-serif; font-size:18px;">Panorama is Locked</h3>
+        <p style="color:#94a3b8; font-size:12px; margin-top:4px;">Enter your numeric PIN to access your personal desk</p>
+      </div>
+      <input type="password" id="pin-entry-input" class="pin-input" maxlength="8" placeholder="••••" autofocus onkeydown="handlePinKey(event)">
+      <button class="btn-action btn-action-accent" style="justify-content:center; padding:10px; font-size:13px;" onclick="verifyPin()">
+        Unlock Desk
+      </button>
+      <div id="pin-error-msg" style="color:#f87171; font-size:11.5px; font-weight:700; display:none;">Incorrect PIN code</div>
+    </div>
+  </div>
+
+  <!-- PIN SECURITY SETTINGS MODAL -->
+  <div class="modal-backdrop" id="security-modal" onclick="closeSecurityModal(event)">
+    <div class="modal-window" onclick="event.stopPropagation()" style="max-width:440px;">
+      <div class="modal-head">
+        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;">PIN SECURITY LOCK</strong>
+        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="closeSecurityModal()">Close</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
+          Protect your notes and thoughts behind a simple numeric PIN. When enabled, Panorama locks automatically whenever you open or refresh the page.
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Set or Change Numeric PIN (4 to 8 digits):</label>
+          <input type="password" id="security-new-pin" class="entry-textarea" style="min-height:unset; padding:8px 12px; font-family:'JetBrains Mono',monospace; font-size:16px; text-align:center; letter-spacing:4px;" maxlength="8" placeholder="e.g. 1234">
+          
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            <button class="btn-action btn-action-accent" style="flex:1; justify-content:center; padding:8px;" onclick="saveNewPin()">
+              Save & Enable PIN
+            </button>
+            <button class="btn-action" style="color:#ef4444; border-color:#fca5a5;" onclick="removePin()">
+              Disable PIN
+            </button>
+          </div>
+        </div>
+
+        <div style="font-size:11px; color:var(--text-muted); line-height:1.4; border-top:1px solid var(--card-border-subtle); padding-top:10px;">
+          * Note: Your PIN is stored strictly inside your browser's private storage. If you ever forget it, you can clear browser site data for this file.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLANATORY ONBOARDING WIZARD MODAL -->
+  <div class="modal-backdrop" id="wizard-modal" onclick="closeWizardModal(event)">
+    <div class="modal-window" onclick="event.stopPropagation()" style="max-width:540px;">
+      <div class="modal-head">
+        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;" id="wizard-title">WELCOME TO PANORAMA</strong>
+        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="closeWizardModal()">Close</button>
+      </div>
+      <div class="modal-body" id="wizard-body">
+        <!-- Wizard step injected by JS -->
+      </div>
+      <div style="padding:12px 20px; background:#f8fafc; border-top:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--text-muted);" id="wizard-step-counter">Step 1 of 4</span>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-action" id="btn-wizard-prev" onclick="wizardPrevStep()">Previous</button>
+          <button class="btn-action btn-action-accent" id="btn-wizard-next" onclick="wizardNextStep()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAIN-ENGLISH USER GUIDE & FAQ MODAL -->
+  <div class="modal-backdrop" id="faq-modal" onclick="closeFaqModal(event)">
+    <div class="modal-window" onclick="event.stopPropagation()" style="max-width:680px;">
+      <div class="modal-head">
+        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;">PANORAMA GUIDE & FAQ (PLAIN ENGLISH)</strong>
+        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="closeFaqModal()">Close</button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="faq-item">
+          <div class="faq-q">What is Panorama in simple words?</div>
+          <div class="faq-a">
+            Panorama is a private, zero-friction daily scratchpad with a personal analyst built into it. During the week, you dump raw, messy thoughts—bugs, sudden travel plans, work friction, or random ideas. Whenever you're ready (usually Friday), the AI reads everything at once to show you recurring patterns, connect related ideas, and suggest simple next steps.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Where are my thoughts stored? Is this private?</div>
+          <div class="faq-a">
+            100% private and local. Everything is saved directly in your browser's private computer memory (LocalStorage). Your thoughts never go to any remote server or cloud database unless you run an AI review using your own personal Google AI Studio key.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Do I have to organize or tag my notes manually?</div>
+          <div class="faq-a">
+            No! You can simply type a thought and hit Enter (or press the microphone button to dictate). While you can click a quick tag like "Annoyance" or "Work", the AI understands the meaning of your notes regardless of tags.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">What happens when I click "Finish Week & Start Fresh"?</div>
+          <div class="faq-a">
+            It snapshots your current week and saves it safely into your "Past Weeks" archive. To make sure you don't drop important balls, any open action steps or unanswered questions are automatically carried forward into Monday's scratchpad.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">How does the "PIN Security" feature work?</div>
+          <div class="faq-a">
+            Click "PIN Security" in the top bar to set a 4 to 8 digit number code. If enabled, whenever you open or refresh Panorama, the page blurs and blocks access until the PIN is entered.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Do I need to pay for Google Gemini?</div>
+          <div class="faq-a">
+            No. Google AI Studio provides a free Gemini API key for personal prototyping. Simply click "Get Free Key ↗" in the top bar, copy your key, and paste it once into the top bar. Panorama uses `gemini-3.8-flash` which is fast and completely free under normal personal limits.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Can I use this without any API key at all?</div>
+          <div class="faq-a">
+            Yes! Click "Use in Claude / ChatGPT (Copy Prompt)". It compiles all your active thoughts into a perfectly formatted request that you can paste directly into Claude, ChatGPT, or any other assistant for free. Then paste the reply back in to display it visually.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Past Weeks Modal -->
+  <div class="modal-backdrop" id="history-modal" onclick="closeHistoryModal(event)">
+    <div class="modal-window" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;">PAST WEEKS ARCHIVE</strong>
+        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="document.getElementById('history-modal').style.display='none'">Close</button>
+      </div>
+      <div class="modal-body" id="history-content"></div>
+    </div>
+  </div>
+
+  <!-- Action-to-Draft Deep Dive Modal -->
+  <div class="modal-backdrop" id="draft-modal" onclick="closeDraftModal(event)">
+    <div class="modal-window" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;" id="draft-modal-title">ACTION PLAN</strong>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="copyDraftText(this)">Copy Text</button>
+          <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="document.getElementById('draft-modal').style.display='none'">Close</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;" id="draft-context-label"></div>
+        <div class="plan-text-area" id="draft-output-area">Drafting step-by-step plan...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Vault (Backup & Restore Modal) -->
+  <div class="modal-backdrop" id="vault-modal" onclick="closeVaultModal(event)">
+    <div class="modal-window" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;">PANORAMA VAULT & BACKUP</strong>
+        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="document.getElementById('vault-modal').style.display='none'">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="vault-box">
+          <strong style="font-size:14px; color:var(--text);">1. Export Complete Vault</strong>
+          <p style="font-size:12px; color:var(--text-secondary);">
+            Download a single, timestamped JSON backup file containing all your active thoughts, archived weeks, dossiers, and daily focus notes.
+          </p>
+          <div>
+            <button class="btn-action btn-action-accent" onclick="downloadVaultBackup()">
+              <span>📥 Download Vault Backup (.json)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="vault-box">
+          <strong style="font-size:14px; color:var(--text);">2. Restore / Sync from File</strong>
+          <p style="font-size:12px; color:var(--text-secondary);">
+            Restore or merge a Panorama JSON backup from another computer or browser.
+          </p>
+          <div class="vault-drop-zone" onclick="document.getElementById('vault-file-input').click()" ondragover="event.preventDefault()" ondrop="handleVaultDrop(event)">
+            <input type="file" id="vault-file-input" style="display:none;" accept=".json" onchange="handleVaultFileSelect(event)">
+            <span style="font-size:24px; display:block; margin-bottom:4px;">📂</span>
+            <strong style="font-size:12.5px; color:var(--primary-blue);">Click to select or drag & drop a backup JSON here</strong>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Safe restore: merges past weeks and updates current notes.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let activeTag = 'annoyance';
+    let feedFilter = 'all';
+    let notes = [];
+    let currentDossier = null;
+    let recognition = null;
+    let isRecording = false;
+    let wizardCurrentStep = 0;
+
+    const SAMPLE_NOTES = [
+      { id: 1, tag: 'annoyance', text: "Spent 45 minutes manually checking flight confirmations and hotel receipts across five different tabs.", date: "Tuesday 09:30" },
+      { id: 2, tag: 'work', text: "Client liked the overview, but asked if we can provide a clean, 1-page PDF summary without all the raw technical logs.", date: "Tuesday 14:15" },
+      { id: 3, tag: 'personal', text: "Need to confirm the boat booking and lock in dates for the family trip before prices go up.", date: "Wednesday 11:20" },
+      { id: 4, tag: 'question', text: "Should I stick with simple local settings, or does this need a full configuration file?", date: "Thursday 16:40" },
+      { id: 5, tag: 'spark', text: "Holiday planning and project troubleshooting have the same problem: too many disconnected apps and no single overview.", date: "Friday 08:50" }
+    ];
+
+    /* -------------------------------------------------------------
+       SECURITY PIN LOCK SYSTEM
+       ------------------------------------------------------------- */
+    function checkSecurityLock() {
+      const pin = localStorage.getItem('3sci_panorama_pin');
+      const lockBtn = document.getElementById('btn-lock-status');
+      
+      if (pin && pin.trim().length >= 4) {
+        lockBtn.innerHTML = `<span>🔒 PIN Active</span>`;
+        // Show lock screen on startup
+        document.getElementById('pin-lock-screen').style.display = 'flex';
+        document.getElementById('app-layout-main').classList.add('locked');
+        setTimeout(() => document.getElementById('pin-entry-input').focus(), 100);
+      } else {
+        lockBtn.innerHTML = `<span>🔓 Set PIN</span>`;
+        document.getElementById('pin-lock-screen').style.display = 'none';
+        document.getElementById('app-layout-main').classList.remove('locked');
+      }
+    }
+
+    function verifyPin() {
+      const savedPin = localStorage.getItem('3sci_panorama_pin') || '';
+      const enteredPin = document.getElementById('pin-entry-input').value.trim();
+      const err = document.getElementById('pin-error-msg');
+
+      if (enteredPin === savedPin) {
+        document.getElementById('pin-lock-screen').style.display = 'none';
+        document.getElementById('app-layout-main').classList.remove('locked');
+        document.getElementById('pin-entry-input').value = '';
+        err.style.display = 'none';
+      } else {
+        err.style.display = 'block';
+        document.getElementById('pin-entry-input').value = '';
+        document.getElementById('pin-entry-input').focus();
+      }
+    }
+
+    function handlePinKey(e) {
+      if (e.key === 'Enter') {
+        verifyPin();
+      }
+    }
+
+    function openSecuritySettingsModal() {
+      const savedPin = localStorage.getItem('3sci_panorama_pin') || '';
+      document.getElementById('security-new-pin').value = savedPin;
+      document.getElementById('security-modal').style.display = 'flex';
+    }
+
+    function closeSecurityModal() {
+      document.getElementById('security-modal').style.display = 'none';
+    }
+
+    function saveNewPin() {
+      const val = document.getElementById('security-new-pin').value.trim();
+      if (!/^\d{4,8}$/.test(val)) {
+        alert("Please enter a numeric string between 4 and 8 digits (e.g. 1234 or 987654).");
+        return;
+      }
+      localStorage.setItem('3sci_panorama_pin', val);
+      alert(`PIN successfully set to ${val}. Panorama is now protected.`);
+      closeSecurityModal();
+      checkSecurityLock();
+    }
+
+    function removePin() {
+      if (confirm("Disable numeric PIN security? Anyone with access to this browser will be able to read your notes directly.")) {
+        localStorage.removeItem('3sci_panorama_pin');
+        closeSecurityModal();
+        checkSecurityLock();
+        alert("PIN removed.");
+      }
+    }
+
+    /* -------------------------------------------------------------
+       EXPLANATORY ONBOARDING WIZARD
+       ------------------------------------------------------------- */
+    const WIZARD_STEPS = [
+      {
+        badge: "STEP 1 OF 4",
+        title: "Zero-Friction Daily Brain Dump",
+        body: "Whenever an annoying bug hits, an errand pops into your head, or a creative spark strikes, jot it down in 5 seconds on the left. Type or hit Dictate (Alt+V). You don't need folders or hierarchies—just get the thought out of your head.",
+        icon: "✍️"
+      },
+      {
+        badge: "STEP 2 OF 4",
+        title: "Live Ambient Headspace Meter",
+        body: "Look at the colorful bar at the top of your desk. As you log thoughts throughout Monday to Thursday, Panorama shows what is truly taking up your mental bandwidth (Work vs. Everyday Annoyances vs. Personal Life). Pin today's main goal in the North Star box.",
+        icon: "📊"
+      },
+      {
+        badge: "STEP 3 OF 4",
+        title: "Friday: Connect The Dots",
+        body: "At the end of your week, click 'Connect The Dots'. Instead of chatting back and forth, Gemini reads your entire week at once: highlighting repeating trouble, connecting unrelated sparks into opportunities, and generating simple action moves.",
+        icon: "🧠"
+      },
+      {
+        badge: "STEP 4 OF 4",
+        title: "Finish Week & Start Fresh",
+        body: "Once reviewed, export your moves to your Calendar (.ICS) or copy your Todo list. Then hit 'Finish Week & Start Fresh'. It archives the week and automatically brings forward any open questions into Monday's scratchpad so you never drop a ball.",
+        icon: "🚀"
+      }
+    ];
+
+    function openWizardModal() {
+      wizardCurrentStep = 0;
+      renderWizardStep();
+      document.getElementById('wizard-modal').style.display = 'flex';
+    }
+
+    function closeWizardModal() {
+      document.getElementById('wizard-modal').style.display = 'none';
+      localStorage.setItem('3sci_panorama_tour_seen', 'true');
+    }
+
+    function renderWizardStep() {
+      const step = WIZARD_STEPS[wizardCurrentStep];
+      const bodyEl = document.getElementById('wizard-body');
+      document.getElementById('wizard-step-counter').innerText = `Step ${wizardCurrentStep + 1} of ${WIZARD_STEPS.length}`;
+
+      bodyEl.innerHTML = `
+        <div class="wizard-card">
+          <span style="font-size:36px;">${step.icon}</span>
+          <span class="wizard-step-badge">${step.badge}</span>
+          <h3 style="font-family:'Space Grotesk', sans-serif; font-size:16px; color:var(--text);">${step.title}</h3>
+          <p style="font-size:13px; color:var(--text-secondary); line-height:1.55;">${step.body}</p>
+        </div>
+      `;
+
+      document.getElementById('btn-wizard-prev').disabled = (wizardCurrentStep === 0);
+      document.getElementById('btn-wizard-next').innerText = (wizardCurrentStep === WIZARD_STEPS.length - 1) ? "Got It!" : "Next";
+    }
+
+    function wizardNextStep() {
+      if (wizardCurrentStep < WIZARD_STEPS.length - 1) {
+        wizardCurrentStep++;
+        renderWizardStep();
+      } else {
+        closeWizardModal();
+      }
+    }
+
+    function wizardPrevStep() {
+      if (wizardCurrentStep > 0) {
+        wizardCurrentStep--;
+        renderWizardStep();
+      }
+    }
+
+    /* -------------------------------------------------------------
+       FAQ & USER GUIDE
+       ------------------------------------------------------------- */
+    function openFaqModal() {
+      document.getElementById('faq-modal').style.display = 'flex';
+    }
+
+    function closeFaqModal() {
+      document.getElementById('faq-modal').style.display = 'none';
+    }
+
+    /* -------------------------------------------------------------
+       CORE LOGIC, VOICE & STORAGE
+       ------------------------------------------------------------- */
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return null;
+
+      const recognizer = new SpeechRecognition();
+      recognizer.continuous = true;
+      recognizer.interimResults = true;
+      recognizer.lang = 'en-US';
+
+      recognizer.onstart = function() {
+        isRecording = true;
+        const btn = document.getElementById('btn-voice-dictate');
+        btn.classList.add('recording');
+        document.getElementById('voice-icon').innerText = '🔴';
+        document.getElementById('voice-label').innerText = 'Listening...';
+      };
+
+      recognizer.onresult = function(event) {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        
+        const input = document.getElementById('note-input');
+        if (event.results[event.results.length - 1].isFinal) {
+          const currentVal = input.value.trim();
+          input.value = currentVal ? currentVal + ' ' + transcript.trim() : transcript.trim();
+        }
+      };
+
+      recognizer.onerror = function() { stopVoiceDictation(); };
+      recognizer.onend = function() { stopVoiceDictation(); };
+      return recognizer;
+    }
+
+    function toggleVoiceDictation() {
+      if (!recognition) {
+        recognition = initSpeechRecognition();
+        if (!recognition) {
+          alert("Your browser does not support voice input. Please try Google Chrome or Microsoft Edge.");
+          return;
+        }
+      }
+
+      if (isRecording) {
+        recognition.stop();
+      } else {
+        try { recognition.start(); } catch (e) { recognition.stop(); }
+      }
+    }
+
+    function stopVoiceDictation() {
+      isRecording = false;
+      const btn = document.getElementById('btn-voice-dictate');
+      if (btn) {
+        btn.classList.remove('recording');
+        document.getElementById('voice-icon').innerText = '🎙️';
+        document.getElementById('voice-label').innerText = 'Dictate';
+      }
+    }
+
+    function selectTag(tag) {
+      activeTag = tag;
+      document.querySelectorAll('.tag-chip').forEach(el => {
+        el.classList.toggle('active', el.dataset.tag === tag);
+      });
+    }
+
+    function setFeedFilter(filter) {
+      feedFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(el => {
+        el.classList.toggle('active', el.dataset.filter === filter);
+      });
+      renderNotes();
+    }
+
+    function syncKey(val) {
+      localStorage.setItem('3sci_panorama_key', val.trim());
+    }
+
+    function getKey() {
+      return document.getElementById('top-gemini-key').value.trim() || localStorage.getItem('3sci_panorama_key') || '';
+    }
+
+    function saveNorthStar(val) {
+      localStorage.setItem('3sci_panorama_north_star', val);
+    }
+
+    function loadNotes() {
+      const stored = localStorage.getItem('3sci_panorama_notes');
+      notes = stored ? JSON.parse(stored) : SAMPLE_NOTES;
+      
+      const storedDossier = localStorage.getItem('3sci_panorama_active_dossier');
+      if (storedDossier) {
+        try {
+          currentDossier = JSON.parse(storedDossier);
+          renderDossier(currentDossier);
+        } catch (e) {}
+      }
+
+      const northStar = localStorage.getItem('3sci_panorama_north_star') || '';
+      document.getElementById('north-star-input').value = northStar;
+
+      renderNotes();
+      updateTelemetry();
+    }
+
+    function saveNotes() {
+      localStorage.setItem('3sci_panorama_notes', JSON.stringify(notes));
+      renderNotes();
+      updateTelemetry();
+      compilePrompt();
+    }
+
+    function addNote() {
+      const input = document.getElementById('note-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      if (isRecording && recognition) recognition.stop();
+
+      const now = new Date();
+      const timeStr = now.toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      notes.unshift({
+        id: Date.now(),
+        tag: activeTag,
+        text: text,
+        date: timeStr
+      });
+
+      input.value = '';
+      saveNotes();
+    }
+
+    function deleteNote(id) {
+      notes = notes.filter(n => n.id !== id);
+      saveNotes();
+    }
+
+    function clearAllNotes() {
+      if (confirm("Clear all thoughts currently in your scratchpad? (Past weeks stay safe)")) {
+        notes = [];
+        saveNotes();
+      }
+    }
+
+    function updateTelemetry() {
+      const total = notes.length;
+      const bar = document.getElementById('telemetry-bar');
+      const legend = document.getElementById('telemetry-legend');
+      const footprint = document.getElementById('storage-footprint');
+
+      const rawBytes = JSON.stringify(localStorage).length;
+      footprint.innerText = (rawBytes / 1024).toFixed(1) + ' KB in Vault';
+
+      if (total === 0) {
+        bar.innerHTML = `<div class="meter-slice other" style="width: 100%;"></div>`;
+        legend.innerHTML = `<span>No active thoughts</span>`;
+        return;
+      }
+
+      const counts = { work: 0, annoyance: 0, personal: 0, spark: 0, other: 0 };
+      notes.forEach(n => {
+        if (n.tag === 'work') counts.work++;
+        else if (n.tag === 'annoyance') counts.annoyance++;
+        else if (n.tag === 'personal') counts.personal++;
+        else if (n.tag === 'spark') counts.spark++;
+        else counts.other++;
+      });
+
+      const pWork = ((counts.work / total) * 100).toFixed(0);
+      const pAnnoy = ((counts.annoyance / total) * 100).toFixed(0);
+      const pPers = ((counts.personal / total) * 100).toFixed(0);
+      const pSpark = ((counts.spark / total) * 100).toFixed(0);
+      const pOther = ((counts.other / total) * 100).toFixed(0);
+
+      bar.innerHTML = `
+        <div class="meter-slice work" style="width: ${pWork}%;" title="Work: ${pWork}%"></div>
+        <div class="meter-slice annoyance" style="width: ${pAnnoy}%;" title="Annoyances: ${pAnnoy}%"></div>
+        <div class="meter-slice personal" style="width: ${pPers}%;" title="Life: ${pPers}%"></div>
+        <div class="meter-slice spark" style="width: ${pSpark}%;" title="Sparks: ${pSpark}%"></div>
+        <div class="meter-slice other" style="width: ${pOther}%;" title="Other: ${pOther}%"></div>
+      `;
+
+      legend.innerHTML = `
+        <span class="legend-item"><span class="legend-dot" style="background:var(--primary-blue);"></span>Work ${pWork}%</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--accent-rose);"></span>Snags ${pAnnoy}%</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--accent-emerald);"></span>Life ${pPers}%</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--accent-purple);"></span>Sparks ${pSpark}%</span>
+      `;
+    }
+
+    function renderNotes() {
+      const container = document.getElementById('stream-container');
+      const countEl = document.getElementById('notes-count');
+      const searchTerm = (document.getElementById('feed-search')?.value || '').toLowerCase().trim();
+
+      let filtered = notes;
+      if (feedFilter !== 'all') {
+        filtered = filtered.filter(n => n.tag === feedFilter);
+      }
+      if (searchTerm) {
+        filtered = filtered.filter(n => n.text.toLowerCase().includes(searchTerm));
+      }
+
+      countEl.innerText = `${notes.length} Thought${notes.length === 1 ? '' : 's'} Active`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:12px;">No matching thoughts.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(n => `
+        <div class="stream-item ${n.tag}">
+          <div class="stream-meta">
+            <span class="stream-tag">${n.tag}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span>${n.date}</span>
+              <button class="btn-del-note" onclick="deleteNote(${n.id})" title="Delete thought">×</button>
+            </div>
+          </div>
+          <div class="stream-text">${n.text}</div>
+        </div>
+      `).join('');
+    }
+
+    /* Prompt Builder */
+    function compilePrompt() {
+      const notesDump = notes.map((n, i) => `[Thought ${i+1}] (${n.tag.toUpperCase()} - ${n.date}): ${n.text}`).join('\n');
+      
+      const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
+      const recentArchives = history.slice(0, 3);
+      
+      let historyContext = "No past weeks recorded yet.";
+      if (recentArchives.length > 0) {
+        historyContext = recentArchives.map((h) => `
+[Past Week - ${h.date}]
+- Main Theme: ${h.theme}
+- What Was Causing Trouble: ${(h.dossier?.recurringSnags || []).join('; ') || 'None recorded'}
+        `).join('\n');
+      }
+
+      const prompt = `You are a trusted, grounded personal thinking partner and advisor.
+Your job is NOT to answer these notes one-by-one like a chatbot.
+Look across all of these disorganized thoughts at once and help build a clear, coherent picture of what is going on across normal everyday life, travel, family, work projects, and new ideas.
+
+TONE GUIDELINES:
+- Plain, human English only.
+- Absolutely NO corporate buzzwords, NO marketing slogans, and NO tech jargon (NEVER use words like: synergy, leverage, ecosystem, friction, paradigm, agile, bandwidth, deliverables, vector).
+- Speak like a thoughtful friend who is helping someone think clearly.
+
+PAST WEEKS NOTES (to see if the same trouble keeps repeating):
+"""
+${historyContext}
+"""
+
+CURRENT NOTES FROM THIS WEEK:
+"""
+${notesDump}
+"""
+
+OUTPUT: Return valid raw JSON only. Do not wrap in markdown or backticks.
+
+JSON STRUCTURE:
+{
+  "theme": "A short, grounded 4-6 word title describing what took up the most mental space",
+  "summary": "Two short, readable paragraphs explaining what stood out this week, what was causing stress or wasting time, and what seems promising.",
+  "repeatingSnag": {
+    "detected": true,
+    "name": "Short name for the repeating issue",
+    "explanation": "Plain explanation of why this keeps happening across weeks and one practical way to stop it."
+  },
+  "recurringSnags": [
+    "Practical root problem 1",
+    "Practical root problem 2"
+  ],
+  "connectedSparks": [
+    {
+      "connection": "Note A + Note B",
+      "idea": "A clear, simple way these two different thoughts actually connect into an interesting idea or shortcut."
+    }
+  ],
+  "workMoves": [
+    {
+      "step": "Specific practical work or project action",
+      "why": "Why doing this gets things moving."
+    }
+  ],
+  "lifeMoves": [
+    {
+      "step": "Personal errand, travel decision, or open question to answer",
+      "why": "Why getting this off the mind gives relief."
+    }
+  ]
+}`;
+
+      document.getElementById('prompt-preview-box').innerText = prompt;
+      return prompt;
+    }
+
+    function togglePromptStudio() {
+      compilePrompt();
+      const el = document.getElementById('prompt-studio-drawer');
+      el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function copyCompiledPrompt(btn) {
+      const text = document.getElementById('prompt-preview-box').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = "Copied!";
+        setTimeout(() => btn.innerText = orig, 1500);
+      });
+    }
+
+    function renderDossier(data) {
+      currentDossier = data;
+      localStorage.setItem('3sci_panorama_active_dossier', JSON.stringify(data));
+
+      document.getElementById('dossier-eyebrow').innerText = "The Full Picture";
+      document.getElementById('dossier-theme').innerText = data.theme || "Patterns & Insights";
+      document.getElementById('dossier-narrative').innerHTML = (data.summary || "").replace(/\n/g, '<br><br>');
+
+      const chronicBanner = document.getElementById('chronic-friction-banner');
+      if (data.repeatingSnag && data.repeatingSnag.detected) {
+        chronicBanner.style.display = 'flex';
+        document.getElementById('chronic-badge-label').innerText = data.repeatingSnag.name || "REPEATING ISSUE";
+        document.getElementById('chronic-body-text').innerHTML = `<strong>Why it keeps coming up:</strong> ${data.repeatingSnag.explanation}`;
+      } else {
+        chronicBanner.style.display = 'none';
+      }
+
+      // 1. Snags
+      const fList = document.getElementById('list-friction');
+      const snags = data.recurringSnags || [];
+      fList.innerHTML = snags.map(f => `
+        <li class="insight-item">
+          <div><strong>Problem:</strong> ${f}</div>
+          <div class="card-actions-row">
+            <button class="btn-card-action" onclick="generateActionPlan('Fix Problem', '${escapeQuotes(f)}')">
+              <span>Draft Solution Sheet</span> ↗
+            </button>
+          </div>
+        </li>
+      `).join('') || '<li class="insight-item">No repeating trouble detected.</li>';
+
+      // 2. Sparks
+      const bList = document.getElementById('list-bridges');
+      const sparks = data.connectedSparks || [];
+      bList.innerHTML = sparks.map(b => `
+        <div class="bridge-box">
+          <span class="bridge-link">${b.connection}</span>
+          <div>${b.idea}</div>
+          <div class="card-actions-row">
+            <button class="btn-card-action" onclick="generateActionPlan('Explore Connected Idea', '${escapeQuotes(b.connection + ': ' + b.idea)}')">
+              <span>Outline This Idea</span> ↗
+            </button>
+          </div>
+        </div>
+      `).join('') || '<div class="bridge-box">No connected sparks yet.</div>';
+
+      // 3. Work
+      const vList = document.getElementById('list-venture');
+      const work = data.workMoves || [];
+      vList.innerHTML = work.map(v => `
+        <li class="insight-item">
+          <div><strong>${v.step}:</strong> ${v.why}</div>
+          <div class="card-actions-row">
+            <button class="btn-card-action" onclick="generateActionPlan('Work Action Plan', '${escapeQuotes(v.step + ' - ' + v.why)}')">
+              <span>Draft 1-Page Plan</span> ↗
+            </button>
+            <button class="btn-card-action calendar" onclick="exportSingleEventICS('${escapeQuotes(v.step)}', '${escapeQuotes(v.why)}')">
+              <span>📅 Add to Calendar</span>
+            </button>
+          </div>
+        </li>
+      `).join('') || '<li class="insight-item">No immediate work steps.</li>';
+
+      // 4. Life
+      const lList = document.getElementById('list-life');
+      const life = data.lifeMoves || [];
+      lList.innerHTML = life.map(l => `
+        <li class="insight-item">
+          <div><strong>${l.step}:</strong> ${l.why}</div>
+          <div class="card-actions-row">
+            <button class="btn-card-action" onclick="generateActionPlan('Personal Plan', '${escapeQuotes(l.step + ' - ' + l.why)}')">
+              <span>Break Down Steps</span> ↗
+            </button>
+            <button class="btn-card-action calendar" onclick="exportSingleEventICS('${escapeQuotes(l.step)}', '${escapeQuotes(l.why)}')">
+              <span>📅 Add to Calendar</span>
+            </button>
+          </div>
+        </li>
+      `).join('') || '<li class="insight-item">Life and travel lists are clear.</li>';
+    }
+
+    function escapeQuotes(str) {
+      return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    async function runHolisticSynthesis() {
+      const apiKey = getKey();
+      if (!apiKey) {
+        alert("Please paste your Google AI key in the top bar, or click 'Use in Claude / ChatGPT' to copy the prompt for free.");
+        document.getElementById('top-gemini-key').focus();
+        return;
+      }
+
+      if (notes.length === 0) {
+        alert("Please jot down at least one thought on the left first.");
+        return;
+      }
+
+      const promptText = compilePrompt();
+      const btn = document.getElementById('btn-run-synth');
+      const statusText = document.getElementById('synth-status');
+
+      btn.disabled = true;
+      statusText.innerText = "Connecting thoughts (Gemini 3.8 Flash)...";
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }],
+            generationConfig: { response_mime_type: "application/json" }
+          })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+          alert(`Google AI Notice: ${data.error.message}`);
+        } else if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          const raw = data.candidates[0].content.parts[0].text;
+          const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+          const parsed = JSON.parse(clean);
+          renderDossier(parsed);
+        }
+      } catch (err) {
+        alert(`Could not complete review: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        statusText.innerText = "Connect The Dots";
+      }
+    }
+
+    /* Action Draft Generator */
+    async function generateActionPlan(title, context) {
+      const modal = document.getElementById('draft-modal');
+      const titleEl = document.getElementById('draft-modal-title');
+      const labelEl = document.getElementById('draft-context-label');
+      const outputEl = document.getElementById('draft-output-area');
+
+      titleEl.innerText = title.toUpperCase();
+      labelEl.innerText = context;
+      outputEl.innerText = "Thinking and drafting practical steps...";
+      modal.style.display = 'flex';
+
+      const apiKey = getKey();
+      if (!apiKey) {
+        outputEl.innerText = `To draft this plan automatically, please paste your Google AI key into the top header bar.\n\nAlternatively, you can copy this prompt into Claude or ChatGPT:\n\n"Break down the following item into a simple, grounded, 1-page action plan with step-by-step instructions and any ready-to-use message drafts:\n\n${context}"`;
+        return;
+      }
+
+      const prompt = `You are a practical, grounded assistant.
+Take this specific goal or problem:
+"${context}"
+
+Draft a clear, simple, human, and immediately useful 1-page plan.
+Include:
+1. THE BOTTOM LINE: What needs to happen in 1-2 sentences.
+2. IMMEDIATE 3 STEPS: Concrete actions to do today or tomorrow.
+3. READY-TO-SEND DRAFT: If this involves a client, teammate, hotel, vendor, or contractor, write a polite, ready-to-send email or message. Otherwise, write a quick checklist of what to avoid.
+
+Strictly NO corporate buzzwords, NO business school fluff. Write plainly and directly.`;
+
+      try {
+        const response = await fetch(`[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$){apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+
+        const data = await response.json();
+        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          outputEl.innerText = data.candidates[0].content.parts[0].text;
+        } else {
+          outputEl.innerText = "Could not generate draft. Please try again.";
+        }
+      } catch (e) {
+        outputEl.innerText = "Error contacting AI: " + e.message;
+      }
+    }
+
+    function closeDraftModal() {
+      document.getElementById('draft-modal').style.display = 'none';
+    }
+
+    function copyDraftText(btn) {
+      const text = document.getElementById('draft-output-area').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = "Copied!";
+        setTimeout(() => btn.innerText = orig, 1500);
+      });
+    }
+
+    /* Calendar (.ICS) & Task Export */
+    function formatICSDate(date) {
+      const pad = (n) => (n < 10 ? '0' + n : n);
+      return (
+        date.getUTCFullYear() +
+        pad(date.getUTCMonth() + 1) +
+        pad(date.getUTCDate()) +
+        'T' +
+        pad(date.getUTCHours()) +
+        pad(date.getUTCMinutes()) +
+        pad(date.getUTCSeconds()) +
+        'Z'
+      );
+    }
+
+    function escapeICS(str) {
+      return (str || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,')
+        .replace(/\n/g, '\\n');
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function exportSingleEventICS(title, description) {
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 10, 0, 0);
+      const endDate = new Date(startDate.getTime() + 45 * 60 * 1000);
+
+      const icsData = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//3Sci Labs//Panorama Synthesizer//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `UID:${Date.now()}@3sci.panorama`,
+        `DTSTAMP:${formatICSDate(now)}`,
+        `DTSTART:${formatICSDate(startDate)}`,
+        `DTEND:${formatICSDate(endDate)}`,
+        `SUMMARY:${escapeICS('Focus: ' + title)}`,
+        `DESCRIPTION:${escapeICS(description + '\n\nOrganized by Panorama from 3Sci Labs')}`,
+        'STATUS:CONFIRMED',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+
+      const safeTitle = (title || 'Action').replace(/[^a-zA-Z0-9]/g, '_').slice(0, 25);
+      downloadFile(icsData, `Focus_${safeTitle}.ics`, 'text/calendar;charset=utf-8');
+    }
+
+    function exportFullCalendarICS() {
+      if (!currentDossier) {
+        alert("Please click 'Connect The Dots' first to generate your action moves.");
+        return;
+      }
+
+      const allMoves = [];
+      (currentDossier.workMoves || []).forEach(w => allMoves.push({ type: 'Work Project', title: w.step, why: w.why }));
+      (currentDossier.lifeMoves || []).forEach(l => allMoves.push({ type: 'Personal & Life', title: l.step, why: l.why }));
+
+      if (allMoves.length === 0) {
+        alert("No action moves available to export.");
+        return;
+      }
+
+      const now = new Date();
+      const events = [];
+
+      allMoves.forEach((move, idx) => {
+        const dayOffset = Math.floor(idx / 2) + 1;
+        const hour = (idx % 2 === 0) ? 10 : 14;
+        
+        const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dayOffset, hour, 0, 0);
+        const endDate = new Date(startDate.getTime() + 45 * 60 * 1000);
+
+        events.push([
+          'BEGIN:VEVENT',
+          `UID:${Date.now()}_${idx}@3sci.panorama`,
+          `DTSTAMP:${formatICSDate(now)}`,
+          `DTSTART:${formatICSDate(startDate)}`,
+          `DTEND:${formatICSDate(endDate)}`,
+          `SUMMARY:${escapeICS(`[${move.type}]${move.title}`)}`,
+          `DESCRIPTION:${escapeICS(`${move.why}\n\nGenerated by Panorama from 3Sci Labs`)}`,
+          'STATUS:CONFIRMED',
+          'END:VEVENT'
+        ].join('\r\n'));
+      });
+
+      const icsData = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//3Sci Labs//Panorama Synthesizer//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        ...events,
+        'END:VCALENDAR'
+      ].join('\r\n');
+
+      const dateTag = new Date().toISOString().slice(0, 10);
+      downloadFile(icsData, `Panorama_Schedule_${dateTag}.ics`, 'text/calendar;charset=utf-8');
+    }
+
+    function copyTaskChecklist(btn) {
+      if (!currentDossier) {
+        alert("Please click 'Connect The Dots' first to create your task list.");
+        return;
+      }
+
+      const lines = [
+        `# Action Checklist: ${currentDossier.theme || 'Weekly Focus'}`,
+        `Generated: ${new Date().toLocaleDateString()}`,
+        '',
+        '## Work & Projects'
+      ];
+
+      (currentDossier.workMoves || []).forEach(w => {
+        lines.push(`- [ ] ${w.step} — ${w.why}`);
+      });
+
+      lines.push('', '## Personal, Travel & Errands');
+      (currentDossier.lifeMoves || []).forEach(l => {
+        lines.push(`- [ ] ${l.step} — ${l.why}`);
+      });
+
+      if (currentDossier.repeatingSnag?.detected) {
+        lines.push('', '## Repeating Trouble to Fix');
+        lines.push(`- [ ] Systemic Fix: ${currentDossier.repeatingSnag.explanation}`);
+      }
+
+      navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = "Copied Todo List!";
+        setTimeout(() => btn.innerText = orig, 1800);
+      });
+    }
+
+    /* Vault (Backup & Restore) */
+    function openVaultModal() {
+      document.getElementById('vault-modal').style.display = 'flex';
+    }
+
+    function closeVaultModal() {
+      document.getElementById('vault-modal').style.display = 'none';
+    }
+
+    function downloadVaultBackup() {
+      const vaultData = {
+        app: "Panorama from 3Sci Labs",
+        version: "3.8",
+        exportedAt: new Date().toISOString(),
+        notes: notes,
+        activeDossier: currentDossier,
+        history: JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]'),
+        northStar: localStorage.getItem('3sci_panorama_north_star') || ''
+      };
+
+      const dateStr = new Date().toISOString().slice(0, 10);
+      downloadFile(JSON.stringify(vaultData, null, 2), `Panorama_Vault_Backup_${dateStr}.json`, 'application/json');
+    }
+
+    function handleVaultFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) processVaultFile(file);
+    }
+
+    function handleVaultDrop(e) {
+      e.preventDefault();
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        processVaultFile(e.dataTransfer.files[0]);
+      }
+    }
+
+    function processVaultFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (!data.notes && !data.history) {
+            alert("Unrecognized file format. Please provide a valid Panorama Vault JSON.");
+            return;
+          }
+
+          if (confirm(`Restore vault backup from ${data.exportedAt ? data.exportedAt.slice(0, 10) : 'file'}?\n\n- Active thoughts: ${data.notes?.length || 0}\n- Past archived weeks: ${data.history?.length || 0}`)) {
+            if (data.notes) {
+              notes = data.notes;
+              localStorage.setItem('3sci_panorama_notes', JSON.stringify(notes));
+            }
+            if (data.history) {
+              localStorage.setItem('3sci_panorama_history', JSON.stringify(data.history));
+            }
+            if (data.activeDossier) {
+              currentDossier = data.activeDossier;
+              localStorage.setItem('3sci_panorama_active_dossier', JSON.stringify(currentDossier));
+              renderDossier(currentDossier);
+            }
+            if (data.northStar) {
+              localStorage.setItem('3sci_panorama_north_star', data.northStar);
+              document.getElementById('north-star-input').value = data.northStar;
+            }
+
+            renderNotes();
+            updateTelemetry();
+            closeVaultModal();
+            alert("Vault restored successfully!");
+          }
+        } catch (err) {
+          alert("Error reading JSON file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* Archive & History */
+    function loadExternalJson() {
+      const raw = document.getElementById('external-json-input').value.trim();
+      if (!raw) return;
+      try {
+        const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+        const parsed = JSON.parse(clean);
+        renderDossier(parsed);
+        document.getElementById('external-json-input').value = '';
+        alert("Loaded successfully!");
+      } catch (e) {
+        alert("Could not read JSON. Make sure you copied valid text.");
+      }
+    }
+
+    function archiveWeekAndStartFresh() {
+      if (notes.length === 0 && !currentDossier) {
+        alert("Nothing to archive yet.");
+        return;
+      }
+
+      const themeLabel = currentDossier ? currentDossier.theme : "Past Week";
+      if (!confirm(`Save this week ("${themeLabel}") to your archive?\n\n- All notes and the summary will be saved to your history.\n- Any open errands or work steps will automatically copy over into next week's scratchpad so you don't lose track of them.`)) {
+        return;
+      }
+
+      const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
+      const archiveRecord = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }),
+        theme: themeLabel,
+        summary: currentDossier?.summary || "No summary run.",
+        notesCount: notes.length,
+        notes: [...notes],
+        dossier: currentDossier
+      };
+      history.unshift(archiveRecord);
+      localStorage.setItem('3sci_panorama_history', JSON.stringify(history));
+
+      let carriedItems = [];
+      if (currentDossier) {
+        if (currentDossier.lifeMoves) {
+          currentDossier.lifeMoves.forEach(item => {
+            carriedItems.push({
+              id: Date.now() + Math.random(),
+              tag: 'personal',
+              text: `[Carried from last week]: ${item.step}`,
+              date: 'Pinned'
+            });
+          });
+        }
+        if (currentDossier.workMoves) {
+          currentDossier.workMoves.forEach(item => {
+            carriedItems.push({
+              id: Date.now() + Math.random(),
+              tag: 'work',
+              text: `[Carried from last week]: ${item.step}`,
+              date: 'Pinned'
+            });
+          });
+        }
+      }
+
+      notes = carriedItems;
+      currentDossier = null;
+      localStorage.removeItem('3sci_panorama_active_dossier');
+      saveNotes();
+
+      document.getElementById('dossier-eyebrow').innerText = "The Full Picture";
+      document.getElementById('dossier-theme').innerText = "Fresh Week Started";
+      document.getElementById('dossier-narrative').innerText = "Past week saved to archive. Open items were carried over into your scratchpad on the left. Ready for new thoughts.";
+      document.getElementById('chronic-friction-banner').style.display = 'none';
+      document.getElementById('list-friction').innerHTML = '<li class="insight-item">No snags recorded yet this week.</li>';
+      document.getElementById('list-bridges').innerHTML = '<div class="bridge-box"><span class="bridge-link">Connected Idea</span><span>Waiting for new thoughts to link.</span></div>';
+      document.getElementById('list-venture').innerHTML = '<li class="insight-item">Work list ready for Monday.</li>';
+      document.getElementById('list-life').innerHTML = '<li class="insight-item">Personal list clean and ready.</li>';
+
+      alert("Week saved! Open items have been pinned to your scratchpad.");
+    }
+
+    function openHistoryModal() {
+      const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
+      const container = document.getElementById('history-content');
+
+      if (history.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">No past weeks saved yet. Click "Finish Week & Start Fresh" at the end of the week to save snapshots.</div>`;
+      } else {
+        container.innerHTML = history.map((h) => `
+          <div class="history-card">
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <strong style="color:var(--primary); font-size:14px;">${h.theme}</strong>
+              <span style="font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;">${h.date} (${h.notesCount} thoughts)</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:1.45;">${h.summary ? h.summary.slice(0, 190) + '...' : 'Saved snapshot'}</p>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
+              <button class="btn-action" style="padding:4px 10px; font-size:11px;" onclick="restoreHistoricalDossier(${h.id})">View This Week</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('history-modal').style.display = 'flex';
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('history-modal').style.display = 'none';
+    }
+
+    function restoreHistoricalDossier(archiveId) {
+      const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
+      const target = history.find(h => h.id === archiveId);
+      if (target && target.dossier) {
+        renderDossier(target.dossier);
+        document.getElementById('dossier-status-pill').innerText = `PAST: ${target.date}`;
+        document.getElementById('history-modal').style.display = 'none';
+      }
+    }
+
+    /* Hotkeys & Init */
+    document.getElementById('note-input').addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        addNote();
+      }
+    });
+
+    window.addEventListener('keydown', function(e) {
+      if (e.altKey && (e.key === 'v' || e.key === 'V')) {
+        e.preventDefault();
+        toggleVoiceDictation();
+      }
+    });
+
+    window.onload = function() {
+      checkSecurityLock();
+      const savedKey = localStorage.getItem('3sci_panorama_key') || '';
+      if (savedKey) document.getElementById('top-gemini-key').value = savedKey;
+      loadNotes();
+
+      // Auto-trigger tour on brand-new setup
+      if (!localStorage.getItem('3sci_panorama_tour_seen')) {
+        setTimeout(openWizardModal, 600);
+      }
+    };
+  </script>
+</body>
+</html>
