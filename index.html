@@ -1503,43 +1503,78 @@ SCHEMA:
     function escapeQuotes(str) { return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
     /* Ultra-Fast Synthesis with Auto-Retry for High Demand Spikes */
+    /* Hard-Capped Ultra-Fast Synthesis Engine (Max 7 Seconds) */
     async function runHolisticSynthesis() {
       const apiKey = getKey();
-      if (!apiKey) { alert("Please paste your Google AI key in the top bar."); document.getElementById('top-gemini-key').focus(); return; }
-      if (notes.length === 0) { alert("Please add at least one note first."); return; }
+      if (!apiKey) {
+        alert("Please paste your Google AI key in the top bar, or use the Copy Prompt option.");
+        document.getElementById('top-gemini-key').focus();
+        return;
+      }
+
+      if (notes.length === 0) {
+        alert("Please add at least one thought on the left first.");
+        return;
+      }
 
       const promptText = compilePrompt();
       const btn = document.getElementById('btn-run-synth');
       const statusText = document.getElementById('synth-status');
 
       btn.disabled = true;
-      const startTime = Date.now();
-      const timerInterval = setInterval(() => {
-        statusText.innerText = `Connecting thoughts (${((Date.now() - startTime)/1000).toFixed(1)}s)...`;
-      }, 200);
+      statusText.innerText = "Connecting thoughts...";
 
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+      
+      // Strict 7-second hard limit: if servers lag, we drop out instantly instead of hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
 
-      async function attemptFetch(retryCount = 0) {
-        try {
-          const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: promptText }] }],
-              generationConfig: { response_mime_type: "application/json", temperature: 0.1, maxOutputTokens: 1024, thinkingConfig: { thinkingBudget: 0 } }
-            })
-          });
-          const json = await res.json();
-          if (json.error) {
-            // Check if it's a high demand overload error
-            if (json.error.code === 503 || json.error.message?.includes("high demand") || json.error.status === "RESOURCE_EXHAUSTED") {
-              if (retryCount < 1) {
-                statusText.innerText = `Server busy, retrying...`;
-                await new Promise(r => setTimeout(r, 2000));
-                return attemptFetch(retryCount + 1);
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }],
+            generationConfig: {
+              response_mime_type: "application/json",
+              temperature: 0.1,
+              maxOutputTokens: 1024,
+              thinkingConfig: {
+                thinkingBudget: 0
               }
             }
+          })
+        });
+
+        clearTimeout(timeoutId);
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error.message);
+        }
+        
+        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          const raw = data.candidates[0].content.parts[0].text;
+          const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+          renderDossier(JSON.parse(clean));
+        } else {
+          throw new Error("Empty response from AI model.");
+        }
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          alert("Server response took longer than 7 seconds (API traffic spike). \n\nTip: Click 'Use in Claude / ChatGPT (Copy Prompt)' in the sidebar—it takes 2 seconds and costs nothing.");
+        } else {
+          alert(`Synthesis skipped: ${err.message}\n\nTip: Use the 'Copy Prompt' button to run it instantly in Claude or ChatGPT.`);
+        }
+      } finally {
+        clearTimeout(timeoutId);
+        btn.disabled = false;
+        statusText.innerText = "Connect The Dots";
+      }
+    }
             throw new Error(json.error.message);
           }
           return json;
