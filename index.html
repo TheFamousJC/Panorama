@@ -408,7 +408,7 @@
       transition: opacity 0.15s;
     }
     .btn-synthesize-ai:hover { opacity: 0.94; }
-    .btn-synthesize-ai:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-synthesize-ai:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .btn-rollover {
       background: #eff6ff;
@@ -1706,72 +1706,57 @@
       `).join('');
     }
 
-    /* Prompt Builder */
+    /* Fast, Concise Prompt Builder */
     function compilePrompt() {
       const notesDump = notes.map((n, i) => `[Thought ${i+1}] (${n.tag.toUpperCase()} - ${n.date}): ${n.text}`).join('\n');
       
       const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
       const recentArchives = history.slice(0, 3);
       
-      let historyContext = "No past weeks recorded yet.";
+      let historyContext = "None";
       if (recentArchives.length > 0) {
-        historyContext = recentArchives.map((h) => `
-[Past Week - ${h.date}]
-- Main Theme: ${h.theme}
-- What Was Causing Trouble: ${(h.dossier?.recurringSnags || []).join('; ') || 'None recorded'}
-        `).join('\n');
+        historyContext = recentArchives.map((h) => `[Past Week: ${h.theme}] Snags: ${(h.dossier?.recurringSnags || []).join('; ') || 'None'}`).join('\n');
       }
 
-      const prompt = `You are a trusted, grounded personal thinking partner and advisor.
-Your job is NOT to answer these notes one-by-one like a chatbot.
-Look across all of these disorganized thoughts at once and help build a clear, coherent picture of what is going on across normal everyday life, travel, family, work projects, and new ideas.
+      const prompt = `You are a trusted, grounded thinking partner. Review all notes simultaneously.
+Produce concise, highly actionable JSON.
+CRITICAL FOR SPEED: Keep sentences crisp and short. No fluff, no essays, no buzzwords.
 
-TONE GUIDELINES:
-- Plain, human English only.
-- Absolutely NO corporate buzzwords, NO marketing slogans, and NO tech jargon (NEVER use words like: synergy, leverage, ecosystem, friction, paradigm, agile, bandwidth, deliverables, vector).
-- Speak like a thoughtful friend who is helping someone think clearly.
-
-PAST WEEKS NOTES (to see if the same trouble keeps repeating):
-"""
+PAST WEEKS HISTORY:
 ${historyContext}
-"""
 
-CURRENT NOTES FROM THIS WEEK:
-"""
+CURRENT THOUGHTS:
 ${notesDump}
-"""
 
-OUTPUT: Return valid raw JSON only. Do not wrap in markdown or backticks.
-
-JSON STRUCTURE:
+OUTPUT JSON ONLY. MATCH SCHEMA EXACTLY:
 {
-  "theme": "A short, grounded 4-6 word title describing what took up the most mental space",
-  "summary": "Two short, readable paragraphs explaining what stood out this week, what was causing stress or wasting time, and what seems promising.",
+  "theme": "Sharp 4-6 word title",
+  "summary": "Exactly 2 concise sentences summarizing where focus went and what needs clearing.",
   "repeatingSnag": {
     "detected": true,
-    "name": "Short name for the repeating issue",
-    "explanation": "Plain explanation of why this keeps happening across weeks and one practical way to stop it."
+    "name": "Short name",
+    "explanation": "One sentence explaining why it repeats and the simple fix."
   },
   "recurringSnags": [
-    "Practical root problem 1",
-    "Practical root problem 2"
+    "Root issue 1 (under 12 words)",
+    "Root issue 2 (under 12 words)"
   ],
   "connectedSparks": [
     {
       "connection": "Note A + Note B",
-      "idea": "A clear, simple way these two different thoughts actually connect into an interesting idea or shortcut."
+      "idea": "One crisp sentence explaining how these link into a smart shortcut."
     }
   ],
   "workMoves": [
     {
-      "step": "Specific practical work or project action",
-      "why": "Why doing this gets things moving."
+      "step": "Specific practical work move",
+      "why": "One sentence rationale"
     }
   ],
   "lifeMoves": [
     {
-      "step": "Personal errand, travel decision, or open question to answer",
-      "why": "Why getting this off the mind gives relief."
+      "step": "Personal task or travel move",
+      "why": "One sentence rationale"
     }
   ]
 }`;
@@ -1880,7 +1865,7 @@ JSON STRUCTURE:
       return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
-    /* Fast Synthesis Engine */
+    /* High-Speed Synthesis Engine */
     async function runHolisticSynthesis() {
       const apiKey = getKey();
       if (!apiKey) {
@@ -1899,13 +1884,18 @@ JSON STRUCTURE:
       const statusText = document.getElementById('synth-status');
 
       btn.disabled = true;
-      statusText.innerText = "Analyzing notes...";
+      const startTime = Date.now();
+      
+      const timerInterval = setInterval(() => {
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        statusText.innerText = `Connecting thoughts (${elapsed}s)...`;
+      }, 200);
 
-      // Targeted high-speed flash endpoint
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      // gemini-1.5-flash is the fastest endpoint on Google AI Studio with zero thinking overhead
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s safety limit
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
 
       try {
         const response = await fetch(endpoint, {
@@ -1916,13 +1906,14 @@ JSON STRUCTURE:
             contents: [{ parts: [{ text: promptText }] }],
             generationConfig: {
               response_mime_type: "application/json",
-              temperature: 0.2,
-              maxOutputTokens: 2048
+              temperature: 0.1,
+              maxOutputTokens: 1024
             }
           })
         });
 
         clearTimeout(timeoutId);
+        clearInterval(timerInterval);
 
         const data = await response.json();
         if (data.error) {
@@ -1935,19 +1926,21 @@ JSON STRUCTURE:
         }
       } catch (err) {
         clearTimeout(timeoutId);
+        clearInterval(timerInterval);
         if (err.name === 'AbortError') {
-          alert("Request timed out. Please check your connection or use the external copy prompt option.");
+          alert("Request timed out. Please check your internet connection or use Option 2: Copy Prompt.");
         } else {
           alert(`Could not complete review: ${err.message}`);
         }
       } finally {
         clearTimeout(timeoutId);
+        clearInterval(timerInterval);
         btn.disabled = false;
         statusText.innerText = "Connect The Dots";
       }
     }
 
-    /* Fast Action Draft Generator */
+    /* High-Speed Action Plan Drafter */
     async function generateActionPlan(title, context) {
       const modal = document.getElementById('draft-modal');
       const titleEl = document.getElementById('draft-modal-title');
@@ -1956,12 +1949,12 @@ JSON STRUCTURE:
 
       titleEl.innerText = title.toUpperCase();
       labelEl.innerText = context;
-      outputEl.innerText = "Thinking and drafting practical steps...";
+      outputEl.innerText = "Drafting practical steps...";
       modal.style.display = 'flex';
 
       const apiKey = getKey();
       if (!apiKey) {
-        outputEl.innerText = `To draft this plan automatically, please paste your Google AI key into the top header bar.\n\nAlternatively, copy this prompt into Claude or ChatGPT:\n\n"Break down the following item into a simple, grounded, 1-page action plan with step-by-step instructions and any ready-to-use message drafts:\n\n${context}"`;
+        outputEl.innerText = `To draft this plan automatically, paste your Google AI key into the header bar.\n\nAlternatively, copy this prompt into Claude or ChatGPT:\n\n"Break down the following into a simple, grounded, 1-page action plan with step-by-step instructions and any ready-to-use message drafts:\n\n${context}"`;
         return;
       }
 
@@ -1969,17 +1962,17 @@ JSON STRUCTURE:
 Take this specific goal or problem:
 "${context}"
 
-Draft a clear, simple, human, and immediately useful 1-page plan.
+Draft a clear, human, immediately useful 1-page plan.
 Include:
 1. THE BOTTOM LINE: What needs to happen in 1-2 sentences.
 2. IMMEDIATE 3 STEPS: Concrete actions to do today or tomorrow.
-3. READY-TO-SEND DRAFT: If this involves a client, teammate, hotel, vendor, or contractor, write a polite, ready-to-send email or message. Otherwise, write a quick checklist of what to avoid.
+3. READY-TO-SEND DRAFT: If this involves a person/vendor, write a polite ready-to-send message. Otherwise, write a checklist of what to avoid.
 
-Strictly NO corporate buzzwords, NO business school fluff. Write plainly and directly.`;
+Strictly NO corporate buzzwords. Write plainly and directly.`;
 
-      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$){apiKey}`;
+      const endpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){apiKey}`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       try {
         const response = await fetch(endpoint, {
@@ -1989,8 +1982,8 @@ Strictly NO corporate buzzwords, NO business school fluff. Write plainly and dir
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-              temperature: 0.3,
-              maxOutputTokens: 1024
+              temperature: 0.2,
+              maxOutputTokens: 800
             }
           })
         });
@@ -2005,7 +1998,7 @@ Strictly NO corporate buzzwords, NO business school fluff. Write plainly and dir
       } catch (e) {
         clearTimeout(timeoutId);
         if (e.name === 'AbortError') {
-          outputEl.innerText = "Draft request timed out. Please try again or copy the prompt into Claude/ChatGPT.";
+          outputEl.innerText = "Request timed out. Please try again.";
         } else {
           outputEl.innerText = "Error contacting AI: " + e.message;
         }
