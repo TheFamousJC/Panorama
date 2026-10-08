@@ -701,7 +701,7 @@ test('new visitors can skip the introduction with Escape and reload without bein
 
 test('existing browser data and the previous tour preference prevent automatic introduction without new writes', () => {
   for (const key of ['notes', 'active_dossier', 'history', 'north_star', 'key', 'pin', 'tour_seen']) {
-    const f = fixture(); f.stored.set('3sci_panorama_' + key, ['notes', 'history'].includes(key) ? '[]' : key === 'active_dossier' ? 'null' : '');
+    const f = fixture(); f.stored.set('3sci_panorama_' + key, ['notes', 'history'].includes(key) ? '[]' : key === 'active_dossier' ? JSON.stringify(dossier()) : '');
     const before = f.snapshot(); f.run('window.onload()');
     assert.notEqual(f.get('wizard-modal').style.display, 'flex'); assert.equal(f.snapshot(), before);
   }
