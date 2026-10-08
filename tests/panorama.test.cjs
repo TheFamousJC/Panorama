@@ -371,3 +371,41 @@ test('Escape cancels the pending review and releases the background controls', (
   assert.equal(f.get('app-layout-main').inert, false);
   assert.equal(f.snapshot(), before);
 });
+
+test('ChatGPT handoff uses an ordinary safe link without putting selected thoughts in the URL', async () => {
+  const f = fixture(); seed(f);
+  f.run('togglePromptStudio(); selectShareNotes(true)');
+  await f.run('copyCompiledPrompt()');
+  const link = html.match(/<a class="btn-action btn-action-accent" href="([^"]+)" target="_blank" rel="([^"]+)">Open ChatGPT \(new tab\)<\/a>/);
+  assert.ok(link, 'The dialog must provide an accessible ChatGPT link');
+  assert.equal(link[1], 'https://chatgpt.com/');
+  assert.ok(link[2].includes('noopener') && link[2].includes('noreferrer'));
+  assert.match(html, /Sign in to ChatGPT if prompted/);
+  assert.match(f.get('share-copy-status').textContent, /your Dot conversation/);
+  assert.equal(f.get('dossier-review').hidden, true);
+});
+
+test('keyboard navigation wraps around the new ChatGPT link without trapping it out of the dialog', () => {
+  const f = fixture(); seed(f);
+  const first = new Element('button');
+  const link = new Element('a');
+  const last = new Element('button');
+  [first, link, last].forEach(el => { el.closest = () => null; });
+  f.get('prompt-studio-drawer').querySelectorAll = selector => {
+    assert.match(selector, /a\[href\]/);
+    return [first, link, last];
+  };
+  let prevented = false;
+  f.context.keyEvent = { key: 'Tab', shiftKey: false, preventDefault() { prevented = true; } };
+  f.context.document.activeElement = link;
+  f.run('handleShareKey(keyEvent)');
+  assert.equal(prevented, false, 'Normal traversal from the link must be allowed');
+  f.context.document.activeElement = last;
+  f.run('handleShareKey(keyEvent)');
+  assert.equal(prevented, true);
+  assert.equal(first.focused, true);
+  f.context.keyEvent.shiftKey = true;
+  f.context.document.activeElement = first;
+  f.run('handleShareKey(keyEvent)');
+  assert.equal(last.focused, true);
+});
