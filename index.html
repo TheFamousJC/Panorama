@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panorama — A little clarity for your day</title>
   <style>
-    :root { --ink:#202b35; --muted:#64717c; --line:#e1e5e8; --paper:#fff; --bg:#f6f7f8; --accent:#254b70; --soft:#eef3f7; --danger:#a03535; }
+    :root { --ink:#302a2b; --muted:#6c625c; --line:#e2d7cb; --paper:#fffdf8; --bg:#f5efe5; --accent:#a0432d; --soft:#f8e8dd; --danger:#a02c35; --teal:#235650; --berry:#543648; }
     * { box-sizing:border-box; }
     [hidden] { display:none !important; }
     body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.6; }
@@ -14,7 +14,7 @@
     button,a,summary { touch-action:manipulation; }
     button { cursor:pointer; }
     button:disabled { opacity:.45; cursor:not-allowed; }
-    :focus-visible { outline:3px solid #538fc4; outline-offset:3px; }
+    :focus-visible { outline:3px solid #267970; outline-offset:3px; }
     h1,h2,h3,h4,p { margin:0; }
     h1 { font-size:clamp(28px,5vw,38px); line-height:1.2; letter-spacing:-1px; font-weight:650; }
     h2 { font-size:22px; line-height:1.35; font-weight:650; }
@@ -43,10 +43,10 @@
     .btn-action,.btn-card-action,.btn-add-entry,.btn-voice { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; min-height:44px; border:1px solid var(--line); border-radius:9px; background:#fff; color:var(--ink); font-size:14px; font-weight:600; text-decoration:none; }
     .btn-action:hover,.btn-card-action:hover,.btn-voice:hover { background:var(--soft); }
     .btn-action-accent,.btn-add-entry { background:var(--accent); border-color:var(--accent); color:#fff; }
-    .btn-action-accent:hover,.btn-add-entry:hover { background:#183b5c; }
+    .btn-action-accent:hover,.btn-add-entry:hover { background:#803221; }
     .btn-link { background:none; border:0; color:var(--accent); padding:4px 0; font-size:14px; text-decoration:underline; text-underline-offset:3px; }
     .danger { color:var(--danger); }
-    textarea,input[type="text"],input[type="password"],input[type="search"],select { width:100%; max-width:100%; min-width:0; border:1px solid #cbd3da; border-radius:9px; padding:12px; background:#fff; color:var(--ink); }
+    textarea,input[type="text"],input[type="password"],input[type="search"],select { width:100%; max-width:100%; min-width:0; border:1px solid #cfc1b4; border-radius:9px; padding:12px; background:#fff; color:var(--ink); }
     textarea { display:block; resize:vertical; line-height:1.6; }
     .entry-textarea { min-height:144px; }
     .entry-actions { margin-top:16px; }
@@ -132,6 +132,74 @@
       .share-actions > .btn-action { flex:1 1 auto; }
       .share-stage-footer > button { flex:1; }.share-progress { gap:8px; font-size:12px; }
     }
+    /* A warm notebook: generous paper surfaces, a coral capture action, and a teal reflection path. */
+    body { background:radial-gradient(ellipse at 95% 0,#f4decb 0,transparent 42%),var(--bg); }
+    .site-header { max-width:856px; padding-top:30px; }
+    main { max-width:856px; padding-top:36px; }
+    .brand { letter-spacing:2px; font-size:15px; color:var(--berry); }
+    .brand-mark { background:var(--berry); border-radius:9px; }
+    .saved-local { background:#ebe7db; color:#58574c; padding:5px 10px; border-radius:20px; }
+    .main-nav { gap:6px; border:0; background:#eae2d8; padding:5px; border-radius:14px; }
+    .main-nav button { flex:1; border:0; border-radius:10px; color:#645952; min-height:44px; }
+    .main-nav button:hover { background:#f3ede5; }
+    .main-nav button[aria-current="page"] { background:var(--paper); color:var(--berry); box-shadow:0 2px 5px #5436480d; }
+    .page-intro h1 { font-family:Georgia,"Times New Roman",serif; font-size:clamp(34px,5.8vw,50px); font-weight:500; letter-spacing:-1.6px; line-height:1.12; }
+    .page-intro > .muted { max-width:650px; font-size:17px; line-height:1.7; }
+    .eyebrow { color:var(--accent); font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:750; }
+    .journey { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; list-style:none; padding:18px 0; margin:24px 0 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+    .journey li { display:flex; align-items:flex-start; gap:10px; min-width:0; }
+    .journey-number { display:grid; place-items:center; width:28px; height:28px; flex:0 0 28px; border:1px solid #c8b7a8; border-radius:50%; color:var(--accent); font-size:12px; font-weight:700; }
+    .journey strong { display:block; font-size:14px; }.journey small { display:block; color:var(--muted); font-size:12px; line-height:1.5; }
+    .card { background:var(--paper); border-color:#e3d7c9; border-radius:20px; box-shadow:0 5px 18px #60432905; }
+    .capture-card { border-top:4px solid #c66b4d; }
+    .capture-card > label { color:var(--ink); font-size:18px; font-weight:650; }
+    .entry-textarea { min-height:130px; background:#fffdfa; margin-top:12px; padding:16px; }
+    textarea::placeholder,input::placeholder { color:#7b7069; opacity:1; }
+    .btn-add-entry { padding-inline:24px; border-radius:11px; }
+    .btn-voice { background:transparent; }
+    .writing-starters { margin-top:14px; }.writing-starters summary { font-size:13px; }
+    .starter-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .starter-actions button { background:#f7eee4; border-color:#e4d2bf; color:#704530; border-radius:24px; font-size:13px; }
+    .optional-details { margin-top:10px; }
+    .priority-details { background:#ecece0; padding:8px 18px; border-radius:12px; }
+    .priority-details summary { color:#4d5946; }
+    .dot-share-panel { background:#e7eeE6; border:1px solid #cbdace; padding:24px; border-radius:20px; margin:0 0 28px; }
+    .dot-share-panel h3 { color:var(--teal); font-family:Georgia,serif; font-weight:500; font-size:27px; line-height:1.2; margin-bottom:16px; }
+    .btn-copy-prompt { background:var(--teal); border-color:var(--teal); min-height:80px; font-size:24px; border-radius:12px; justify-content:flex-start; padding:14px 20px; }
+    .btn-copy-prompt:hover { background:#193f3b; }
+    .btn-copy-prompt:disabled { opacity:1; background:#d1ddd2; color:#58685b; border-color:#c0cfc2; }
+    .btn-copy-prompt:disabled .dot-share-logo { opacity:.6; }
+    .dot-share-hint { text-align:left; color:#486156; font-size:14px; }
+    .dot-share-logo { width:46px; height:46px; }
+    .thought-list { display:grid; gap:12px; }
+    .stream-item { background:var(--paper); padding:16px 20px 20px; border:1px solid var(--line); border-radius:14px; }
+    .stream-tag:not(:empty) { background:#f1e8dc; color:#74543e; padding:3px 9px; border-radius:12px; }
+    .stream-text { font-size:16px; line-height:1.7; }.btn-del-note:hover { color:var(--danger); }
+    #notes-count { border:1px solid #d8cbbd; padding:4px 10px; border-radius:16px; }
+    .empty-note { padding:24px; border:1px dashed #cebcaa; border-radius:14px; background:#ffffff40; }
+    .review-picture { background:#f1e4d7; border-color:#dfc9b5; }
+    .review-picture h2 { font:500 clamp(25px,4vw,33px)/1.25 Georgia,serif; margin-top:10px; }
+    .next-steps li { padding:14px 0 14px 8px; border-bottom:1px solid var(--line); }
+    .next-steps li:last-child { border:0; }.next-steps li::marker { color:var(--accent); font-weight:750; }
+    .history-card { background:var(--paper); border-left:4px solid #b89870; }.history-card summary { color:var(--berry); }
+    .settings-section { background:var(--paper); padding:22px; border:1px solid var(--line); border-radius:16px; }
+    .settings-section summary { color:var(--berry); font-weight:650; }
+    .notice,.share-review { background:#edf1e8; }.status:not(:empty) { border-left:3px solid #ba684a; padding:8px 12px; background:#fff5e9; color:#74402d; border-radius:0 7px 7px 0; }
+    .modal-window,.pin-box { background:var(--paper); }.modal-head { background:#f3ece2; border-radius:16px 16px 0 0; color:var(--berry); }
+    .share-progress li { padding:6px 10px; border-radius:8px; }.share-progress [aria-current="step"] { background:var(--teal); color:#fff; }
+    .share-note-list label:has(input:checked) { background:#eef1e7; }.share-note-list label { padding-inline:10px; }
+    .share-stage > h2 { font:500 30px/1.2 Georgia,serif; }
+    @media (max-width:600px) {
+      .site-header { padding-top:20px; }.brand { font-size:13px; gap:9px; }.saved-local { font-size:11px; }
+      .main-nav { gap:2px; }.main-nav button { padding:10px 5px; font-size:12px; }
+      main { padding-top:28px; }.page-intro h1 { letter-spacing:-1px; }.page-intro > .muted { font-size:16px; }
+      .journey { gap:8px; padding:14px 0; }.journey li { gap:6px; }.journey-number { width:22px; height:22px; flex-basis:22px; font-size:11px; }
+      .journey strong { font-size:12px; }.journey small { font-size:11px; }
+      .capture-card { padding:20px; }.dot-share-panel { padding:20px; }.dot-share-panel h3 { font-size:25px; }
+      .btn-copy-prompt { font-size:20px; padding:12px; gap:10px; }.dot-share-logo { width:40px; height:40px; }
+      .settings-section { padding:20px; }.stream-item { padding:14px 16px 18px; }
+    }
+    @media (max-width:359px) { .journey small { display:none; }.journey li { flex-direction:column; }.btn-copy-prompt { font-size:18px; } }
     @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
   </style>
 </head>
@@ -150,10 +218,11 @@
   </header>
   <main id="app-layout-main">
     <section class="page" id="page-notes" aria-labelledby="notes-title">
-      <div class="page-intro"><h1 id="notes-title" tabindex="-1">What's on your mind?</h1><p class="muted">Big ideas. Everyday worries. Get them out of your head and into Panorama. My Dot helps you connect the pieces and turn them into your next move.</p></div>
-      <div class="card">
-        <label for="note-input" class="help-text">A thought, an idea, or something to sort out</label>
+      <div class="page-intro"><p class="eyebrow">A little space for a fresh perspective</p><h1 id="notes-title" tabindex="-1">What's on your mind?</h1><p class="muted">Big ideas. Everyday worries. Get them out of your head and into Panorama. My Dot helps you connect the pieces and turn them into your next move.</p><ol class="journey" aria-label="How Panorama works"><li><span class="journey-number" aria-hidden="true">1</span><span><strong>Capture</strong><small>Get it out of your head</small></span></li><li><span class="journey-number" aria-hidden="true">2</span><span><strong>Reflect</strong><small>Take it to My Dot</small></span></li><li><span class="journey-number" aria-hidden="true">3</span><span><strong>Act</strong><small>Choose your next move</small></span></li></ol></div>
+      <div class="card capture-card">
+        <label for="note-input" class="help-text">Start with one thought</label>
         <textarea id="note-input" class="entry-textarea" placeholder="Start anywhere. You don't need to organize it yet."></textarea>
+        <details class="writing-starters"><summary>Need a starting point?</summary><div class="details-body"><p class="help-text">Choose a starter and make it yours. Nothing is saved until you choose Save thought.</p><div class="starter-actions"><button class="btn-action" onclick="useWritingStarter('idea')">An idea to explore</button><button class="btn-action" onclick="useWritingStarter('worry')">Something on my mind</button><button class="btn-action" onclick="useWritingStarter('decision')">A decision to make</button></div></div></details>
         <details class="optional-details"><summary>Add a category (optional)</summary><div class="details-body"><div><label for="note-category">Category for this thought</label><select id="note-category" onchange="selectTag(this.value)"><option value="other">No category</option><option value="work">Work</option><option value="personal">Personal</option><option value="annoyance">Something in the way</option><option value="spark">Idea</option><option value="question">Question</option><option value="chores">Errand</option></select></div></div></details>
         <div class="row spread entry-actions">
           <button class="btn-add-entry" onclick="addNote()">Save thought</button>
@@ -164,14 +233,14 @@
       </div>
       <details class="priority-details"><summary>Today's priority (optional)</summary><div class="details-body"><div><label for="north-star-input">Today's priority</label><input type="text" id="north-star-input" placeholder="What matters most today?" oninput="saveNorthStar(this.value)"><p class="help-text">Saves as you type. You can choose to include this when sharing.</p><p id="priority-status" class="status" role="status"></p></div></div></details>
       <section aria-labelledby="saved-thoughts-title">
-        <div class="row spread"><h2 id="saved-thoughts-title" tabindex="-1">Your saved thoughts</h2><span class="help-text" id="notes-count">0 thoughts</span></div>
-        <p id="priority-preview" class="help-text"></p>
-        <div class="dot-share-panel">
+        <div class="dot-share-panel"><h3>Find the thread in your thoughts.</h3>
           <button class="btn-copy-prompt" id="start-dot-share" onclick="togglePromptStudio()" aria-label="Share with My Dot" aria-describedby="dot-share-hint">
             <img class="dot-share-logo" src="assets/dot-default.png" width="56" height="56" alt=""><span class="dot-share-label">Share with My Dot</span>
           </button>
           <p class="dot-share-hint" id="dot-share-hint">Choose thoughts, take them to your Dot in ChatGPT, and bring back a review.</p>
         </div>
+        <div class="row spread"><h2 id="saved-thoughts-title" tabindex="-1">Your saved thoughts</h2><span class="help-text" id="notes-count">0 thoughts</span></div>
+        <p id="priority-preview" class="help-text"></p>
         <details class="thought-tools" id="thought-tools" hidden>
           <summary>Find a thought</summary>
           <div class="details-body stack">
@@ -190,8 +259,8 @@
       <div class="page-intro"><h1 id="review-title" tabindex="-1">Your latest review</h1><p class="muted">A little perspective, and a place to begin.</p></div>
       <div id="review-empty" class="card stack"><h2>No review yet</h2><p>Add a few thoughts, then share them with My Dot. Your review will appear here after you bring back and save the reply.</p><button class="btn-action btn-action-accent" onclick="showPage('notes')">Back to my thoughts</button></div>
       <div id="review-content" class="stack" hidden>
-        <article class="card"><p class="help-text">The big picture</p><h2 id="dossier-theme"></h2><p id="dossier-narrative" class="macro-narrative review-summary"></p></article>
-        <section class="card"><h2>Suggested next steps</h2><ol id="next-steps" class="next-steps"></ol><p class="help-text">Start with whichever feels useful. Explore all suggestions below. Nothing has been scheduled or sent.</p></section>
+        <article class="card review-picture"><p class="eyebrow">The big picture</p><h2 id="dossier-theme"></h2><p id="dossier-narrative" class="macro-narrative review-summary"></p></article>
+        <section class="card"><p class="eyebrow">From reflection to action</p><h2>Suggested next steps</h2><ol id="next-steps" class="next-steps"></ol><p class="help-text">Start with whichever feels useful. Explore all suggestions below. Nothing has been scheduled or sent.</p></section>
         <details class="card"><summary>Explore the patterns and all suggestions</summary><div class="details-body">
           <div id="chronic-friction-banner" class="chronic-alert"><strong id="chronic-badge-label"></strong><p id="chronic-body-text" class="chronic-body"></p></div>
           <h3>What keeps getting in your way</h3><ul id="list-friction" class="insight-list"></ul>
@@ -531,6 +600,18 @@
       }
       notes = next; renderNotes(); updateTelemetry(); renderShareNotes(); return true;
     }
+    function useWritingStarter(kind) {
+      const starters = { idea: 'An idea I keep coming back to is ', worry: 'Something on my mind right now is ', decision: 'A decision I would like to think through is ' };
+      if (!Object.hasOwn(starters, kind)) return;
+      const input = document.getElementById('note-input');
+      if (input.value.trim()) {
+        document.getElementById('note-save-status').textContent = 'You already have a thought in progress. Save it or clear the text before choosing a starter.';
+      } else {
+        input.value = starters[kind];
+        document.getElementById('note-save-status').textContent = 'Make this starter your own, then choose Save thought.';
+      }
+      input.focus();
+    }
     function addNote() {
       const input = document.getElementById('note-input');
       const text = input.value.trim();
@@ -588,7 +669,7 @@
       document.getElementById('start-dot-share').disabled = notes.length === 0;
       document.getElementById('dot-share-hint').textContent = notes.length ? 'Choose thoughts, take them to your Dot in ChatGPT, and bring back a review.' : 'Save a thought above to start a review with My Dot.';
       container.replaceChildren();
-      if (!filtered.length) container.append(textElement('p', 'empty-note', notes.length ? 'No thoughts match your search.' : 'Your saved thoughts will appear here. Start with one thing on your mind.'));
+      if (!filtered.length) container.append(textElement('p', 'empty-note', notes.length ? 'No thoughts match your search.' : 'Your first thought starts the picture. An idea, a worry, a half-formed plan: it all belongs here.'));
       if (!filtered.length && notes.length) container.append(actionButton('Clear search and filters', resetThoughtFilters));
       filtered.forEach(n => {
         const item = textElement('div', 'stream-item ' + (NOTE_TAGS.includes(n.tag) ? n.tag : ''));

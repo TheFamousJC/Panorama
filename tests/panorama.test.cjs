@@ -671,3 +671,18 @@ test('PIN unlock returns to the visible screen and empty calendar exports explai
   f.run('exportFullCalendarICS()');
   assert.equal(downloaded, false); assert.match(f.get('review-export-status').textContent, /no work suggestions/);
 });
+
+test('optional writing starters fill only an empty draft and never overwrite or save user content', () => {
+  const f = fixture(); seed(f); const before = f.snapshot();
+  f.run("useWritingStarter('idea')");
+  assert.equal(f.get('note-input').value, 'An idea I keep coming back to is ');
+  assert.equal(f.snapshot(), before);
+  f.get('note-input').value = 'My unfinished thought';
+  f.run("useWritingStarter('worry')");
+  assert.equal(f.get('note-input').value, 'My unfinished thought');
+  assert.match(f.get('note-save-status').textContent, /already have a thought/);
+  f.get('note-input').value = ''; f.run("useWritingStarter('decision')");
+  assert.match(f.get('note-input').value, /A decision/);
+  assert.equal(f.snapshot(), before);
+  f.run("useWritingStarter('invalid')"); assert.equal(f.snapshot(), before);
+});

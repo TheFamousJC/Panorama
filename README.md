@@ -10,6 +10,8 @@ The **Thoughts** screen starts empty for new users. Write what is on your mind a
 
 A category applies only to the thought being saved and resets afterward. Today's priority is a separate optional control. Failed capture saves keep the draft and existing thoughts unchanged. Search filters clear after saving so the new thought remains visible.
 
+The warm notebook design uses cream paper surfaces, coral capture controls, and a teal Dot handoff. A compact Capture / Reflect / Act guide explains the journey. **Need a starting point?** offers optional writing starters; choosing one only fills an empty draft and never overwrites or saves a thought.
+
 No example thoughts or compulsory tour are inserted. Voice input is available when the browser supports it.
 
 ## Review with My Dot
