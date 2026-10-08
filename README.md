@@ -36,7 +36,17 @@ Dialogs support Escape, keyboard focus containment, and return focus to their op
 
 History shows both existing weekly archives and saved previous reviews. Expand an entry to read its review and original thoughts, or search its contents.
 
-Review exports are under **Copy or download this review**: copy the action list, download a Markdown summary, or download work calendar blocks at preset times. Calendar exports do not check availability or sync a calendar.
+Review exports are under **Copy or download this review**: copy the action list, download a Markdown summary (including your Monday plan), or choose calendar times. Calendar exports do not check availability or sync a calendar.
+
+## From a messy week to Monday
+
+- **Review this week** selects thoughts from the current Monday–Sunday in your local time and opens the existing manual Dot handoff. The selection shows dates and a count; all other thoughts remain available for manual selection. New thoughts save a full timestamp. Older timestamp-based IDs remain usable; thoughts without a reliable date are explicitly left for manual selection.
+- **My Monday plan** saves priorities, first steps, definitions of done, and progress (To do, Done, Deferred, Dropped). Use **Save changes** on each action. Add your own actions whenever needed. Older review formats remain supported and show up to three suggestions as editable plan starters.
+- **Follow-through:** the optional recent-review context includes unfinished actions from the current plan and History. For repeated action titles, the latest status wins, so completed or dropped actions are not revived from an older review. This context is only copied when the checkbox is selected.
+- **Thoughts behind this insight** opens source thought snapshots for bottlenecks and connections. Dot is asked to cite selected thought IDs. Panorama resolves those IDs only against your actual selected thoughts, never against source text supplied by the assistant. Snapshots survive deletion and archiving and are included in backups. Citations make the source inspectable; they do not prove the assistant's interpretation. Old reviews explain when no source citation is available.
+- **Choose calendar times** lets you select unfinished actions and edit each date, local start time, and duration before downloading an ICS file. Defaults start next Monday, with two blocks per day. Single-suggestion calendar buttons use the same preview. Import the file into your calendar and check the times there.
+
+The prepared Dot message now requests at most three Monday priorities, supporting thought IDs, and small experiments for product ideas. Existing notes, reviews, archives, and backups remain compatible. Plans and source snapshots live inside the saved review; backup and History retain them.
 
 ## Settings
 

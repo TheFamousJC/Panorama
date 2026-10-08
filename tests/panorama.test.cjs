@@ -737,3 +737,98 @@ test('wizard traps keyboard focus and can always close when its preference canno
   f.run('closeWizardModal()'); assert.equal(f.get('app-layout-main').inert, false);
   assert.equal(f.get('wizard-modal').style.display, 'none'); assert.equal(f.snapshot(), before);
 });
+
+test('weekly selection respects local Monday boundaries and keeps undated legacy thoughts available', () => {
+  const f = fixture();
+  const start = new Date(2026, 9, 5), end = new Date(2026, 9, 12);
+  seed(f, { notes: [
+    { ...notes[0], id: start.getTime(), createdAt: start.toISOString() },
+    { ...notes[1], id: end.getTime(), createdAt: end.toISOString() },
+    { ...notes[0], id: 9 },
+    { ...notes[0], id: start.getTime() - 1 }
+  ] });
+  const before = f.snapshot();
+  f.run('selectThisWeek(new Date(2026, 9, 9))');
+  assert.equal(f.run('selectedShareNotes.size'), 1);
+  assert.equal(f.run(`selectedShareNotes.has(${start.getTime()})`), true);
+  assert.match(f.get('week-selection-summary').textContent, /no reliable date/);
+  assert.equal(f.snapshot(), before);
+});
+
+test('Monday plans survive reload, backup and history; failed saves keep the previous plan', () => {
+  const f = fixture(); seed(f);
+  f.set('newReview', { ...dossier('New'), mondayPlan: [{ step: 'Ship', firstStep: 'Check', doneWhen: 'Published', status: 'open' }] });
+  f.run('renderDossier(newReview)');
+  f.run("persistPlan(planActions().map(a => ({...a, status: 'done'})))");
+  f.run('loadNotes()');
+  assert.equal(f.run('planActions()[0].status'), 'done');
+  const before = f.snapshot(); f.failStorageOnce('3sci_panorama_active_dossier');
+  assert.equal(f.run("persistPlan(planActions().map(a => ({...a, status: 'dropped'})))"), false);
+  assert.equal(f.snapshot(), before);
+  assert.equal(f.run('planActions()[0].status'), 'done');
+  f.run('restoreVault(createVaultBackup())');
+  assert.equal(f.run('planActions()[0].doneWhen'), 'Published');
+  f.run("renderDossier({...newReview, theme:'Next'})");
+  assert.equal(JSON.parse(f.stored.get('3sci_panorama_history'))[0].dossier.mondayPlan[0].status, 'done');
+});
+
+test('follow-through respects the latest status and the explicit sharing toggle', () => {
+  const f = fixture(); seed(f);
+  f.set('old', { ...dossier(), mondayPlan: [{ step: 'Fix', firstStep: '', doneWhen: '', status: 'open' }] });
+  f.run('renderDossier(old); persistPlan(planActions().map(a => ({...a, status:"done"})))');
+  assert.equal(f.run('unfinishedActions().length'), 0);
+  f.run('persistPlan(planActions().map(a => ({...a, status:"deferred"})))');
+  assert.equal(f.run('unfinishedActions().length'), 1);
+  const context = include => JSON.parse(f.run(`compilePrompt(notes, false, ${include})`).split('CONTEXT:\n')[1].split('\n\nSCHEMA:')[0]);
+  assert.equal(context(false).followThrough.length, 0);
+  assert.equal(context(true).followThrough[0].status, 'deferred');
+});
+
+test('evidence uses only selected local source snapshots and remains after deleting thoughts', () => {
+  const f = fixture(); seed(f);
+  f.run('selectedShareNotes.add(1)');
+  review(f, { ...dossier('Sources'), recurringSnags: ['Delay'], evidence: [{ insight: 'Delay', noteIds: ['1', '2', '999'] }], sourceNotes: [{...notes[0], text:'Fabricated source'}] });
+  assert.doesNotMatch(f.get('dossier-review-content').textContent, /Fabricated source|SYNTHETIC excluded note/);
+  f.run('applyExternalDossier(); notes = []; paintDossier(currentDossier)');
+  assert.match(f.get('list-friction').textContent, /SYNTHETIC selected note/);
+  assert.doesNotMatch(f.get('list-friction').textContent, /SYNTHETIC excluded note|Fabricated source/);
+  f.run('restoreVault(createVaultBackup())');
+  assert.match(f.get('list-friction').textContent, /SYNTHETIC selected note/);
+});
+
+test('calendar preview selects actions and validates local dates and durations before export', () => {
+  const f = fixture(); seed(f);
+  f.run('openCalendarPlanner()');
+  assert.equal(f.run('calendarRows.length'), 2);
+  f.run("calendarRows[0].date.value='2026-10-12'; calendarRows[0].time.value='09:30'; calendarRows[0].duration.value='60'; calendarRows[1].selected.checked=false");
+  const ics = f.run('buildPlannedCalendar(calendarRows)');
+  assert.equal((ics.match(/BEGIN:VEVENT/g) || []).length, 1);
+  assert.match(ics, /UID:.*@panorama.local/);
+  assert.match(ics, /SUMMARY:Write a test/);
+  assert.doesNotMatch(ics, /Walk outside/);
+  f.run("calendarRows[0].duration.value='0'");
+  assert.throws(() => f.run('buildPlannedCalendar(calendarRows)'), /duration/);
+  f.run("calendarRows[0].duration.value='45'; calendarRows[0].date.value='2026-02-30'");
+  assert.throws(() => f.run('buildPlannedCalendar(calendarRows)'), /date/);
+  assert.equal(f.run('nextMonday(new Date(2026,9,9)).getDate()'), 12);
+  assert.equal(f.run('nextMonday(new Date(2026,9,12)).getDate()'), 19);
+});
+
+test('invalid plan fields and evidence cannot partially restore a backup', () => {
+  const f = fixture(); seed(f); const before = f.snapshot();
+  f.set('bad', { notes, activeDossier: { ...dossier(), mondayPlan:[{step:'X', firstStep:'', doneWhen:'', status:'mystery'}] } });
+  assert.throws(() => f.run('restoreVault(bad)'), /status/);
+  assert.equal(f.snapshot(), before);
+  f.set('bad', { notes, activeDossier: { ...dossier(), evidence:[{insight:'X',noteIds:[{}]}] } });
+  assert.throws(() => f.run('restoreVault(bad)'), /noteId/);
+  assert.equal(f.snapshot(), before);
+});
+
+test('calendar files escape text and fold Unicode lines without injecting extra events', () => {
+  const f = fixture();
+  f.run('calendarRows = [{selected:{checked:true},date:{value:"2026-10-12"},time:{value:"10:00"},duration:{value:"45"},action:{step:"Line;comma,\\nBEGIN:VEVENT", firstStep:"שלום".repeat(80),doneWhen:"Done"}}]');
+  const ics = f.run('buildPlannedCalendar(calendarRows)');
+  assert.equal((ics.match(/(?:^|\r\n)BEGIN:VEVENT/g) || []).length, 1);
+  assert.match(ics, /Line\\;comma\\,\\nBEGIN:VEVENT/);
+  for (const line of ics.split('\r\n')) assert.ok(Buffer.byteLength(line, 'utf8') <= 75);
+});
