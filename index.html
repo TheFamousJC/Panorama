@@ -200,6 +200,14 @@
       .settings-section { padding:20px; }.stream-item { padding:14px 16px 18px; }
     }
     @media (max-width:359px) { .journey small { display:none; }.journey li { flex-direction:column; }.btn-copy-prompt { font-size:18px; } }
+    .header-tools { display:flex; align-items:center; gap:16px; }
+    .header-tools .btn-link { white-space:nowrap; color:var(--berry); font-weight:650; }
+    .header-tools [aria-current="page"] { text-decoration-thickness:2px; }
+    .faq-list > h2 { margin-bottom:16px; }.faq-list > details { padding:12px 20px; background:var(--paper); border:1px solid var(--line); border-radius:12px; margin-top:10px; }
+    .faq-list summary { font-size:16px; font-weight:600; color:var(--berry); }
+    .introduction-window { max-width:620px; }.intro-step { margin-top:18px; }.intro-step h2 { font:500 clamp(26px,5vw,34px)/1.2 Georgia,serif; }
+    #wizard-modal .share-stage-footer { justify-content:flex-end; }
+    @media (max-width:600px) { .header-tools { flex-direction:column; gap:0; align-items:flex-end; }.header-tools .saved-local { max-width:none; font-size:10px; }.header-tools .btn-link { font-size:12px; }.faq-list > details { padding:10px 16px; }.intro-step .notice { padding:14px; } }
     @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
   </style>
 </head>
@@ -207,7 +215,7 @@
   <header class="site-header">
     <div class="brand-row">
       <div class="brand"><span class="brand-mark"><img src="logo_white.png" alt="3Sci"></span><span>PANORAMA</span></div>
-      <span class="saved-local">Saved in this browser</span>
+      <div class="header-tools"><span class="saved-local">Saved in this browser</span><button class="btn-link" id="nav-help" onclick="openFaqModal()">Help &amp; FAQ</button></div>
     </div>
     <nav class="main-nav" aria-label="Main navigation">
       <button id="nav-notes" aria-current="page" onclick="showPage('notes')">Thoughts</button>
@@ -293,9 +301,38 @@
         <button class="btn-action" id="btn-run-synth" onclick="runHolisticSynthesis()"><span id="synth-status">Review with Google AI</span></button>
       </div></details>
       <details class="settings-section"><summary>Thought categories &amp; storage</summary><div class="details-body"><p class="help-text">How your saved thoughts are categorized.</p><div class="meter" id="telemetry-bar"></div><div class="telemetry-legend" id="telemetry-legend"></div><p id="storage-footprint" class="help-text"></p></div></details>
-      <details class="settings-section" id="help-settings"><summary>How Panorama works</summary><div class="details-body stack"><p>Save whatever is on your mind. When you want a fresh perspective, use Share with My Dot.</p><p>Choose thoughts, copy the prepared message, open ChatGPT, and paste it into your Dot conversation. Sign in if prompted. Then copy Dot's complete reply back to Panorama, preview it, and save the review.</p><p>A new review keeps the previous review in History. Archiving also keeps your thoughts there. Nothing is sent or scheduled automatically.</p></div></details>
+      <section class="settings-section" id="help-settings"><h2>A little guidance</h2><p class="help-text">Revisit the introduction or find a quick answer.</p><button class="btn-action" onclick="openFaqModal()">Help &amp; FAQ</button></section>
+    </section>
+    <section class="page" id="page-help" hidden aria-labelledby="help-title">
+      <div class="page-intro"><p class="eyebrow">A little guidance</p><h1 id="help-title" tabindex="-1">Make yourself at home.</h1><p class="muted">A quick introduction, and answers when you need them.</p></div>
+      <section class="card stack"><h2>New here, or need a refresher?</h2><p>Three short steps: capture a thought, reflect with an assistant, and choose a next move.</p><button class="btn-action btn-action-accent" id="replay-introduction" onclick="openWizardModal()">Show introduction again</button></section>
+      <section class="faq-list" aria-labelledby="faq-title"><h2 id="faq-title">Frequently asked questions</h2>
+        <details><summary>What does Panorama do?</summary><div class="details-body"><p>Panorama is a place to collect ideas, worries, and things to think through. When you want a fresh perspective, take selected thoughts to an AI assistant and bring back a review of patterns and possible next steps. You choose what to act on.</p></div></details>
+        <details><summary>What is My Dot? Do I need one?</summary><div class="details-body"><p>My Dot means your personal AI assistant in ChatGPT. Availability may vary; not everyone has a Dot. Panorama does not create or connect one for you. You can also use the prepared message in a regular ChatGPT conversation or another assistant that can follow its reply format. No account, setup, or API key is needed to save thoughts here.</p></div></details>
+        <details><summary>How do I share thoughts and bring back a review?</summary><div class="details-body"><ol class="step-instructions"><li>Choose <strong>Share with My Dot</strong>, select thoughts, and decide whether to include your priority or recent review themes.</li><li>Copy the prepared message. Open ChatGPT, sign in if prompted, and paste it into your Dot conversation or another assistant conversation.</li><li>Copy the complete structured reply back to Panorama. Choose <strong>Preview review</strong>, check it, then <strong>Save review</strong>.</li></ol><p>Nothing is sent automatically. Panorama cannot see your login, read your chats, or retrieve the reply for you.</p></div></details>
+        <details><summary>Why won't Panorama read my assistant's reply?</summary><div class="details-body"><p>The copied message asks for a structured reply called JSON. Copy the entire reply, including any code block. If the assistant adds a chatty explanation instead, ask it to return only the JSON requested in the original message. Previewing never changes your saved review.</p></div></details>
+        <details><summary>What is Review with Google AI?</summary><div class="details-body"><p>It is a separate optional route under <strong>Settings &gt; Other review options</strong>. It needs a Google API key and available quota; provider charges may apply. Running it sends all current thoughts, your priority, and recent review context to Google. It does not contact My Dot. Optional drafting sends the selected suggestion to Google.</p></div></details>
+        <details><summary>Where are my thoughts saved? Do they sync?</summary><div class="details-body"><p>Thoughts, reviews, and History are saved in this browser for this site. They do not automatically sync to another device, browser, profile, or site address. Clearing browser data can remove them; private browsing may discard them when you close it. Download a backup to keep a separate copy.</p></div></details>
+        <details><summary>How do backup and restore work?</summary><div class="details-body"><p>In <strong>Settings &gt; Backup &amp; restore</strong>, choose <strong>Download backup</strong>. Keep the file somewhere private. It includes thoughts, reviews, History, and your priority, but not your API key or PIN. To move data, open Panorama in the other browser and restore that file. Restore replaces the information included in the backup; download your current backup first if you want to keep it.</p></div></details>
+        <details><summary>What should I know about privacy?</summary><div class="details-body"><p>Share only what you are comfortable giving your assistant. Copied thoughts enter your clipboard; after you paste or run a Google AI review, the provider's privacy settings apply. Voice input may use an online speech service. Saved browser data is not encrypted by Panorama. The optional PIN hides the screen; it does not protect files from someone with access to your browser profile.</p></div></details>
+        <details><summary>What happens to previous reviews and archived thoughts?</summary><div class="details-body"><p>Saving a different review keeps the previous one in History. <strong>Archive these thoughts</strong> keeps the current thoughts and review in History, then clears your current list. Your priority stays. Deleting thoughts is a separate action; nothing is scheduled or sent on your behalf.</p></div></details>
+      </section>
+      <button class="btn-action" onclick="showPage('notes'); document.getElementById('note-input').focus()">Back to my thoughts</button>
     </section>
   </main>
+
+  <div class="modal-backdrop" id="wizard-modal" onkeydown="handleWizardKey(event)">
+    <div class="modal-window introduction-window" role="dialog" aria-modal="true" aria-labelledby="wizard-title">
+      <div class="modal-head"><strong id="wizard-title">Welcome to Panorama</strong><button class="btn-action" onclick="closeWizardModal()">Skip</button></div>
+      <div class="modal-body">
+        <p id="wizard-progress" class="eyebrow" role="status">Step 1 of 3</p>
+        <section id="wizard-step-1" class="intro-step stack" aria-labelledby="wizard-heading-1"><h2 id="wizard-heading-1" tabindex="-1">Get it out of your head.</h2><p>Big ideas, everyday worries, half-formed plans. Save one thought at a time, then look for a next step when you're ready.</p><p class="notice">Start writing straight away. No account, API key, or setup is needed to capture thoughts.</p></section>
+        <section id="wizard-step-2" class="intro-step stack" hidden aria-labelledby="wizard-heading-2"><h2 id="wizard-heading-2" tabindex="-1">A fresh perspective, with My Dot.</h2><p>My Dot means your personal AI assistant in ChatGPT. Availability varies; if you don't have one, you can use a regular assistant conversation.</p><p>Choose <strong>Share with My Dot</strong>, select thoughts, and copy the prepared message. Paste it into your assistant, then bring its complete structured reply back here to <strong>preview and save</strong>.</p><p class="help-text">This is a manual handoff. Panorama cannot send the message, see your chats, or fetch the reply. Review with Google AI is a separate optional route in Settings.</p></section>
+        <section id="wizard-step-3" class="intro-step stack" hidden aria-labelledby="wizard-heading-3"><h2 id="wizard-heading-3" tabindex="-1">Your space. Your next move.</h2><p>Your review offers patterns and possible next steps. You decide what to do; Panorama does not send messages or schedule actions.</p><p class="notice">Your thoughts stay in this browser with no automatic device sync. Download a backup in Settings to keep a copy. Restore replaces the data included in that file.</p><p class="help-text">Share only what you're comfortable giving an assistant; its privacy settings apply. Browser storage is not encrypted by Panorama. Help &amp; FAQ is always available at the top.</p></section>
+        <div class="share-stage-footer"><button class="btn-action" id="wizard-back" onclick="setWizardStep(wizardStep - 1)" hidden>Back</button><button class="btn-action btn-action-accent" id="wizard-next" onclick="advanceWizard()">Next</button></div>
+      </div>
+    </div>
+  </div>
 
   <div class="modal-backdrop" id="prompt-studio-drawer" onkeydown="handleShareKey(event)">
     <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="share-title">
@@ -343,6 +380,7 @@
     let isRecording = false;
     let currentPage = 'notes';
     let shareStep = 1;
+    let wizardStep = 1;
     let dialogReturnFocus = null;
     let draftRequest = 0;
     let pendingDossier = null;
@@ -410,9 +448,9 @@
 
 
     function showPage(page, focus = true) {
-      if (!['notes', 'review', 'history', 'settings'].includes(page)) return;
+      if (!['notes', 'review', 'history', 'settings', 'help'].includes(page)) return;
       currentPage = page;
-      ['notes', 'review', 'history', 'settings'].forEach(name => {
+      ['notes', 'review', 'history', 'settings', 'help'].forEach(name => {
         document.getElementById('page-' + name).hidden = name !== page;
         document.getElementById('nav-' + name).setAttribute('aria-current', name === page ? 'page' : 'false');
       });
@@ -531,8 +569,37 @@
       }
     }
 
-    function openWizardModal() { openFaqModal(); }
-    function openFaqModal() { showPage('settings'); document.getElementById('help-settings').open = true; }
+    function openWizardModal(automatic = false) {
+      openSecondaryModal('wizard-modal', 'wizard-heading-1');
+      if (automatic) dialogReturnFocus = document.getElementById('note-input');
+      setWizardStep(1);
+    }
+    function setWizardStep(step) {
+      if (![1, 2, 3].includes(step)) return;
+      wizardStep = step;
+      [1, 2, 3].forEach(n => { document.getElementById('wizard-step-' + n).hidden = n !== step; });
+      document.getElementById('wizard-progress').textContent = 'Step ' + step + ' of 3';
+      document.getElementById('wizard-back').hidden = step === 1;
+      document.getElementById('wizard-next').textContent = step === 3 ? 'Finish' : 'Next';
+      document.getElementById('wizard-modal').scrollTop = 0;
+      document.getElementById('wizard-heading-' + step).focus();
+    }
+    function advanceWizard() { if (wizardStep === 3) closeWizardModal(true); else setWizardStep(wizardStep + 1); }
+    function closeWizardModal(finished = false) {
+      // A preference failure must never stop someone leaving the introduction.
+      try { localStorage.setItem('3sci_panorama_intro_seen', '1'); } catch (err) {}
+      closeSecondaryModal('wizard-modal');
+      if (finished) { showPage('notes'); document.getElementById('note-input').focus(); }
+    }
+    function handleWizardKey(event) {
+      if (event.key === 'Escape') { event.preventDefault(); closeWizardModal(); }
+      else trapDialogTab(event, 'wizard-modal');
+    }
+    function shouldShowIntroduction() {
+      const existingKeys = ['notes', 'active_dossier', 'history', 'north_star', 'key', 'pin', 'tour_seen', 'intro_seen'];
+      return !existingKeys.some(key => localStorage.getItem('3sci_panorama_' + key) !== null);
+    }
+    function openFaqModal() { showPage('help'); }
 
     /* Voice Capture */
     function initSpeechRecognition() {
@@ -1233,7 +1300,7 @@
 
     document.getElementById('note-input').addEventListener('input', () => { document.getElementById('note-save-status').textContent = ''; });
     document.getElementById('note-input').addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); addNote(); } });
-    window.onload = () => { checkSecurityLock(); const k = localStorage.getItem('3sci_panorama_key'); if (k) document.getElementById('top-gemini-key').value = k; loadNotes(); showPage('notes', false); };
+    window.onload = () => { const introduce = shouldShowIntroduction(); checkSecurityLock(); const k = localStorage.getItem('3sci_panorama_key'); if (k) document.getElementById('top-gemini-key').value = k; loadNotes(); showPage('notes', false); if (introduce) openWizardModal(true); };
   </script>
 </body>
 </html>

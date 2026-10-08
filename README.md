@@ -12,7 +12,7 @@ A category applies only to the thought being saved and resets afterward. Today's
 
 The warm notebook design uses cream paper surfaces, coral capture controls, and a teal Dot handoff. A compact Capture / Reflect / Act guide explains the journey. **Need a starting point?** offers optional writing starters; choosing one only fills an empty draft and never overwrites or saves a thought.
 
-No example thoughts or compulsory tour are inserted. Voice input is available when the browser supports it.
+No example thoughts are inserted. On a new browser with no Panorama data or introduction preference, a three-step introduction opens once and can be skipped immediately (including with Escape). Existing users are not interrupted. **Help & FAQ** in the header provides answers and **Show introduction again**. Skip or Finish remembers only the introduction preference; existing notes, settings, and backup formats are unchanged. Voice input is available when the browser supports it.
 
 ## Review with My Dot
 
@@ -44,7 +44,7 @@ Review exports are under **Copy or download this review**: copy the action list,
 - **Privacy:** manage the screen-lock PIN and see storage/voice information. The PIN hides the desk; it does not encrypt notes or protect against someone with access to the browser profile.
 - **Other review options → Review with Google AI:** configure the Google API key and explicitly send all current thoughts, today's priority, and recent review context to Gemini. Detailed suggestions also offer optional Gemini drafting. The key is stored unencrypted in this browser. Account quota/access and charges apply. No real key is needed for tests.
 - **Thought categories & storage:** category distribution and storage footprint.
-- **How Panorama works:** optional guidance, with no mandatory startup tour.
+- **Help & FAQ:** a dedicated header link explains My Dot availability, the manual handoff, optional Google AI, local storage, backup/restore, privacy, and History. The introduction can be replayed at any time.
 
 Data is stored in this browser, without cross-device syncing. Backups omit the API key and PIN but include private thoughts/history; keep them outside this public repository. Voice input may use an online recognition service. The page uses system fonts and a local Dot image; there are no automatic assistant requests or third-party scripts.
 

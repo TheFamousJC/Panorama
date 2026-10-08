@@ -686,3 +686,54 @@ test('optional writing starters fill only an empty draft and never overwrite or 
   assert.equal(f.snapshot(), before);
   f.run("useWritingStarter('invalid')"); assert.equal(f.snapshot(), before);
 });
+
+test('new visitors can skip the introduction with Escape and reload without being interrupted again', () => {
+  const f = fixture(); f.run('window.onload()');
+  assert.equal(f.get('wizard-modal').style.display, 'flex');
+  assert.equal(f.run('wizardStep'), 1); assert.equal(f.get('app-layout-main').inert, true);
+  f.context.escape = { key: 'Escape', preventDefault() {} }; f.run('handleWizardKey(escape)');
+  assert.equal(f.get('wizard-modal').style.display, 'none');
+  assert.equal(f.get('app-layout-main').inert, false); assert.equal(f.context.document.body.style.overflow, '');
+  assert.equal(f.get('note-input').focused, true); assert.equal(f.run('notes.length'), 0);
+  assert.equal(f.stored.get('3sci_panorama_intro_seen'), '1');
+  f.run('window.onload()'); assert.equal(f.get('wizard-modal').style.display, 'none');
+});
+
+test('existing browser data and the previous tour preference prevent automatic introduction without new writes', () => {
+  for (const key of ['notes', 'active_dossier', 'history', 'north_star', 'key', 'pin', 'tour_seen']) {
+    const f = fixture(); f.stored.set('3sci_panorama_' + key, ['notes', 'history'].includes(key) ? '[]' : key === 'active_dossier' ? 'null' : '');
+    const before = f.snapshot(); f.run('window.onload()');
+    assert.notEqual(f.get('wizard-modal').style.display, 'flex'); assert.equal(f.snapshot(), before);
+  }
+});
+
+test('wizard Back, replay and Finish preserve the current draft and stored content', () => {
+  const f = fixture(); seed(f); f.stored.set('3sci_panorama_intro_seen', '1'); const before = f.snapshot();
+  f.get('note-input').value = 'Unfinished personal draft';
+  f.run('openFaqModal()'); assert.equal(f.get('page-help').hidden, false);
+  f.context.document.activeElement = f.get('replay-introduction');
+  f.run('openWizardModal(); advanceWizard(); advanceWizard()');
+  assert.equal(f.get('wizard-next').textContent, 'Finish'); assert.equal(f.get('wizard-step-3').hidden, false);
+  f.run('setWizardStep(2)'); assert.equal(f.get('wizard-heading-2').focused, true);
+  assert.equal(f.get('wizard-step-3').hidden, true); assert.equal(f.get('wizard-next').textContent, 'Next');
+  f.run('closeWizardModal()'); assert.equal(f.get('replay-introduction').focused, true);
+  assert.equal(f.run('currentPage'), 'help');
+  f.run('openWizardModal()'); assert.equal(f.run('wizardStep'), 1); assert.equal(f.get('wizard-back').hidden, true);
+  f.run('setWizardStep(3); advanceWizard()');
+  assert.equal(f.run('currentPage'), 'notes'); assert.equal(f.get('note-input').focused, true);
+  assert.equal(f.get('note-input').value, 'Unfinished personal draft'); assert.equal(f.snapshot(), before);
+});
+
+test('wizard traps keyboard focus and can always close when its preference cannot be saved', () => {
+  const f = fixture(); seed(f); f.run('openWizardModal()');
+  const first = new Element('button'), last = new Element('button');
+  first.closest = last.closest = () => null; f.get('wizard-modal').querySelectorAll = () => [first, last];
+  f.context.document.activeElement = last; let prevented = false;
+  f.context.tab = { key: 'Tab', shiftKey: false, preventDefault() { prevented = true; } };
+  f.run('handleWizardKey(tab)'); assert.equal(prevented, true); assert.equal(first.focused, true);
+  f.context.document.activeElement = first; f.context.tab.shiftKey = true;
+  f.run('handleWizardKey(tab)'); assert.equal(last.focused, true);
+  const before = f.snapshot(); f.failStorageOnce('3sci_panorama_intro_seen');
+  f.run('closeWizardModal()'); assert.equal(f.get('app-layout-main').inert, false);
+  assert.equal(f.get('wizard-modal').style.display, 'none'); assert.equal(f.snapshot(), before);
+});
