@@ -1,36 +1,46 @@
 # Panorama from 3Sci Labs
 
-> **Daily Thoughts & Ideas Synthesizer**
-> A local thought scratchpad with a manual Dot review workflow and optional Gemini analysis.
+A place to unload your thoughts and find your next step.
 
-## Quick start
+## Start with a thought
 
-Open index.html in a modern browser such as Chrome or Edge. No build, installation, or Node runtime is needed to use the app. Keep using the same browser and file location to retain access to its existing local storage.
+Open index.html in a modern browser, or use the existing GitHub Pages site. No build or installation is required. Keep using the same browser and site/file location to retain access to its saved data.
 
-Capture tagged thoughts with **Save Thought** or **Ctrl+Enter**, search/filter the feed, and set today's North Star. Dictation is available when supported by the browser.
+The **Thoughts** screen starts empty for new users. Write what is on your mind and choose **Save thought** (or Ctrl+Enter). Categories and **Today's priority** are optional. Existing thoughts, tags, priorities, reviews, archives, API keys, and PIN settings retain their original storage keys.
 
-## Share with My Dot
+No example thoughts or compulsory tour are inserted. Voice input is available when the browser supports it.
 
-1. Use the large **Share with My Dot** button at the top of the left scratchpad (above Quick Brain Dump). Open it and select individual thoughts, or choose **Select all thoughts**. No thoughts are selected initially; selections last only for the current page session.
-2. Choose whether to include the North Star (initially on) and themes/recurring snags from the last three archived weeks (initially off).
-3. Review the exact prompt, then **Copy prompt for My Dot**. Choose **Open ChatGPT (new tab)**, sign in to ChatGPT if prompted, open your Dot conversation, and paste the prompt yourself. You can also paste the same prompt into another assistant. If clipboard access is blocked, the app selects the prompt for manual copying.
-4. Paste the assistant's JSON reply and choose **Review reply**. Invalid JSON or an invalid dossier structure shows an error without changing your current dossier.
-5. Inspect the proposed summary and actions, then choose **Apply reviewed dossier**. **Cancel review**, Escape, or closing the dialog discards the pending reply. Editing a reply requires reviewing it again. Applying an identical dossier does not create duplicates.
+## Review with My Dot
 
-The ChatGPT link is ordinary navigation: Panorama cannot detect your ChatGPT login state and never probes your session or handles your credentials. There is no automatic assistant connection, background transmission, or credential requirement for this workflow. Applying a reply replaces only the current dossier; thoughts, archived weeks, and North Star are preserved. Notes and assistant output display as plain text, including text that looks like HTML.
+Use **Share with My Dot** beside your saved thoughts. Only one stage is shown at a time:
 
-## Existing analysis and exports
+1. **Choose thoughts.** Select what to share. Today's priority and recent review themes are optional. Review the selected content before continuing.
+2. **Take them to Dot.** Copy the prepared message, open ChatGPT, sign in if prompted, and paste the message into your Dot conversation. **View the full message** reveals exactly what will be copied. If clipboard access fails, the app opens and selects that message for manual copying.
+3. **Bring back a review.** Paste Dot's complete response, including any code block. **Preview review** shows the proposed result; **Save review** saves it. Back keeps an unfinished reply within the open dialog. Cancel, Escape, or closing discards the pending reply without changing saved data. Editing the reply or changing its selected context requires previewing again.
 
-- **Connect The Dots** explicitly sends all current notes, the North Star, and recent snag history to Google's Gemini API using your browser-stored Google API key.
-- Gemini synthesis and action drafting use gemini-3.8-flash and the documented LOW thinking level. See Google's [model documentation](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash) and [ThinkingConfig reference](https://ai.google.dev/api/generate-content#thinkingconfig). Model access, quota, charges, and availability depend on your Google account. Synthesis has a seven-second request timeout; action drafting uses the same corrected endpoint.
-- **Copy Todo List** copies a Markdown checklist. The summary export helper creates a Markdown summary. Calendar controls download .ics focus blocks at preset times; they do not check availability or sync a calendar.
-- **Finish Week & Start Fresh** archives the current notes/dossier and clears the active desk. It does not automatically carry questions forward.
+Panorama cannot detect ChatGPT login state, send a message to Dot, or receive its response automatically. The ChatGPT link is ordinary navigation with no thoughts or credentials in the URL. The structured response format is specified in the copied message; an arbitrary prose reply is not accepted. This handoff needs no API key.
 
-## Vault and privacy
+The sharing dialog is the only scroll container in the flow. The thought list has natural height, and the optional full-message textarea has an explicit minimum height. This avoids the former shrinking list/preview problem on shorter screens.
 
-**Vault → Download Vault Backup** exports notes, the active dossier, history, and North Star as JSON. Restore validates the complete file before asking to replace its included fields. It restores the active dossier and can clear an empty North Star or null dossier. Older notes-only backups retain fields they omit. Existing storage keys and note IDs are preserved. Malformed files are rejected; selecting the same file again after cancelling is supported.
+## Reviews and History
 
-Notes, the API key, and the PIN remain in this browser's localStorage, without encryption. The PIN hides the desk; it is not protection against someone with access to the browser profile or developer tools. Backups omit the API key and PIN but include personal notes/history: keep them private and outside this public Git repository. The manual handoff shares only what you choose to paste into your assistant, subject to that provider's settings. Google fonts load externally, and browser dictation may use an online speech service.
+**Latest review** shows a summary and up to three suggested next steps, followed by expandable patterns and all remaining suggestions. No actions are scheduled or sent automatically.
+
+Saving a different review retains the prior review and its thought/priority snapshot in **History**. Reapplying the same review does not create a duplicate. **Archive these thoughts**, under Manage saved thoughts, moves the current thoughts/review into History and clears the active list after confirmation. Today's priority remains. Deleting current thoughts is a separate action.
+
+History shows both existing weekly archives and saved previous reviews. Expand an entry to read its review and original thoughts, or search its contents.
+
+Review exports are under **Copy or download this review**: copy the action list, download a Markdown summary, or download calendar blocks at preset times. Calendar exports do not check availability or sync a calendar.
+
+## Settings
+
+- **Backup & restore:** download notes, active review, history, and priority as a private JSON backup. Restore validates all included fields before replacing them. Empty priority and null review restore correctly; legacy backups retain omitted fields. Storage errors roll back attempted writes before the in-memory view changes.
+- **Privacy:** manage the screen-lock PIN and see storage/voice information. The PIN hides the desk; it does not encrypt notes or protect against someone with access to the browser profile.
+- **Optional Gemini review:** configure the Google API key and explicitly send all current thoughts, today's priority, and recent review context to Gemini. Detailed suggestions also offer optional Gemini drafting. The key is stored unencrypted in this browser. Account quota/access and charges apply. No real key is needed for tests.
+- **Thought categories & storage:** category distribution and storage footprint.
+- **How Panorama works:** optional guidance, with no mandatory startup tour.
+
+Data is stored in this browser, without cross-device syncing. Backups omit the API key and PIN but include private thoughts/history; keep them outside this public repository. Voice input may use an online recognition service. The page uses system fonts and a local Dot image; there are no automatic assistant requests or third-party scripts.
 
 ## Regression tests
 
@@ -38,13 +48,12 @@ With Node.js 18 or newer:
 
     node --test tests/panorama.test.cjs
 
-The dependency-free tests execute the inline application script in a Node VM with a minimal DOM double, synthetic localStorage, and mocked fetch/clipboard/file operations. They cover selection/privacy boundaries, reply validation, review/apply/cancel/repeat behavior, unsafe text, complete and legacy vault restores, storage failures, Gemini request construction, and archive/export behavior. They never read a real browser profile or contact an AI provider.
+Tests execute the inline script in an isolated Node VM with synthetic storage, a minimal DOM double, and mocked fetch/clipboard/file operations. They cover startup/navigation, stage/back/cancel/repeat flows, selection/privacy, invalid replies, unsafe text, review-history preservation, archive cancellation/storage failures, complete and legacy vault restoration, and existing Gemini/export behavior.
 
-These are runtime logic tests, not real-browser layout, clipboard-permission, download, or live Gemini tests. For a browser smoke test, use a separate browser profile or fresh local origin containing only synthetic data; exercise the sharing flow, malformed reply, cancel, repeat apply, and vault export/restore before using personal notes.
+These are runtime logic tests, not a browser-layout or live Gemini test. Browser QA must use a fresh origin/profile and synthetic data. Check the three-stage flow, visible selection checkboxes, full-message preview height, responsive layout, keyboard navigation, and data preservation.
 
 ## Dot artwork
 
 The standard default Dot avatar is bundled unchanged as assets/dot-default.png.
 Source: [official default Dot asset](https://persistent.oaistatic.com/images/c4b1da2e76451476d06b17712a926d0f46ee88f07f82a098cef84bcb9175e58e.png).
 SHA-256: c4b1da2e76451476d06b17712a926d0f46ee88f07f82a098cef84bcb9175e58e.
-It is served locally by this site; displaying the button does not request a remote avatar or load an external script.

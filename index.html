@@ -3,1356 +3,278 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panorama from 3Sci Labs | Daily Thoughts & Ideas Synthesizer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
+  <title>Panorama — A little clarity for your day</title>
   <style>
-    :root {
-      --bg: #f1f5f9;
-      --card-bg: #ffffff;
-      --card-border: #cbd5e1;
-      --card-border-subtle: #e2e8f0;
-      
-      --primary: #0f172a;
-      --primary-accent: #1e3a8a;
-      --primary-blue: #2563eb;
-      --blue-subtle: #eff6ff;
-      
-      --accent-purple: #7c3aed;
-      --purple-subtle: #f5f3ff;
-      --accent-rose: #e11d48;
-      --accent-emerald: #059669;
-      --accent-amber: #d97706;
-      
-      --text: #0f172a;
-      --text-secondary: #334155;
-      --text-muted: #64748b;
-      --dark-header: #090e17;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    /* Top Command Bar */
-    header {
-      background: var(--dark-header);
-      border-bottom: 1px solid #1e293b;
-      padding: 10px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-      gap: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .brand-group { display: flex; align-items: center; gap: 12px; }
-    .brand-logo-frame {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .brand-logo { height: 26px; width: auto; object-fit: contain; }
-    .brand-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 16px;
-      font-weight: 800;
-      color: #f8fafc;
-      letter-spacing: 0.4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .brand-tag { font-size: 10.5px; font-weight: 600; color: #94a3b8; }
-
-    .top-api-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #131d2e;
-      border: 1px solid #24344d;
-      padding: 5px 12px;
-      border-radius: 6px;
-    }
-    .top-api-label { font-size: 11px; font-weight: 700; color: #38bdf8; white-space: nowrap; }
-    .top-api-input {
-      background: #090e17;
-      border: 1px solid #334155;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 11.5px;
-      padding: 4px 8px;
-      width: 170px;
-      outline: none;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .top-api-input:focus { border-color: #38bdf8; }
-    .top-api-link { font-size: 10.5px; color: #93c5fd; text-decoration: none; white-space: nowrap; }
-    .top-api-link:hover { text-decoration: underline; }
-
-    .header-actions { display: flex; align-items: center; gap: 6px; }
-    .btn-action {
-      background: #1e293b;
-      color: #e2e8f0;
-      border: 1px solid #334155;
-      padding: 6px 11px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s ease;
-    }
-    .btn-action:hover { background: #334155; border-color: #64748b; color: #fff; }
-    .btn-action-accent {
-      background: #2563eb;
-      color: #ffffff;
-      border: 1px solid #3b82f6;
-    }
-    .btn-action-accent:hover { background: #1d4ed8; border-color: #60a5fa; color: #fff; }
-    .btn-action-lock {
-      background: #1e1b4b;
-      color: #c7d2fe;
-      border: 1px solid #4338ca;
-    }
-    .btn-action-lock:hover { background: #312e81; color: #fff; }
-
-    /* Layout */
-    .app-layout {
-      display: grid;
-      grid-template-columns: 460px 1fr;
-      flex-grow: 1;
-      min-height: calc(100vh - 54px);
-      transition: filter 0.3s ease;
-    }
-    .app-layout.locked {
-      filter: blur(8px) grayscale(50%);
-      pointer-events: none;
-      user-select: none;
-    }
-
-    /* Left Sidebar */
-    .scratchpad-sidebar {
-      background: #ffffff;
-      border-right: 1.5px solid var(--card-border);
-      padding: 18px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      max-height: calc(100vh - 54px);
-      overflow-y: auto;
-    }
-
-    .section-title {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--primary-accent);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .quick-entry-box {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background: #f8fafc;
-      border: 1.5px solid var(--card-border);
-      border-radius: 8px;
-      padding: 12px;
-    }
-    .entry-textarea {
-      background: #ffffff;
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 13px;
-      font-family: inherit;
-      resize: vertical;
-      min-height: 80px;
-      outline: none;
-      line-height: 1.45;
-    }
-    .entry-textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
-
-    .tag-row {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .tag-chip {
-      font-size: 10.5px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
-      border: 1px solid var(--card-border);
-      background: #ffffff;
-      color: var(--text-secondary);
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s;
-    }
-    .tag-chip.active {
-      background: var(--primary-accent);
-      border-color: var(--primary-accent);
-      color: #ffffff;
-    }
-
-    .entry-button-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .btn-add-entry {
-      flex: 1;
-      background: var(--primary-accent);
-      color: #ffffff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: background 0.15s;
-    }
-    .btn-add-entry:hover { background: #172554; }
-
-    /* Voice Button */
-    .btn-voice {
-      background: #ffffff;
-      color: var(--primary-blue);
-      border: 1px solid var(--card-border);
-      padding: 7px 11px;
-      border-radius: 6px;
-      font-size: 11.5px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      white-space: nowrap;
-    }
-    .btn-voice:hover { background: var(--blue-subtle); border-color: var(--primary-blue); }
-    .btn-voice.recording {
-      background: #fef2f2;
-      border-color: #ef4444;
-      color: #ef4444;
-      animation: pulseRecord 1.5s infinite;
-    }
-    @keyframes pulseRecord {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-      70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    /* Filter & Search */
-    .feed-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 4px;
-    }
-    .feed-search-input {
-      background: #ffffff;
-      border: 1px solid var(--card-border);
-      border-radius: 5px;
-      padding: 6px 10px;
-      font-size: 11.5px;
-      outline: none;
-      font-family: inherit;
-    }
-    .feed-search-input:focus { border-color: var(--primary-blue); }
-    .filter-pills {
-      display: flex;
-      gap: 4px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-    }
-    .filter-pill {
-      font-size: 9.5px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 12px;
-      background: #f1f5f9;
-      color: var(--text-muted);
-      border: 1px solid var(--card-border-subtle);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .filter-pill.active {
-      background: #e2e8f0;
-      color: var(--text);
-      border-color: #cbd5e1;
-    }
-
-    /* Note Feed */
-    .stream-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 2px;
-    }
-    .stream-count {
-      font-size: 10.5px;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .stream-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow-y: auto;
-      max-height: 230px;
-      padding-right: 4px;
-    }
-    .stream-item {
-      background: #f8fafc;
-      border: 1px solid var(--card-border);
-      border-left: 3.5px solid var(--primary-blue);
-      border-radius: 6px;
-      padding: 9px 11px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .stream-item.annoyance { border-left-color: var(--accent-rose); }
-    .stream-item.work { border-left-color: var(--primary-blue); }
-    .stream-item.personal { border-left-color: var(--accent-emerald); }
-    .stream-item.question { border-left-color: var(--accent-amber); }
-    .stream-item.chores { border-left-color: #0ea5e9; }
-    .stream-item.spark { border-left-color: var(--accent-purple); }
-
-    .stream-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 9.5px;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .stream-tag {
-      font-size: 8.5px;
-      font-weight: 800;
-      padding: 1.5px 5px;
-      border-radius: 3px;
-      background: #e2e8f0;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-    }
-    .stream-text {
-      font-size: 12px;
-      color: var(--text);
-      line-height: 1.4;
-      white-space: pre-wrap;
-    }
-    .btn-del-note {
-      background: none;
-      border: none;
-      color: #94a3b8;
-      cursor: pointer;
-      font-size: 12px;
-      padding: 0 2px;
-    }
-    .btn-del-note:hover { color: #ef4444; }
-
-    /* Bottom Action Controls */
-    .synthesis-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      border-top: 1.5px solid var(--card-border);
-      padding-top: 12px;
-      margin-top: auto;
-    }
-    .btn-synthesize-ai {
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-      color: #ffffff;
-      border: none;
-      padding: 11px 14px;
-      border-radius: 7px;
-      font-size: 12.5px;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      transition: opacity 0.15s;
-    }
-    .btn-synthesize-ai:hover { opacity: 0.94; }
-    .btn-synthesize-ai:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .btn-rollover {
-      background: #eff6ff;
-      color: #1e3a8a;
-      border: 1px solid #bfdbfe;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 11.5px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-rollover:hover { background: #dbeafe; }
-
-    .dot-share-panel { flex-shrink:0; }
-    .btn-copy-prompt {
-      width: 100%;
-      min-width: 0;
-      min-height: 104px;
-      padding: 20px;
-      background: #111827;
-      color: #ffffff;
-      border: 2px solid #374151;
-      border-radius: 16px;
-      font-family: inherit;
-      font-size: clamp(22px, 2.1vw, 28px);
-      font-weight: 800;
-      line-height: 1.2;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.16);
-    }
-    .btn-copy-prompt:hover { background:#1f2937; border-color:#64748b; }
-    .btn-copy-prompt:focus-visible { outline:3px solid #2563eb; outline-offset:4px; }
-    .dot-share-logo { width:64px; height:64px; flex-shrink:0; object-fit:contain; }
-    .dot-share-label { min-width:0; overflow-wrap:break-word; }
-    .dot-share-hint { margin-top:10px; font-size:12px; line-height:1.5; color:var(--text-secondary); text-align:center; }
-    .chatgpt-handoff { padding:16px; border:1px solid #c7d2fe; border-radius:10px; background:#eef2ff; }
-    .chatgpt-handoff p { margin:8px 0 12px; line-height:1.5; }
-    .chatgpt-handoff a { min-height:44px; text-decoration:none; justify-content:center; }
-    .chatgpt-handoff a:focus-visible { outline:3px solid #2563eb; outline-offset:3px; }
-
-    /* Prompt Drawer */
-    .prompt-studio {
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-      background: #f8fafc;
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 10px;
-    }
-    .prompt-preview {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
-      background: #ffffff;
-      border: 1px solid var(--card-border);
-      border-radius: 4px;
-      padding: 8px;
-      max-height: 120px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      color: var(--text-secondary);
-    }
-
-    /* Right Main Desk Stage */
-    .dossier-stage {
-      padding: 20px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      overflow-y: auto;
-      max-height: calc(100vh - 54px);
-    }
-
-    /* Telemetry & Daily North Star */
-    .desk-telemetry-panel {
-      background: #ffffff;
-      border: 1.5px solid var(--card-border);
-      border-radius: 8px;
-      padding: 14px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-    }
-    .telemetry-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
-    .telemetry-label {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .telemetry-meter-bar {
-      height: 8px;
-      border-radius: 4px;
-      background: #e2e8f0;
-      display: flex;
-      overflow: hidden;
-      width: 100%;
-    }
-    .meter-slice { height: 100%; transition: width 0.3s ease; }
-    .meter-slice.work { background: var(--primary-blue); }
-    .meter-slice.annoyance { background: var(--accent-rose); }
-    .meter-slice.personal { background: var(--accent-emerald); }
-    .meter-slice.spark { background: var(--accent-purple); }
-    .meter-slice.other { background: #94a3b8; }
-
-    .telemetry-legend {
-      display: flex;
-      gap: 12px;
-      font-size: 10.5px;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-muted);
-      flex-wrap: wrap;
-    }
-    .legend-item { display: flex; align-items: center; gap: 4px; }
-    .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
-
-    /* Daily North Star Strip */
-    .north-star-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #f8fafc;
-      border: 1px dashed #cbd5e1;
-      padding: 8px 12px;
-      border-radius: 6px;
-    }
-    .north-star-icon { font-size: 14px; }
-    .north-star-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--text);
-      font-family: inherit;
-    }
-    .north-star-input::placeholder { color: #94a3b8; font-weight: 500; }
-
-    /* Summary Header Card */
-    .macro-card {
-      background: #ffffff;
-      border: 1.5px solid var(--card-border);
-      border-left: 5px solid var(--accent-purple);
-      border-radius: 8px;
-      padding: 18px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    }
-    .macro-eyebrow {
-      font-size: 10.5px;
-      font-weight: 800;
-      color: var(--accent-purple);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .macro-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--text);
-    }
-    .macro-narrative {
-      font-size: 13.5px;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    /* Repeating Snag Card */
-    .chronic-alert {
-      display: none;
-      background: #fff1f2;
-      border: 1.5px solid #fecdd3;
-      border-left: 5px solid #e11d48;
-      border-radius: 8px;
-      padding: 14px 18px;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .chronic-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .chronic-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
-      font-weight: 800;
-      color: #9f1239;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .chronic-badge {
-      font-size: 9.5px;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      background: #ffe4e6;
-      color: #be123c;
-      padding: 2px 7px;
-      border-radius: 4px;
-      border: 1px solid #f43f5e;
-    }
-    .chronic-body {
-      font-size: 12.5px;
-      color: #881337;
-      line-height: 1.45;
-    }
-
-    /* 4-Section Grid */
-    .quantum-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    .quadrant-card {
-      background: var(--card-bg);
-      border: 1.5px solid var(--card-border);
-      border-radius: 8px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      border-top-width: 4px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-    }
-    .quadrant-card.friction { border-top-color: var(--accent-rose); }
-    .quadrant-card.bridges { border-top-color: var(--accent-purple); }
-    .quadrant-card.venture { border-top-color: var(--primary-blue); }
-    .quadrant-card.life { border-top-color: var(--accent-emerald); }
-
-    .quadrant-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .insight-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 12.5px;
-      color: var(--text-secondary);
-    }
-    .insight-item {
-      padding: 9px 11px;
-      background: #f8fafc;
-      border-radius: 6px;
-      border: 1px solid var(--card-border-subtle);
-      line-height: 1.45;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .insight-item strong { color: var(--text); }
-
-    .card-actions-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 3px;
-    }
-
-    .bridge-box {
-      background: #fdf4ff;
-      border: 1px solid #f5d0fe;
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-size: 12px;
-      line-height: 1.45;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .bridge-link { font-size: 10.5px; font-weight: 800; color: #a21caf; }
-
-    /* Action Buttons */
-    .btn-card-action {
-      background: #ffffff;
-      border: 1px solid var(--card-border);
-      color: var(--text-secondary);
-      padding: 3px 7px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.15s ease;
-    }
-    .btn-card-action:hover {
-      background: var(--blue-subtle);
-      border-color: var(--primary-blue);
-      color: var(--primary-blue);
-    }
-    .btn-card-action.calendar:hover {
-      background: #f0fdf4;
-      border-color: #22c55e;
-      color: #15803d;
-    }
-
-    /* Modal Windows */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-window {
-      background: #ffffff;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 780px;
-      max-height: 85vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
-      border: 1.5px solid var(--card-border);
-    }
-    .modal-head {
-      background: var(--dark-header);
-      color: #fff;
-      padding: 13px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-body {
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    /* Security PIN Lock Overlay */
-    .pin-lock-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(9, 14, 23, 0.95);
-      backdrop-filter: blur(12px);
-      z-index: 500;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .pin-box {
-      background: #0f172a;
-      border: 1.5px solid #334155;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 360px;
-      padding: 28px 24px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-    .pin-input {
-      background: #020617;
-      border: 2px solid #3b82f6;
-      border-radius: 8px;
-      font-size: 28px;
-      letter-spacing: 12px;
-      text-align: center;
-      color: #fff;
-      padding: 10px;
-      outline: none;
-      font-family: 'JetBrains Mono', monospace;
-      width: 100%;
-    }
-
-    /* Guide & FAQ */
-    .faq-item {
-      background: #f8fafc;
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .faq-q { font-weight: 800; font-size: 13px; color: var(--primary); }
-    .faq-a { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
-
-    /* Wizard Slide Styles */
-    .wizard-card {
-      background: #f8fafc;
-      border: 1.5px solid var(--card-border);
-      border-radius: 8px;
-      padding: 24px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .wizard-step-badge {
-      font-size: 11px;
-      font-weight: 800;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--primary-blue);
-      text-transform: uppercase;
-      background: var(--blue-subtle);
-      padding: 3px 8px;
-      border-radius: 4px;
-    }
-
-    /* Vault Modal Styles */
-    .vault-box {
-      background: #f8fafc;
-      border: 1.5px solid var(--card-border);
-      border-radius: 8px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .vault-drop-zone {
-      border: 2px dashed #94a3b8;
-      border-radius: 8px;
-      padding: 24px;
-      text-align: center;
-      background: #ffffff;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .vault-drop-zone:hover {
-      border-color: var(--primary-blue);
-      background: var(--blue-subtle);
-    }
-
-    .plan-text-area {
-      font-family: inherit;
-      font-size: 13px;
-      color: var(--text);
-      line-height: 1.6;
-      white-space: pre-wrap;
-      background: #f8fafc;
-      border: 1px solid var(--card-border);
-      padding: 16px;
-      border-radius: 8px;
-      min-height: 280px;
-    }
-
-    .share-body { display:flex; flex-direction:column; gap:12px; font-size:13px; }
-    .share-body h3 { font-size:14px; }
-    .share-body label { display:flex; align-items:flex-start; gap:8px; }
-    .share-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-    .share-note-list { max-height:190px; overflow:auto; border:1px solid var(--card-border); border-radius:6px; }
-    .share-note-list label { padding:10px; border-bottom:1px solid var(--card-border); overflow-wrap:anywhere; }
-    .share-note-list input { margin-top:3px; flex-shrink:0; }
-    .share-body .prompt-preview { width:100%; max-height:none; resize:vertical; }
-    .share-review { white-space:pre-wrap; overflow-wrap:anywhere; padding:14px; background:#f8fafc; margin:12px 0; }
-    .share-review h4 { margin-top:12px; }
-    .macro-narrative, .stream-text { white-space:pre-wrap; overflow-wrap:anywhere; }
-    button:disabled { opacity:0.5; cursor:not-allowed; }
-    .app-layout > *, .quantum-grid > * { min-width:0; }
-    @media (max-width: 1200px) {
-      header { flex-wrap:wrap; }
-      .header-actions { flex-wrap:wrap; }
-    }
-    @media (max-width: 900px) {
-      header { position:static; padding:14px 16px; gap:12px; }
-      .app-layout { grid-template-columns:minmax(0, 1fr); min-height:0; }
-      .scratchpad-sidebar { max-height:none; overflow-y:visible; border-right:0; padding:16px; }
-      .dossier-stage { max-height:none; overflow-y:visible; padding:16px; }
-      .top-api-container { max-width:100%; flex-wrap:wrap; }
-      .top-api-input { min-width:0; max-width:100%; }
-      .btn-copy-prompt { font-size:26px; }
-    }
-    @media (max-width: 480px) {
-      .btn-copy-prompt { min-height:96px; padding:16px 12px; gap:10px; font-size:22px; }
-      .dot-share-logo { width:56px; height:56px; }
-      .quantum-grid { grid-template-columns:minmax(0, 1fr); }
-      .telemetry-row { flex-wrap:wrap; }
-      .north-star-input { min-width:0; }
-      .modal-backdrop { padding:8px; }
-      .modal-window { max-height:94vh; }
-      .modal-head, .modal-body { padding:14px; }
-      .share-actions > .btn-action { flex:1 1 auto; justify-content:center; }
-      .chatgpt-handoff a { width:100%; }
-    }
+    :root { --ink:#202b35; --muted:#64717c; --line:#e1e5e8; --paper:#fff; --bg:#f6f7f8; --accent:#254b70; --soft:#eef3f7; --danger:#a03535; }
+    * { box-sizing:border-box; }
+    [hidden] { display:none !important; }
+    body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.6; }
+    button,input,textarea,select { font:inherit; }
+    button,a,input,textarea,select,summary { -webkit-tap-highlight-color:transparent; }
+    button,a,summary { touch-action:manipulation; }
+    button { cursor:pointer; }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    :focus-visible { outline:3px solid #538fc4; outline-offset:3px; }
+    h1,h2,h3,h4,p { margin:0; }
+    h1 { font-size:clamp(28px,5vw,38px); line-height:1.2; letter-spacing:-1px; font-weight:650; }
+    h2 { font-size:22px; line-height:1.35; font-weight:650; }
+    h3 { font-size:18px; font-weight:650; }
+    h4 { font-size:16px; margin:20px 0 6px; }
+    a { color:var(--accent); }
+    .muted,.help-text { color:var(--muted); }
+    .help-text { font-size:14px; }
+    .site-header { max-width:880px; margin:auto; padding:28px 28px 0; width:100%; }
+    .brand-row { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:1px; }
+    .brand-mark { padding:5px 8px; border-radius:7px; background:#172536; display:flex; align-items:center; }
+    .brand-mark img { width:42px; height:auto; }
+    .saved-local { color:var(--muted); font-size:12px; }
+    .main-nav { display:flex; gap:4px; margin-top:24px; border-bottom:1px solid var(--line); }
+    .main-nav button { background:transparent; border:0; border-bottom:3px solid transparent; padding:12px 16px; color:var(--muted); font-size:14px; }
+    .main-nav button[aria-current="page"] { border-bottom-color:var(--ink); color:var(--ink); font-weight:650; }
+    main { max-width:800px; padding:44px 28px 64px; margin:auto; }
+    .page { display:block; }
+    .page > * + * { margin-top:28px; }
+    .page-intro > * + * { margin-top:10px; }
+    .card { background:var(--paper); padding:28px; border:1px solid var(--line); border-radius:16px; }
+    .stack > * + * { margin-top:16px; }
+    .row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .spread { justify-content:space-between; }
+    .btn-action,.btn-card-action,.btn-add-entry,.btn-voice { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; min-height:44px; border:1px solid var(--line); border-radius:9px; background:#fff; color:var(--ink); font-size:14px; font-weight:600; text-decoration:none; }
+    .btn-action:hover,.btn-card-action:hover,.btn-voice:hover { background:var(--soft); }
+    .btn-action-accent,.btn-add-entry { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .btn-action-accent:hover,.btn-add-entry:hover { background:#183b5c; }
+    .btn-link { background:none; border:0; color:var(--accent); padding:4px 0; font-size:14px; text-decoration:underline; text-underline-offset:3px; }
+    .danger { color:var(--danger); }
+    textarea,input[type="text"],input[type="password"],input[type="search"],select { width:100%; max-width:100%; min-width:0; border:1px solid #cbd3da; border-radius:9px; padding:12px; background:#fff; color:var(--ink); }
+    textarea { display:block; resize:vertical; line-height:1.6; }
+    .entry-textarea { min-height:144px; }
+    .entry-actions { margin-top:16px; }
+    label { display:block; font-size:14px; }
+    label + input,label + textarea,label + select { margin-top:6px; }
+    .optional-details { margin-top:20px; font-size:14px; }
+    details > summary { cursor:pointer; color:var(--accent); padding:8px 0; font-size:14px; }
+    details > .details-body { padding:12px 0 4px; }
+    .thought-list { margin-top:20px; }
+    .stream-item { padding:20px 0; border-bottom:1px solid var(--line); }
+    .stream-meta { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:6px; color:var(--muted); font-size:12px; }
+    .stream-tag { text-transform:none; }
+    .stream-text,.macro-narrative,.chronic-body,.insight-item,.bridge-box { white-space:pre-wrap; overflow-wrap:anywhere; }
+    .btn-del-note { background:transparent; border:0; color:var(--muted); font-size:12px; padding:6px; }
+    .empty-note { color:var(--muted); padding:24px 0; }
+    .thought-tools { margin-top:16px; }
+    .thought-tools select { width:auto; }
+    .dot-share-panel { margin-top:24px; }
+    .btn-copy-prompt { width:100%; min-height:92px; display:flex; align-items:center; justify-content:center; gap:16px; border:1px solid #172536; border-radius:14px; background:#172536; color:#fff; padding:16px 20px; font-size:clamp(22px,4vw,28px); line-height:1.25; font-weight:650; }
+    .btn-copy-prompt:hover { background:#26394e; }
+    .dot-share-logo { width:56px; height:56px; flex-shrink:0; object-fit:contain; }
+    .dot-share-label { min-width:0; }
+    .dot-share-hint { text-align:center; font-size:13px; color:var(--muted); margin-top:10px; }
+    .latest-review-link { padding:16px 0; border-top:1px solid var(--line); }
+    .next-steps { padding-left:24px; margin:16px 0 0; }
+    .next-steps li { padding:12px 0 12px 6px; }
+    .next-steps p { color:var(--muted); font-size:14px; margin-top:4px; }
+    .review-summary { margin-top:16px; }
+    .insight-list { list-style:none; margin:0; padding:0; }
+    .insight-item,.bridge-box { padding:14px 0; border-bottom:1px solid var(--line); }
+    .bridge-link { display:block; font-weight:650; }
+    .card-actions-row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .insight-item > .btn-card-action,.bridge-box > .btn-card-action { margin-top:10px; }
+    .chronic-alert { display:none; background:var(--soft); padding:16px; border-radius:10px; margin:16px 0; flex-direction:column; gap:6px; }
+    .history-card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px; margin-top:16px; overflow-wrap:anywhere; }
+    .history-card > * + * { margin-top:10px; }
+    .history-card summary { font-size:16px; font-weight:600; }
+    .settings-section { padding:24px 0; border-top:1px solid var(--line); }
+    .settings-section > * + * { margin-top:14px; }
+    .meter { height:8px; display:flex; border-radius:8px; overflow:hidden; background:#e5e7eb; margin:12px 0; }
+    .meter-slice.work { background:#467598; }.meter-slice.annoyance { background:#b77e70; }.meter-slice.personal { background:#80a391; }.meter-slice.spark { background:#9a8ab1; }.meter-slice.other { background:#9aa3ab; }
+    .telemetry-legend { font-size:12px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; }
+    .notice { background:var(--soft); padding:16px; border-radius:10px; font-size:14px; }
+    .status { color:var(--accent); font-size:14px; margin-top:12px; overflow-wrap:anywhere; }
+    /* Each dialog has ONE scroll owner. Its contents keep their natural height. */
+    .modal-backdrop,.pin-lock-overlay { display:none; position:fixed; inset:0; z-index:200; background:rgba(23,37,54,.6); padding:32px 16px; overflow-y:auto; align-items:flex-start; justify-content:center; }
+    .modal-window,.pin-box { width:100%; max-width:720px; margin:auto; flex:none; background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:0 20px 70px #0003; }
+    .modal-head { padding:20px 28px; display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line); }
+    .modal-body { display:block; padding:28px; }
+    .share-progress { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 26px; padding:0; list-style:none; font-size:13px; color:var(--muted); }
+    .share-progress li { padding:4px 0; }
+    .share-progress [aria-current="step"] { color:var(--ink); font-weight:700; }
+    .share-stage > * + * { margin-top:18px; }
+    .share-note-list { display:block; height:auto; max-height:none; overflow:visible; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+    .share-note-list label { display:grid; grid-template-columns:20px minmax(0,1fr); gap:12px; padding:16px 0; border-bottom:1px solid var(--line); align-items:start; overflow-wrap:anywhere; }
+    .share-note-list label:last-child { border-bottom:0; }
+    input[type="checkbox"] { width:18px; height:18px; accent-color:var(--accent); margin:3px 0; }
+    .check-label { display:flex; align-items:flex-start; gap:10px; }
+    .share-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .share-stage-footer { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-top:20px; border-top:1px solid var(--line); margin-top:28px; }
+    .prompt-preview { min-height:260px; height:300px; width:100%; font:13px/1.6 ui-monospace,monospace; }
+    .share-review { background:#f7f9fa; padding:20px; border-radius:12px; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .share-review > * + * { margin-top:10px; }
+    .step-instructions { padding-left:22px; }.step-instructions li { padding:8px 0; }
+    .pin-lock-overlay { z-index:300; }.pin-box { max-width:420px; padding:28px; }
+    .pin-box > * + * { margin-top:16px; }
+    .locked { filter:blur(8px); pointer-events:none; user-select:none; }
+    .plan-text-area { white-space:pre-wrap; overflow-wrap:anywhere; padding:20px; background:var(--bg); margin-top:16px; }
+    @media (max-width:600px) {
+      .site-header { padding:20px 16px 0; }.brand-row { align-items:flex-start; }
+      .saved-local { max-width:100px; text-align:right; }
+      .main-nav { gap:0; justify-content:space-between; }.main-nav button { padding:12px 8px; font-size:13px; }
+      main { padding:28px 16px 48px; }.card { padding:20px; }
+      .btn-copy-prompt { font-size:22px; padding:16px 12px; gap:12px; }
+      .dot-share-logo { width:48px; height:48px; }
+      .modal-backdrop { padding:12px 8px; }.modal-head,.modal-body { padding:20px; }
+      .share-actions > .btn-action { flex:1 1 auto; }
+      .share-stage-footer > button { flex:1; }.share-progress { gap:8px; font-size:12px; }
+    }
+    @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
   </style>
 </head>
 <body>
-
-  <!-- Top Bar -->
-  <header>
-    <div class="brand-group">
-      <div class="brand-logo-frame">
-        <img src="logo_white.png" class="brand-logo" alt="3Sci">
-      </div>
-      <div>
-        <div class="brand-title">PANORAMA</div>
-        <div class="brand-tag">Daily Thoughts & Ideas Synthesizer | 3Sci Labs</div>
-      </div>
+  <header class="site-header">
+    <div class="brand-row">
+      <div class="brand"><span class="brand-mark"><img src="logo_white.png" alt="3Sci"></span><span>PANORAMA</span></div>
+      <span class="saved-local">Saved in this browser</span>
     </div>
-
-    <!-- Google AI Key -->
-    <div class="top-api-container">
-      <span class="top-api-label">Google AI Key:</span>
-      <input type="password" class="top-api-input" id="top-gemini-key" placeholder="Paste your API key..." oninput="syncKey(this.value)">
-      <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="top-api-link">Get API Key ↗</a>
-    </div>
-
-    <!-- Header Actions -->
-    <div class="header-actions">
-      <button class="btn-action btn-action-lock" onclick="openSecuritySettingsModal()" id="btn-lock-status" title="Set or manage numeric PIN protection">
-        <span>🔒 PIN Security</span>
-      </button>
-      <button class="btn-action" onclick="openWizardModal()" title="How Panorama works step by step">
-        <span>💡 Tour</span>
-      </button>
-      <button class="btn-action" onclick="openFaqModal()" title="Plain-English User Guide and FAQs">
-        <span>❓ Guide & FAQ</span>
-      </button>
-      <button class="btn-action" onclick="openVaultModal()" title="Local JSON Backup and Restore">
-        <span>📦 Vault</span>
-      </button>
-      <button class="btn-action" onclick="openHistoryModal()">Past Weeks</button>
-      <button class="btn-action btn-action-accent" onclick="exportFullCalendarICS()" title="Download universal .ICS focus blocks">
-        <span>📅 Calendar</span>
-      </button>
-      <button class="btn-action" onclick="copyTaskChecklist(this)">Copy Todo List</button>
-    </div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <button id="nav-notes" aria-current="page" onclick="showPage('notes')">Thoughts</button>
+      <button id="nav-review" onclick="showPage('review')">Latest review</button>
+      <button id="nav-history" onclick="showPage('history')">History</button>
+      <button id="nav-settings" onclick="showPage('settings')">Settings</button>
+    </nav>
   </header>
-
-  <!-- Main View -->
-  <div class="app-layout" id="app-layout-main">
-    
-    <!-- Left: Scratchpad -->
-    <div class="scratchpad-sidebar">
-      <div class="dot-share-panel">
-        <button class="btn-copy-prompt" onclick="togglePromptStudio()" aria-label="Share with My Dot" aria-describedby="dot-share-hint">
-          <img class="dot-share-logo" src="assets/dot-default.png" width="64" height="64" alt="">
-          <span class="dot-share-label">Share with My Dot</span>
-        </button>
-        <p class="dot-share-hint" id="dot-share-hint">Choose your thoughts, then take them to your Dot in ChatGPT.</p>
-      </div>
-      <div class="section-title">
-        <span>Quick Brain Dump</span>
-        <button class="btn-action" style="padding:2px 6px; font-size:10px; color:#ef4444;" onclick="clearAllNotes()">Clear Scratchpad</button>
-      </div>
-
-      <!-- Input Box -->
-      <div class="quick-entry-box">
-        <textarea class="entry-textarea" id="note-input" placeholder="Jot down anything: an annoying snag, a trip note, a tool idea, an errand, or a quick question... (Press Ctrl+Enter to save)"></textarea>
-        
-        <div class="tag-row">
-          <span class="tag-chip active" data-tag="annoyance" onclick="selectTag('annoyance')">Annoyance</span>
-          <span class="tag-chip" data-tag="work" onclick="selectTag('work')">Work & Projects</span>
-          <span class="tag-chip" data-tag="personal" onclick="selectTag('personal')">Life & Travel</span>
-          <span class="tag-chip" data-tag="question" onclick="selectTag('question')">Question</span>
-          <span class="tag-chip" data-tag="chores" onclick="selectTag('chores')">Chores & Errands</span>
-          <span class="tag-chip" data-tag="spark" onclick="selectTag('spark')">Idea / Spark</span>
+  <main id="app-layout-main">
+    <section class="page" id="page-notes" aria-labelledby="notes-title">
+      <div class="page-intro"><h1 id="notes-title" tabindex="-1">What's on your mind?</h1><p class="muted">Put your thoughts here. Find your next step when you're ready.</p></div>
+      <div class="card">
+        <label for="note-input" class="help-text">A thought, an idea, or something to sort out</label>
+        <textarea id="note-input" class="entry-textarea" placeholder="Start anywhere. You don't need to organize it yet."></textarea>
+        <div class="row spread entry-actions">
+          <button class="btn-add-entry" onclick="addNote()">Save thought</button>
+          <button class="btn-voice" id="btn-voice-dictate" onclick="toggleVoiceDictation()"><span id="voice-icon" aria-hidden="true">◉</span><span id="voice-label">Use my voice</span></button>
         </div>
-
-        <div class="entry-button-row">
-          <button class="btn-add-entry" onclick="addNote()">
-            <span>Save Thought</span>
-            <span style="font-size:10px; opacity:0.8;">(Ctrl+Enter)</span>
+        <p id="note-save-status" class="status" role="status"></p>
+        <details class="optional-details">
+          <summary>Add a category or today's priority <span class="muted">(optional)</span></summary>
+          <div class="details-body stack">
+            <div><label for="note-category">Category for this thought</label><select id="note-category" onchange="selectTag(this.value)"><option value="other">No category</option><option value="work">Work</option><option value="personal">Personal</option><option value="annoyance">Something in the way</option><option value="spark">Idea</option><option value="question">Question</option><option value="chores">Errand</option></select></div>
+            <div><label for="north-star-input">Today's priority</label><input type="text" id="north-star-input" placeholder="What matters most today?" oninput="saveNorthStar(this.value)"><p class="help-text">Saves as you type. You can choose to include this when sharing.</p></div>
+          </div>
+        </details>
+      </div>
+      <section aria-labelledby="saved-thoughts-title">
+        <div class="row spread"><h2 id="saved-thoughts-title">Your saved thoughts</h2><span class="help-text" id="notes-count">0 thoughts</span></div>
+        <p id="priority-preview" class="help-text"></p>
+        <details class="thought-tools" id="thought-tools" hidden>
+          <summary>Find a thought</summary>
+          <div class="details-body stack">
+            <label for="feed-search">Search thoughts<input type="search" id="feed-search" placeholder="Search your thoughts" oninput="renderNotes()"></label>
+            <label for="feed-category">Filter by category<select id="feed-category" onchange="setFeedFilter(this.value)"><option value="all">All categories</option><option value="work">Work</option><option value="personal">Personal</option><option value="annoyance">Something in the way</option><option value="spark">Idea</option><option value="question">Question</option><option value="chores">Errand</option><option value="other">No category</option></select></label>
+          </div>
+        </details>
+        <div class="thought-list" id="stream-container"></div>
+        <div class="dot-share-panel">
+          <button class="btn-copy-prompt" id="start-dot-share" onclick="togglePromptStudio()" aria-label="Share with My Dot" aria-describedby="dot-share-hint">
+            <img class="dot-share-logo" src="assets/dot-default.png" width="56" height="56" alt=""><span class="dot-share-label">Share with My Dot</span>
           </button>
-          
-          <button class="btn-voice" id="btn-voice-dictate" onclick="toggleVoiceDictation()" title="Click to dictate a thought">
-            <span id="voice-icon">🎙️</span>
-            <span id="voice-label">Dictate</span>
-          </button>
+          <p class="dot-share-hint" id="dot-share-hint">Choose thoughts, take them to your Dot in ChatGPT, and bring back a review.</p>
         </div>
+      </section>
+      <div id="latest-review-link" class="latest-review-link" hidden><button class="btn-link" onclick="showPage('review')">View your latest review</button></div>
+      <details><summary>Manage saved thoughts</summary><div class="details-body stack"><p class="help-text">Archiving keeps your thoughts and current review in History, then gives you a fresh list.</p><button class="btn-action" onclick="archiveWeekAndStartFresh()">Archive these thoughts</button><br><button class="btn-link danger" onclick="clearAllNotes()">Delete all current thoughts</button></div></details>
+    </section>
+
+    <section class="page" id="page-review" hidden aria-labelledby="review-title">
+      <div class="page-intro"><h1 id="review-title" tabindex="-1">Your latest review</h1><p class="muted">A little perspective, and a place to begin.</p></div>
+      <div id="review-empty" class="card stack"><h2>No review yet</h2><p>Add a few thoughts, then share them with My Dot. Your review will appear here after you bring back and save the reply.</p><button class="btn-action btn-action-accent" onclick="showPage('notes')">Back to my thoughts</button></div>
+      <div id="review-content" class="stack" hidden>
+        <article class="card"><p class="help-text">The big picture</p><h2 id="dossier-theme"></h2><p id="dossier-narrative" class="macro-narrative review-summary"></p></article>
+        <section class="card"><h2>Three suggested next steps</h2><ol id="next-steps" class="next-steps"></ol><p class="help-text">Suggestions to consider. Nothing has been scheduled or sent.</p></section>
+        <details class="card"><summary>Explore the patterns and all suggestions</summary><div class="details-body">
+          <div id="chronic-friction-banner" class="chronic-alert"><strong id="chronic-badge-label"></strong><p id="chronic-body-text" class="chronic-body"></p></div>
+          <h3>What keeps getting in your way</h3><ul id="list-friction" class="insight-list"></ul>
+          <h3>Connections worth exploring</h3><div id="list-bridges" class="insight-list"></div>
+          <h3>Work suggestions</h3><ul id="list-venture" class="insight-list"></ul>
+          <h3>Personal suggestions</h3><ul id="list-life" class="insight-list"></ul>
+          <p class="help-text">Optional drafting uses Gemini, configured in Settings.</p>
+        </div></details>
+        <details><summary>Copy or download this review</summary><div class="details-body row"><button class="btn-action" onclick="copyTaskChecklist(this)">Copy action list</button><button class="btn-action" onclick="exportDossierMarkdown()">Download summary</button><button class="btn-action" onclick="exportFullCalendarICS()">Download calendar blocks</button></div><p class="help-text">Calendar blocks use preset times. Check them in your calendar before adding them.</p></details>
+        <div class="row"><button class="btn-action" onclick="showPage('notes')">Back to my thoughts</button><button class="btn-link" onclick="togglePromptStudio()">Start another review</button></div>
       </div>
+    </section>
 
-      <!-- Feed Filter & Search -->
-      <div class="feed-controls">
-        <input type="text" class="feed-search-input" id="feed-search" placeholder="Search saved thoughts..." oninput="renderNotes()">
-        <div class="filter-pills">
-          <span class="filter-pill active" data-filter="all" onclick="setFeedFilter('all')">All</span>
-          <span class="filter-pill" data-filter="annoyance" onclick="setFeedFilter('annoyance')">Annoyance</span>
-          <span class="filter-pill" data-filter="work" onclick="setFeedFilter('work')">Work</span>
-          <span class="filter-pill" data-filter="personal" onclick="setFeedFilter('personal')">Life</span>
-          <span class="filter-pill" data-filter="spark" onclick="setFeedFilter('spark')">Spark</span>
-        </div>
-      </div>
+    <section class="page" id="page-history" hidden aria-labelledby="history-title">
+      <div class="page-intro"><h1 id="history-title" tabindex="-1">History</h1><p class="muted">Your past reviews and archived thoughts, kept for later.</p></div>
+      <label for="history-search">Find a past review or thought<input type="search" id="history-search" placeholder="Search history" oninput="renderHistory()"></label>
+      <div id="history-content"></div>
+    </section>
 
-      <!-- Feed of Notes -->
-      <div class="stream-header">
-        <span class="stream-count" id="notes-count">0 Thoughts Active</span>
-        <span style="font-size:10px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;" id="storage-footprint">0.0 KB</span>
-      </div>
-      <div class="stream-list" id="stream-container"></div>
+    <section class="page" id="page-settings" hidden aria-labelledby="settings-title">
+      <div class="page-intro"><h1 id="settings-title" tabindex="-1">Settings</h1><p class="muted">Your data, privacy, and optional tools.</p></div>
+      <section class="settings-section" id="backup-settings"><h2>Backup &amp; restore</h2><p class="help-text">Download a private copy of your thoughts, reviews, history, and priority. Backups do not include your API key or PIN.</p>
+        <div class="row"><button class="btn-action" onclick="downloadVaultBackup()">Download backup</button><button class="btn-action" onclick="document.getElementById('vault-file-input').click()">Restore a backup</button><input type="file" id="vault-file-input" accept=".json" hidden onchange="handleVaultFileSelect(event)"></div>
+        <p class="help-text">Restoring replaces the included data. Download a backup first if you want to keep your current version.</p>
+      </section>
+      <section class="settings-section"><h2>Privacy</h2><p class="help-text">Your data is saved in this browser, not synced between devices. Sharing with My Dot is manual: you choose what to copy and paste. Your assistant's privacy settings apply. Voice input may use an online speech service.</p><p class="help-text">The optional PIN hides your desk; it does not encrypt your data or protect it from someone with access to this browser profile.</p><button class="btn-action" id="btn-lock-status" onclick="openSecuritySettingsModal()">Set a screen-lock PIN</button></section>
+      <details class="settings-section" id="gemini-settings"><summary>Optional: review directly with Gemini</summary><div class="details-body stack">
+        <p class="help-text">An alternative to the manual Dot handoff. Running a review sends all current thoughts, today's priority, and recent review themes to Google. A Google API key and available quota are required.</p>
+        <div><label for="top-gemini-key">Google API key</label><input type="password" id="top-gemini-key" placeholder="Your Google API key" oninput="syncKey(this.value)" autocomplete="off"><p class="help-text">Stored unencrypted in this browser. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Get an API key</a></p></div>
+        <button class="btn-action" id="btn-run-synth" onclick="runHolisticSynthesis()"><span id="synth-status">Review with Gemini</span></button>
+      </div></details>
+      <details class="settings-section"><summary>Thought categories &amp; storage</summary><div class="details-body"><p class="help-text">How your saved thoughts are categorized.</p><div class="meter" id="telemetry-bar"></div><div class="telemetry-legend" id="telemetry-legend"></div><p id="storage-footprint" class="help-text"></p></div></details>
+      <details class="settings-section" id="help-settings"><summary>How Panorama works</summary><div class="details-body stack"><p>Save whatever is on your mind. When you want a fresh perspective, use Share with My Dot.</p><p>Choose thoughts, copy the prepared message, open ChatGPT, and paste it into your Dot conversation. Sign in if prompted. Then copy Dot's complete reply back to Panorama, preview it, and save the review.</p><p>A new review keeps the previous review in History. Archiving also keeps your thoughts there. Nothing is sent or scheduled automatically.</p></div></details>
+    </section>
+  </main>
 
-      <!-- Bottom Controls -->
-      <div class="synthesis-controls">
-        <button class="btn-synthesize-ai" id="btn-run-synth" onclick="runHolisticSynthesis()">
-          <span id="synth-status">Connect The Dots</span>
-        </button>
-
-        <button class="btn-rollover" onclick="archiveWeekAndStartFresh()" title="Saves this week to history and clears the active scratchpad">
-          <span>Finish Week & Start Fresh</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Right: Synthesized Picture -->
-    <div class="dossier-stage">
-      
-      <!-- Live Desk Telemetry: Cognitive Load Meter & Daily North Star -->
-      <div class="desk-telemetry-panel">
-        <div class="telemetry-row">
-          <span class="telemetry-label">Active Headspace Telemetry</span>
-          <div class="telemetry-legend" id="telemetry-legend"></div>
-        </div>
-        <div class="telemetry-meter-bar" id="telemetry-bar">
-          <div class="meter-slice work" style="width: 20%;"></div>
-          <div class="meter-slice annoyance" style="width: 20%;"></div>
-          <div class="meter-slice personal" style="width: 20%;"></div>
-          <div class="meter-slice spark" style="width: 20%;"></div>
-          <div class="meter-slice other" style="width: 20%;"></div>
-        </div>
-
-        <!-- Sticky North Star -->
-        <div class="north-star-box">
-          <span class="north-star-icon">⭐</span>
-          <input type="text" class="north-star-input" id="north-star-input" placeholder="Today's non-negotiable focus or main priority (saves automatically)..." oninput="saveNorthStar(this.value)">
-        </div>
-      </div>
-
-      <!-- Big Picture Summary Card -->
-      <div class="macro-card">
-        <div class="macro-eyebrow">
-          <span id="dossier-eyebrow">The Full Picture</span>
-          <span id="dossier-status-pill" style="font-size:10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace;">THIS WEEK</span>
-        </div>
-        <h2 class="macro-title" id="dossier-theme">Your Connected Thoughts Will Show Up Here</h2>
-        <p class="macro-narrative" id="dossier-narrative">
-          Jot down quick thoughts on the left whenever they pop into your head—daily snags, travel logistics, work ideas, or open questions.
-          When you're ready, click <strong>Connect The Dots</strong> to see recurring patterns, hidden links between your ideas, and simple ways forward.
-        </p>
-      </div>
-
-      <!-- Recurring Snag Alert -->
-      <div class="chronic-alert" id="chronic-friction-banner">
-        <div class="chronic-head">
-          <div class="chronic-title">
-            <span>⚠️ Repeating Snag Alert</span>
-          </div>
-          <span class="chronic-badge" id="chronic-badge-label">KEEPS HAPPENING</span>
-        </div>
-        <div class="chronic-body" id="chronic-body-text"></div>
-      </div>
-
-      <!-- 4 Natural Sections -->
-      <div class="quantum-grid">
-        
-        <!-- 1. Recurring Snags -->
-        <div class="quadrant-card friction">
-          <div class="quadrant-title">
-            <span style="color:var(--accent-rose);">●</span>
-            <span>Recurring Snags & Drains</span>
-          </div>
-          <ul class="insight-list" id="list-friction">
-            <li class="insight-item">No snags analyzed yet.</li>
-          </ul>
-        </div>
-
-        <!-- 2. Connected Sparks -->
-        <div class="quadrant-card bridges">
-          <div class="quadrant-title">
-            <span style="color:var(--accent-purple);">●</span>
-            <span>Connected Sparks (Ideas Linking Together)</span>
-          </div>
-          <div class="insight-list" id="list-bridges">
-            <div class="bridge-box">
-              <span class="bridge-link">Connected Idea</span>
-              <span>When unrelated thoughts link together into a practical opportunity, they show up here.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Projects & Work Moves -->
-        <div class="quadrant-card venture">
-          <div class="quadrant-title">
-            <span style="color:var(--primary-blue);">●</span>
-            <span>Projects & Work Moves</span>
-          </div>
-          <ul class="insight-list" id="list-venture">
-            <li class="insight-item">Practical next steps for work will appear here.</li>
-          </ul>
-        </div>
-
-        <!-- 4. Life & Errands -->
-        <div class="quadrant-card life">
-          <div class="quadrant-title">
-            <span style="color:var(--accent-emerald);">●</span>
-            <span>Life, Travel & Open Questions</span>
-          </div>
-          <ul class="insight-list" id="list-life">
-            <li class="insight-item">Personal tasks, travel plans, and open questions will be tracked here.</li>
-          </ul>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- Manual handoff: no assistant connection or automatic transmission. -->
-  <div class="modal-backdrop" id="prompt-studio-drawer" onkeydown="handleShareKey(event)" onclick="closePromptStudio()">
-    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="share-title" onclick="event.stopPropagation()" style="max-width:760px;">
-      <div class="modal-head">
-        <strong id="share-title">Share with My Dot</strong>
-        <button class="btn-action" onclick="closePromptStudio()">Close sharing</button>
-      </div>
-      <div class="modal-body share-body">
-        <p>Choose what to share, then copy the prompt into your Dot conversation in ChatGPT. Nothing is sent automatically. Your assistant's privacy settings apply to what you paste.</p>
-        <h3>1. Choose context</h3>
-        <div class="share-actions">
-          <button class="btn-action" onclick="selectShareNotes(true)">Select all thoughts</button>
-          <button class="btn-action" onclick="selectShareNotes(false)">Select none</button>
-          <span id="share-note-count"></span>
-        </div>
-        <div id="share-note-list" class="share-note-list"></div>
-        <label><input type="checkbox" id="share-north-star" checked onchange="updateSharePrompt()"> Include today's North Star</label>
-        <label><input type="checkbox" id="share-history" onchange="updateSharePrompt()"> Include themes and recurring snags from the last 3 archived weeks</label>
-        <label for="prompt-preview-box"><strong>2. Review exactly what you will copy</strong></label>
-        <textarea id="prompt-preview-box" class="prompt-preview" readonly rows="8"></textarea>
-        <button class="btn-action btn-action-accent" id="copy-share-prompt" onclick="copyCompiledPrompt(this)" disabled>Copy prompt for My Dot</button>
-        <p id="share-copy-status" role="status" aria-live="polite"></p>
-        <section class="chatgpt-handoff" aria-labelledby="chatgpt-handoff-title">
-          <h3 id="chatgpt-handoff-title">3. Open your Dot in ChatGPT</h3>
-          <p><strong>Sign in to ChatGPT if prompted.</strong> Open your Dot conversation and paste the copied prompt. Then return here with the JSON reply.</p>
-          <a class="btn-action btn-action-accent" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Open ChatGPT (new tab)</a>
+  <div class="modal-backdrop" id="prompt-studio-drawer" onkeydown="handleShareKey(event)">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="share-title">
+      <div class="modal-head"><strong id="share-title" tabindex="-1">Share with My Dot</strong><button class="btn-action" onclick="closePromptStudio()">Cancel</button></div>
+      <div class="modal-body">
+        <ol class="share-progress" aria-label="Review progress"><li id="share-progress-1" aria-current="step">1. Choose thoughts</li><li id="share-progress-2">2. Take them to Dot</li><li id="share-progress-3">3. Bring back a review</li></ol>
+        <section class="share-stage" id="share-stage-1" aria-labelledby="share-stage-title-1">
+          <h2 id="share-stage-title-1" tabindex="-1">What would you like help with?</h2><p class="muted">Choose the thoughts you want your Dot to consider. Nothing is sent automatically.</p>
+          <div class="share-actions"><button class="btn-action" onclick="selectShareNotes(true)">Select all</button><button class="btn-link" onclick="selectShareNotes(false)">Clear selection</button><span id="share-note-count" class="help-text"></span></div>
+          <div id="share-note-list" class="share-note-list"></div>
+          <label class="check-label"><input type="checkbox" id="share-north-star" checked onchange="changeShareContext()">Include today's priority</label>
+          <label class="check-label"><input type="checkbox" id="share-history" onchange="changeShareContext()">Include themes and recurring problems from the last 3 reviews</label>
+          <div class="share-stage-footer"><button class="btn-action" onclick="closePromptStudio()">Cancel</button><button class="btn-action btn-action-accent" id="share-continue" onclick="setShareStep(2)" disabled>Continue</button></div>
         </section>
-        <label for="external-json-input"><strong>4. Paste the assistant's JSON reply</strong></label>
-        <textarea class="entry-textarea" id="external-json-input" placeholder="Paste the JSON reply here..." oninput="invalidateDossierReview()" style="min-height:100px;"></textarea>
-        <button class="btn-action" onclick="loadExternalJson()">Review reply</button>
-        <p id="share-import-status" role="status" aria-live="polite"></p>
-        <section id="dossier-review" hidden>
-          <h3>5. Review before applying</h3>
-          <p>Applying replaces only the current dossier. Your thoughts, archives, and North Star stay as they are.</p>
-          <div id="dossier-review-content" class="share-review"></div>
-          <div class="share-actions">
-            <button class="btn-action btn-action-accent" id="apply-dossier" onclick="applyExternalDossier()" disabled>Apply reviewed dossier</button>
-            <button class="btn-action" onclick="cancelDossierReview()">Cancel review</button>
-          </div>
+        <section class="share-stage" id="share-stage-2" hidden aria-labelledby="share-stage-title-2">
+          <h2 id="share-stage-title-2" tabindex="-1">Take your thoughts to My Dot</h2><p id="share-context-summary" class="notice"></p>
+          <ol class="step-instructions"><li>Copy the message below.</li><li>Open ChatGPT and sign in if prompted.</li><li>Open your Dot conversation and paste the message. When Dot replies, copy its complete reply and return here.</li></ol>
+          <div class="share-actions"><button class="btn-action btn-action-accent" id="copy-share-prompt" onclick="copyCompiledPrompt()" disabled>Copy message</button><a class="btn-action" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Open ChatGPT (new tab)</a></div>
+          <p id="share-copy-status" class="status" role="status" aria-live="polite"></p>
+          <details id="full-message-details"><summary>View the full message</summary><div class="details-body"><label for="prompt-preview-box">Exactly what will be copied</label><textarea id="prompt-preview-box" class="prompt-preview" readonly rows="12"></textarea></div></details>
+          <p class="help-text">Panorama cannot see your ChatGPT login or send the message for you. You can also paste the message into another assistant.</p>
+          <div class="share-stage-footer"><button class="btn-action" onclick="setShareStep(1)">Back</button><button class="btn-action btn-action-accent" onclick="setShareStep(3)">I have Dot's reply</button></div>
+        </section>
+        <section class="share-stage" id="share-stage-3" hidden aria-labelledby="share-stage-title-3">
+          <h2 id="share-stage-title-3" tabindex="-1">Bring back your review</h2><p class="muted">Paste Dot's complete reply, including any code block. You'll see a readable preview before saving.</p>
+          <div id="share-reply-entry"><label for="external-json-input">Dot's reply</label><textarea id="external-json-input" class="entry-textarea" placeholder="Paste the complete reply here" oninput="invalidateDossierReview()"></textarea><button class="btn-action btn-action-accent" style="margin-top:16px" onclick="loadExternalJson()">Preview review</button></div>
+          <p id="share-import-status" class="status" role="status" aria-live="polite"></p>
+          <section id="dossier-review" hidden class="stack"><div id="dossier-review-content" class="share-review"></div><p class="help-text">Saving updates your latest review. Your previous review stays in History; your thoughts and priority stay as they are.</p><div class="share-actions"><button class="btn-action btn-action-accent" id="apply-dossier" onclick="applyExternalDossier()" disabled>Save review</button><button class="btn-action" onclick="cancelDossierReview()">Discard this reply</button></div></section>
+          <div id="share-success" hidden class="notice stack"><strong>Ready when you are.</strong><p>Your review is saved. Nothing has been scheduled or sent.</p><button class="btn-action btn-action-accent" onclick="finishShare()">View my review</button></div>
+          <div class="share-stage-footer"><button class="btn-action" onclick="setShareStep(2)">Back</button><button class="btn-action" onclick="closePromptStudio()">Close</button></div>
         </section>
       </div>
     </div>
   </div>
 
-  <!-- PIN LOCK OVERLAY -->
-  <div class="pin-lock-overlay" id="pin-lock-screen">
-    <div class="pin-box">
-      <div style="font-size:32px;">🔐</div>
-      <div>
-        <h3 style="color:#f8fafc; font-family:'Space Grotesk', sans-serif; font-size:18px;">Panorama is Locked</h3>
-        <p style="color:#94a3b8; font-size:12px; margin-top:4px;">Enter your numeric PIN to access your personal desk</p>
-      </div>
-      <input type="password" id="pin-entry-input" class="pin-input" maxlength="8" placeholder="••••" autofocus onkeydown="handlePinKey(event)">
-      <button class="btn-action btn-action-accent" style="justify-content:center; padding:10px; font-size:13px;" onclick="verifyPin()">
-        Unlock Desk
-      </button>
-      <div id="pin-error-msg" style="color:#f87171; font-size:11.5px; font-weight:700; display:none;">Incorrect PIN code</div>
-    </div>
-  </div>
-
-  <!-- PIN SECURITY SETTINGS MODAL -->
-  <div class="modal-backdrop" id="security-modal" onclick="closeSecurityModal(event)">
-    <div class="modal-window" onclick="event.stopPropagation()" style="max-width:440px;">
-      <div class="modal-head">
-        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;">PIN SECURITY LOCK</strong>
-        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="closeSecurityModal()">Close</button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
-          Hide your desk behind a simple numeric PIN (this does not encrypt notes or the stored API key). When enabled, Panorama locks automatically whenever you open or refresh the page.
-        </p>
-
-        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Set or Change Numeric PIN (4 to 8 digits):</label>
-          <input type="password" id="security-new-pin" class="entry-textarea" style="min-height:unset; padding:8px 12px; font-family:'JetBrains Mono',monospace; font-size:16px; text-align:center; letter-spacing:4px;" maxlength="8" placeholder="e.g. 1234">
-          
-          <div style="display:flex; gap:8px; margin-top:4px;">
-            <button class="btn-action btn-action-accent" style="flex:1; justify-content:center; padding:8px;" onclick="saveNewPin()">
-              Save & Enable PIN
-            </button>
-            <button class="btn-action" style="color:#ef4444; border-color:#fca5a5;" onclick="removePin()">
-              Disable PIN
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ONBOARDING WIZARD MODAL -->
-  <div class="modal-backdrop" id="wizard-modal" onclick="closeWizardModal(event)">
-    <div class="modal-window" onclick="event.stopPropagation()" style="max-width:540px;">
-      <div class="modal-head">
-        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;" id="wizard-title">WELCOME TO PANORAMA</strong>
-        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="closeWizardModal()">Close</button>
-      </div>
-      <div class="modal-body" id="wizard-body"></div>
-      <div style="padding:12px 20px; background:#f8fafc; border-top:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--text-muted);" id="wizard-step-counter">Step 1 of 4</span>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-action" id="btn-wizard-prev" onclick="wizardPrevStep()">Previous</button>
-          <button class="btn-action btn-action-accent" id="btn-wizard-next" onclick="wizardNextStep()">Next</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- GUIDE & FAQ MODAL -->
-  <div class="modal-backdrop" id="faq-modal" onclick="closeFaqModal(event)">
-    <div class="modal-window" onclick="event.stopPropagation()" style="max-width:680px;">
-      <div class="modal-head">
-        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;">PANORAMA GUIDE & FAQ (PLAIN ENGLISH)</strong>
-        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="closeFaqModal()">Close</button>
-      </div>
-      <div class="modal-body">
-        <div class="faq-item">
-          <div class="faq-q">What is Panorama in simple words?</div>
-          <div class="faq-a">Panorama is a private daily scratchpad with a personal analyst built into it. Dump raw thoughts during the week, and hit Connect The Dots on Friday to see patterns, connect ideas, and get clear action steps.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q">Where are my thoughts stored?</div>
-          <div class="faq-a">Notes are saved in this browser's localStorage. Gemini review sends notes, North Star, and recent snag history to Google. Sharing with My Dot only copies your chosen context; you paste it yourself. Fonts load from Google, and browser dictation may use an online speech service. The PIN is a screen lock, not encryption.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q">What if Google AI shows a "High Demand" error?</div>
-          <div class="faq-a">Gemini review stops after 7 seconds. You can try again or use Share with My Dot to copy selected context to your assistant without a Gemini key.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAST WEEKS MODAL -->
-  <div class="modal-backdrop" id="history-modal" onclick="closeHistoryModal(event)">
-    <div class="modal-window" onclick="event.stopPropagation()">
-      <div class="modal-head">
-        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;">PAST WEEKS ARCHIVE</strong>
-        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="document.getElementById('history-modal').style.display='none'">Close</button>
-      </div>
-      <div class="modal-body" id="history-content"></div>
-    </div>
-  </div>
-
-  <!-- ACTION PLAN MODAL -->
-  <div class="modal-backdrop" id="draft-modal" onclick="closeDraftModal(event)">
-    <div class="modal-window" onclick="event.stopPropagation()">
-      <div class="modal-head">
-        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;" id="draft-modal-title">ACTION PLAN</strong>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="copyDraftText(this)">Copy Text</button>
-          <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="document.getElementById('draft-modal').style.display='none'">Close</button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <div style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;" id="draft-context-label"></div>
-        <div class="plan-text-area" id="draft-output-area">Drafting step-by-step plan...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- VAULT MODAL -->
-  <div class="modal-backdrop" id="vault-modal" onclick="closeVaultModal(event)">
-    <div class="modal-window" onclick="event.stopPropagation()">
-      <div class="modal-head">
-        <strong style="font-family:'Space Grotesk', sans-serif; font-size:15px;">PANORAMA VAULT & BACKUP</strong>
-        <button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="document.getElementById('vault-modal').style.display='none'">Close</button>
-      </div>
-      <div class="modal-body">
-        <div class="vault-box">
-          <strong style="font-size:14px; color:var(--text);">Export Complete Vault</strong>
-          <button class="btn-action btn-action-accent" onclick="downloadVaultBackup()">📥 Download Vault Backup (.json)</button>
-        </div>
-        <div class="vault-box">
-          <strong style="font-size:14px; color:var(--text);">Restore from File</strong>
-          <div class="vault-drop-zone" onclick="document.getElementById('vault-file-input').click()">
-            <input type="file" id="vault-file-input" style="display:none;" accept=".json" onchange="handleVaultFileSelect(event)">
-            <strong style="font-size:12.5px; color:var(--primary-blue);">Click to select a backup JSON file</strong>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <div class="pin-lock-overlay" id="pin-lock-screen"><div class="pin-box" role="dialog" aria-modal="true" aria-labelledby="pin-title"><h2 id="pin-title">Your Panorama is locked</h2><p class="muted">Enter your screen-lock PIN.</p><label for="pin-entry-input">PIN</label><input type="password" id="pin-entry-input" maxlength="8" inputmode="numeric" onkeydown="handlePinKey(event)"><button class="btn-action btn-action-accent" onclick="verifyPin()">Unlock</button><p id="pin-error-msg" class="danger" style="display:none" role="alert">That PIN doesn't match. Try again.</p></div></div>
+  <div class="modal-backdrop" id="security-modal"><div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="security-title"><div class="modal-head"><strong id="security-title">Screen-lock PIN</strong><button class="btn-action" onclick="closeSecurityModal()">Close</button></div><div class="modal-body stack"><p>This hides your desk when you reopen it. It does not encrypt your data.</p><label for="security-new-pin">Choose a 4–8 digit PIN</label><input type="password" id="security-new-pin" maxlength="8" inputmode="numeric"><div class="row"><button class="btn-action btn-action-accent" onclick="saveNewPin()">Save PIN</button><button class="btn-action danger" onclick="removePin()">Remove PIN</button></div></div></div></div>
+  <div class="modal-backdrop" id="draft-modal"><div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="draft-modal-title"><div class="modal-head"><strong id="draft-modal-title">Draft next steps</strong><button class="btn-action" onclick="closeDraftModal()">Close</button></div><div class="modal-body"><p id="draft-context-label" class="help-text"></p><div id="draft-output-area" class="plan-text-area"></div><button class="btn-action" style="margin-top:16px" onclick="copyDraftText(this)">Copy draft</button></div></div></div>
   <script>
-    let activeTag = 'annoyance';
+    let activeTag = 'other';
     let feedFilter = 'all';
     let notes = [];
     let currentDossier = null;
     let recognition = null;
     let isRecording = false;
-    let wizardCurrentStep = 0;
+    let currentPage = 'notes';
+    let shareStep = 1;
     let pendingDossier = null;
     let reviewedReply = '';
     const selectedShareNotes = new Set();
-    const NOTE_TAGS = ['annoyance', 'work', 'personal', 'question', 'chores', 'spark'];
+    const NOTE_TAGS = ['other', 'annoyance', 'work', 'personal', 'question', 'chores', 'spark'];
     function geminiEndpoint(key) {
       return 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(key);
     }
@@ -1412,27 +334,56 @@
     }
 
 
-    const SAMPLE_NOTES = [
-      { id: 1, tag: 'annoyance', text: "Spent 45 minutes manually checking flight confirmations and hotel receipts across five different tabs.", date: "Tuesday 09:30" },
-      { id: 2, tag: 'work', text: "Client liked the overview, but asked if we can provide a clean, 1-page PDF summary without all the raw technical logs.", date: "Tuesday 14:15" },
-      { id: 3, tag: 'personal', text: "Need to confirm the boat booking and lock in dates for the family trip before prices go up.", date: "Wednesday 11:20" },
-      { id: 4, tag: 'question', text: "Should I stick with simple local settings, or does this need a full configuration file?", date: "Thursday 16:40" },
-      { id: 5, tag: 'spark', text: "Holiday planning and project troubleshooting have the same problem: too many disconnected apps and no single overview.", date: "Friday 08:50" }
-    ];
+
+    function showPage(page, focus = true) {
+      if (!['notes', 'review', 'history', 'settings'].includes(page)) return;
+      currentPage = page;
+      ['notes', 'review', 'history', 'settings'].forEach(name => {
+        document.getElementById('page-' + name).hidden = name !== page;
+        document.getElementById('nav-' + name).setAttribute('aria-current', name === page ? 'page' : 'false');
+      });
+      if (page === 'history') renderHistory();
+      if (focus) {
+        document.getElementById((page === 'notes' ? 'notes' : page) + '-title').focus();
+        window.scrollTo?.({ top: 0 });
+      }
+    }
+    function categoryName(tag) {
+      return ({ other: 'No category', annoyance: 'Something in the way', work: 'Work', personal: 'Personal', question: 'Question', chores: 'Errand', spark: 'Idea' })[tag] || tag;
+    }
+    function updatePriorityPreview() {
+      const priority = localStorage.getItem('3sci_panorama_north_star') || '';
+      document.getElementById('priority-preview').textContent = priority ? "Today's priority: " + priority : '';
+    }
+    function historySnapshot(kind) {
+      return { id: Date.now(), date: new Date().toLocaleDateString(), kind, theme: currentDossier?.theme || 'Saved thoughts',
+        summary: currentDossier?.summary || '', notes: [...notes], dossier: currentDossier,
+        northStar: localStorage.getItem('3sci_panorama_north_star') || '' };
+    }
+    function writeStorageChanges(updates) {
+      const previous = new Map([...updates.keys()].map(key => [key, localStorage.getItem(key)]));
+      const write = (key, value) => value === null ? localStorage.removeItem(key) : localStorage.setItem(key, value);
+      try { updates.forEach((value, key) => write(key, value)); }
+      catch (err) { previous.forEach((value, key) => write(key, value)); throw err; }
+    }
 
     /* Security PIN Lock System */
     function checkSecurityLock() {
       const pin = localStorage.getItem('3sci_panorama_pin');
       const lockBtn = document.getElementById('btn-lock-status');
       if (pin && pin.trim().length >= 4) {
-        lockBtn.innerHTML = `<span>🔒 PIN Active</span>`;
+        lockBtn.textContent = 'Manage screen-lock PIN';
         document.getElementById('pin-lock-screen').style.display = 'flex';
         document.getElementById('app-layout-main').classList.add('locked');
+        document.getElementById('app-layout-main').inert = true;
+        document.querySelector('header').inert = true;
         setTimeout(() => document.getElementById('pin-entry-input').focus(), 100);
       } else {
-        lockBtn.innerHTML = `<span>🔓 Set PIN</span>`;
+        lockBtn.textContent = 'Set a screen-lock PIN';
         document.getElementById('pin-lock-screen').style.display = 'none';
         document.getElementById('app-layout-main').classList.remove('locked');
+        document.getElementById('app-layout-main').inert = false;
+        document.querySelector('header').inert = false;
       }
     }
 
@@ -1443,6 +394,8 @@
       if (enteredPin === savedPin) {
         document.getElementById('pin-lock-screen').style.display = 'none';
         document.getElementById('app-layout-main').classList.remove('locked');
+        document.getElementById('app-layout-main').inert = false;
+        document.querySelector('header').inert = false;
         document.getElementById('pin-entry-input').value = '';
         err.style.display = 'none';
       } else {
@@ -1474,28 +427,8 @@
       }
     }
 
-    /* Onboarding Wizard */
-    const WIZARD_STEPS = [
-      { badge: "STEP 1 OF 4", title: "Zero-Friction Brain Dump", body: "Jot down bugs, errands, or ideas instantly on the left without organizing them.", icon: "✍️" },
-      { badge: "STEP 2 OF 4", title: "Live Headspace Meter", body: "The color bar shows what is dominating your mental bandwidth during the week.", icon: "📊" },
-      { badge: "STEP 3 OF 4", title: "Connect The Dots", body: "On Friday, click Connect The Dots to synthesize your week into smart action steps.", icon: "🧠" },
-      { badge: "STEP 4 OF 4", title: "Start Fresh", body: "Archive your week and start a fresh scratchpad. Past notes remain in Past Weeks and vault backups.", icon: "🚀" }
-    ];
-
-    function openWizardModal() { wizardCurrentStep = 0; renderWizardStep(); document.getElementById('wizard-modal').style.display = 'flex'; }
-    function closeWizardModal() { document.getElementById('wizard-modal').style.display = 'none'; localStorage.setItem('3sci_panorama_tour_seen', 'true'); }
-    function renderWizardStep() {
-      const step = WIZARD_STEPS[wizardCurrentStep];
-      document.getElementById('wizard-step-counter').innerText = `Step ${wizardCurrentStep + 1} of 4`;
-      document.getElementById('wizard-body').innerHTML = `<div class="wizard-card"><span style="font-size:36px;">${step.icon}</span><span class="wizard-step-badge">${step.badge}</span><h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;">${step.title}</h3><p style="font-size:13px;color:var(--text-secondary);">${step.body}</p></div>`;
-      document.getElementById('btn-wizard-prev').disabled = (wizardCurrentStep === 0);
-      document.getElementById('btn-wizard-next').innerText = (wizardCurrentStep === WIZARD_STEPS.length - 1) ? "Got It!" : "Next";
-    }
-    function wizardNextStep() { if (wizardCurrentStep < WIZARD_STEPS.length - 1) { wizardCurrentStep++; renderWizardStep(); } else { closeWizardModal(); } }
-    function wizardPrevStep() { if (wizardCurrentStep > 0) { wizardCurrentStep--; renderWizardStep(); } }
-
-    function openFaqModal() { document.getElementById('faq-modal').style.display = 'flex'; }
-    function closeFaqModal() { document.getElementById('faq-modal').style.display = 'none'; }
+    function openWizardModal() { openFaqModal(); }
+    function openFaqModal() { showPage('settings'); document.getElementById('help-settings').open = true; }
 
     /* Voice Capture */
     function initSpeechRecognition() {
@@ -1523,7 +456,7 @@
     function stopVoiceDictation() {
       isRecording = false;
       const btn = document.getElementById('btn-voice-dictate');
-      if (btn) { btn.classList.remove('recording'); document.getElementById('voice-icon').innerText = '🎙️'; document.getElementById('voice-label').innerText = 'Dictate'; }
+      if (btn) { btn.classList.remove('recording'); document.getElementById('voice-icon').innerText = '🎙️'; document.getElementById('voice-label').innerText = 'Use my voice'; }
     }
 
     /* Storage & Telemetry */
@@ -1538,14 +471,15 @@
     }
     function syncKey(val) { localStorage.setItem('3sci_panorama_key', val.trim()); }
     function getKey() { return document.getElementById('top-gemini-key').value.trim() || localStorage.getItem('3sci_panorama_key') || ''; }
-    function saveNorthStar(val) { localStorage.setItem('3sci_panorama_north_star', val); updateSharePrompt(); }
+    function saveNorthStar(val) { localStorage.setItem('3sci_panorama_north_star', val); updatePriorityPreview(); changeShareContext(); }
 
     function loadNotes() {
-      notes = JSON.parse(localStorage.getItem('3sci_panorama_notes') || JSON.stringify(SAMPLE_NOTES));
+      notes = validateNotes(JSON.parse(localStorage.getItem('3sci_panorama_notes') || '[]'));
       const storedDossier = localStorage.getItem('3sci_panorama_active_dossier');
       currentDossier = storedDossier ? validateDossier(JSON.parse(storedDossier), true) : null;
       paintDossier(currentDossier);
       document.getElementById('north-star-input').value = localStorage.getItem('3sci_panorama_north_star') || '';
+      updatePriorityPreview();
       renderNotes();
       updateTelemetry();
     }
@@ -1556,12 +490,15 @@
       if (!text) return;
       if (isRecording && recognition) recognition.stop();
       const now = new Date();
-      notes.unshift({ id: Date.now(), tag: activeTag, text: text, date: now.toLocaleDateString(undefined, {weekday:'short'}) + ' ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) });
+      let noteId = Date.now();
+      while (notes.some(note => note.id === noteId)) noteId++;
+      notes.unshift({ id: noteId, tag: activeTag, text: text, date: now.toLocaleDateString(undefined, {weekday:'short'}) + ' ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) });
       input.value = '';
       saveNotes();
+      document.getElementById('note-save-status').textContent = 'Thought saved in this browser.';
     }
-    function deleteNote(id) { notes = notes.filter(n => n.id !== id); saveNotes(); }
-    function clearAllNotes() { if (confirm("Clear active scratchpad?")) { notes = []; saveNotes(); } }
+    function deleteNote(id) { if (confirm('Delete this thought? This cannot be undone.')) { notes = notes.filter(n => n.id !== id); saveNotes(); } }
+    function clearAllNotes() { if (confirm('Delete all current thoughts? This cannot be undone. Your reviews and history will stay.')) { notes = []; saveNotes(); } }
 
     function updateTelemetry() {
       const total = notes.length;
@@ -1588,15 +525,18 @@
       const container = document.getElementById('stream-container');
       const searchTerm = (document.getElementById('feed-search').value || '').toLowerCase().trim();
       const filtered = notes.filter(n => (feedFilter === 'all' || n.tag === feedFilter) && n.text.toLowerCase().includes(searchTerm));
-      document.getElementById('notes-count').textContent = notes.length + ' Thoughts Active';
+      document.getElementById('notes-count').textContent = notes.length + (notes.length === 1 ? ' thought' : ' thoughts');
+      document.getElementById('thought-tools').hidden = notes.length === 0;
+      document.getElementById('start-dot-share').disabled = notes.length === 0;
+      document.getElementById('dot-share-hint').textContent = notes.length ? 'Choose thoughts, take them to your Dot in ChatGPT, and bring back a review.' : 'Save a thought above to start a review with My Dot.';
       container.replaceChildren();
-      if (!filtered.length) container.append(textElement('p', '', 'No matching thoughts.'));
+      if (!filtered.length) container.append(textElement('p', 'empty-note', notes.length ? 'No thoughts match your search.' : 'Your saved thoughts will appear here. Start with one thing on your mind.'));
       filtered.forEach(n => {
         const item = textElement('div', 'stream-item ' + (NOTE_TAGS.includes(n.tag) ? n.tag : ''));
         const meta = textElement('div', 'stream-meta');
         const actions = textElement('div', 'share-actions');
         actions.append(textElement('span', '', n.date), actionButton('Delete', () => deleteNote(n.id), 'btn-del-note'));
-        meta.append(textElement('span', 'stream-tag', n.tag), actions);
+        meta.append(textElement('span', 'stream-tag', n.tag === 'other' ? '' : categoryName(n.tag)), actions);
         item.append(meta, textElement('div', 'stream-text', n.text));
         container.append(item);
       });
@@ -1636,9 +576,9 @@
         checkbox.checked = selectedShareNotes.has(n.id);
         checkbox.addEventListener('change', () => {
           if (checkbox.checked) selectedShareNotes.add(n.id); else selectedShareNotes.delete(n.id);
-          updateSharePrompt();
+          changeShareContext();
         });
-        label.append(checkbox, textElement('span', '', '[' + n.tag + '] ' + n.text));
+        label.append(checkbox, textElement('span', '', (n.tag === 'other' ? '' : '[' + categoryName(n.tag) + '] ') + n.text));
         list.append(label);
       });
       updateSharePrompt();
@@ -1650,27 +590,60 @@
         ? compilePrompt(selected, document.getElementById('share-north-star').checked, document.getElementById('share-history').checked)
         : 'Select the thoughts you want to share. Nothing is sent automatically.';
       document.getElementById('copy-share-prompt').disabled = selected.length === 0;
+      document.getElementById('share-continue').disabled = selected.length === 0;
+      const extras = [];
+      if (document.getElementById('share-north-star').checked && localStorage.getItem('3sci_panorama_north_star')) extras.push("today's priority");
+      if (document.getElementById('share-history').checked) extras.push('recent review themes');
+      document.getElementById('share-context-summary').textContent = selected.length + (selected.length === 1 ? ' thought' : ' thoughts') + (extras.length ? ', plus ' + extras.join(' and ') : '') + '. Only the context you chose is included.';
       document.getElementById('share-copy-status').textContent = '';
     }
     function selectShareNotes(all) {
       selectedShareNotes.clear();
       if (all) notes.forEach(n => selectedShareNotes.add(n.id));
+      invalidateDossierReview();
       renderShareNotes();
     }
+
+    function changeShareContext() {
+      invalidateDossierReview();
+      updateSharePrompt();
+    }
+    function setShareStep(step) {
+      if (![1, 2, 3].includes(step)) return;
+      if (step > 1 && !notes.some(n => selectedShareNotes.has(n.id))) return;
+      shareStep = step;
+      [1, 2, 3].forEach(n => {
+        document.getElementById('share-stage-' + n).hidden = n !== step;
+        document.getElementById('share-progress-' + n).setAttribute('aria-current', n === step ? 'step' : 'false');
+      });
+      document.getElementById('prompt-studio-drawer').scrollTop = 0;
+      document.getElementById('share-stage-title-' + step).focus();
+    }
     function togglePromptStudio() {
+      if (!notes.length) {
+        showPage('notes');
+        document.getElementById('note-save-status').textContent = 'Save a thought first, then share it with My Dot.';
+        document.getElementById('note-input').focus();
+        return;
+      }
+      cancelDossierReview();
+      document.getElementById('share-import-status').textContent = '';
       renderShareNotes();
       document.getElementById('prompt-studio-drawer').style.display = 'flex';
       document.getElementById('app-layout-main').inert = true;
       document.querySelector('header').inert = true;
-      document.getElementById('share-title').setAttribute('tabindex', '-1');
-      document.getElementById('share-title').focus();
+      document.body.style.overflow = 'hidden';
+      setShareStep(1);
     }
     function handleShareKey(event) {
       if (event.key === 'Escape') { event.preventDefault(); closePromptStudio(); return; }
       if (event.key !== 'Tab') return;
-      const controls = [...document.getElementById('prompt-studio-drawer').querySelectorAll('button, input, textarea, a[href]')].filter(el => !el.disabled && !el.closest('[hidden]'));
+      const controls = [...document.getElementById('prompt-studio-drawer').querySelectorAll('button, input, textarea, a[href], summary')]
+        .filter(el => !el.disabled && !el.closest('[hidden]') && !el.closest('details:not([open]) > :not(summary)'));
       const first = controls[0], last = controls[controls.length - 1];
-      if (event.shiftKey && (document.activeElement === first || document.activeElement.id === 'share-title')) {
+      if (!first) return;
+      const focusedTitle = document.activeElement?.id?.startsWith('share-stage-title-');
+      if (event.shiftKey && (document.activeElement === first || focusedTitle || document.activeElement?.id === 'share-title')) {
         event.preventDefault(); last.focus();
       } else if (!event.shiftKey && document.activeElement === last) {
         event.preventDefault(); first.focus();
@@ -1681,8 +654,10 @@
       document.getElementById('prompt-studio-drawer').style.display = 'none';
       document.getElementById('app-layout-main').inert = false;
       document.querySelector('header').inert = false;
-      document.querySelector('.btn-copy-prompt').focus();
+      document.body.style.overflow = '';
+      document.getElementById('nav-' + currentPage).focus();
     }
+    function finishShare() { closePromptStudio(); showPage('review'); }
     async function copyCompiledPrompt() {
       if (!notes.some(n => selectedShareNotes.has(n.id))) return;
       updateSharePrompt();
@@ -1691,6 +666,7 @@
         await navigator.clipboard.writeText(preview.value);
         document.getElementById('share-copy-status').textContent = "Copied. Open ChatGPT, sign in if prompted, and paste into your Dot conversation. Bring its JSON reply back here.";
       } catch (err) {
+        document.getElementById('full-message-details').open = true;
         preview.focus(); preview.select();
         document.getElementById('share-copy-status').textContent = 'Clipboard access is unavailable. Copy the selected prompt manually.';
       }
@@ -1701,66 +677,93 @@
       document.getElementById('dossier-review').hidden = true;
       document.getElementById('dossier-review-content').replaceChildren();
       document.getElementById('apply-dossier').disabled = true;
+      document.getElementById('share-success').hidden = true;
+      document.getElementById('share-reply-entry').hidden = false;
       document.getElementById('share-import-status').textContent = '';
     }
     function cancelDossierReview() {
       invalidateDossierReview();
       document.getElementById('external-json-input').value = '';
-      document.getElementById('share-import-status').textContent = 'Review cancelled. Your current dossier was not changed.';
+      document.getElementById('share-import-status').textContent = 'Reply discarded. Your saved review was not changed.';
+    }
+
+    function appendReadableReview(content, data) {
+      content.append(textElement('h3', '', data.theme), textElement('p', '', data.summary));
+      const section = (title, items) => {
+        if (!items.length) return;
+        content.append(textElement('h4', '', title));
+        items.forEach(item => content.append(textElement('p', '', item)));
+      };
+      section('A repeating problem', data.repeatingSnag.detected ? [data.repeatingSnag.name + ': ' + data.repeatingSnag.explanation] : []);
+      section('What keeps getting in your way', data.recurringSnags);
+      section('Connections worth exploring', data.connectedSparks.map(x => x.connection + ': ' + x.idea));
+      section('Work suggestions', data.workMoves.map(x => x.step + ': ' + x.why));
+      section('Personal suggestions', data.lifeMoves.map(x => x.step + ': ' + x.why));
     }
     function loadExternalJson() {
       invalidateDossierReview();
       try {
         const reply = document.getElementById('external-json-input').value;
         const data = parseDossierReply(reply);
-        const content = document.getElementById('dossier-review-content');
-        content.append(textElement('h3', '', data.theme), textElement('p', '', data.summary));
-        const section = (title, items) => {
-          content.append(textElement('h4', '', title));
-          items.forEach(item => content.append(textElement('p', '', item)));
-          if (!items.length) content.append(textElement('p', '', 'None.'));
-        };
-        section('Repeating snag', data.repeatingSnag.detected ? [data.repeatingSnag.name + ': ' + data.repeatingSnag.explanation] : []);
-        section('Recurring snags', data.recurringSnags);
-        section('Connected sparks', data.connectedSparks.map(x => x.connection + ': ' + x.idea));
-        section('Work moves', data.workMoves.map(x => x.step + ': ' + x.why));
-        section('Life moves', data.lifeMoves.map(x => x.step + ': ' + x.why));
+        appendReadableReview(document.getElementById('dossier-review-content'), data);
         pendingDossier = data;
         reviewedReply = reply;
         document.getElementById('dossier-review').hidden = false;
         document.getElementById('apply-dossier').disabled = false;
-        document.getElementById('share-import-status').textContent = 'Reply checked. Review it below before applying.';
+        document.getElementById('share-import-status').textContent = 'Here is your preview. Nothing changes until you save.';
       } catch (err) {
-        document.getElementById('share-import-status').textContent = err.message;
+        document.getElementById('share-import-status').textContent = "We couldn't read that reply. Copy Dot's complete response, including any code block, and try again.";
       }
     }
     function applyExternalDossier() {
       if (!pendingDossier) return;
       if (document.getElementById('external-json-input').value !== reviewedReply) {
         invalidateDossierReview();
-        document.getElementById('share-import-status').textContent = 'The reply changed. Review it again before applying.';
+        document.getElementById('share-import-status').textContent = 'The reply changed. Preview it again before saving.';
         return;
       }
       try {
         const duplicate = JSON.stringify(pendingDossier) === JSON.stringify(currentDossier);
+        const hadPreviousReview = currentDossier !== null;
         if (!duplicate) renderDossier(pendingDossier);
         invalidateDossierReview();
         document.getElementById('external-json-input').value = '';
-        document.getElementById('share-import-status').textContent = duplicate ? 'This dossier is already current. Nothing changed.' : 'Reviewed dossier applied. Close sharing to see it on your desk.';
+        document.getElementById('share-success').hidden = false;
+        document.getElementById('share-reply-entry').hidden = true;
+        document.getElementById('share-import-status').textContent = duplicate ? 'This review is already current. Nothing changed.' : (hadPreviousReview ? 'Review saved. Your previous review is in History.' : 'Your first review is saved.');
       } catch (err) {
-        document.getElementById('share-import-status').textContent = 'Could not save the dossier. Your previous dossier is unchanged.';
+        document.getElementById('share-import-status').textContent = 'Could not save the review. Your previous review is unchanged. Try downloading a backup in Settings.';
       }
     }
 
+
     function renderDossier(data) {
       const validated = validateDossier(data);
-      localStorage.setItem('3sci_panorama_active_dossier', JSON.stringify(validated));
+      const updates = new Map([['3sci_panorama_active_dossier', JSON.stringify(validated)]]);
+      if (currentDossier && JSON.stringify(currentDossier) !== JSON.stringify(validated)) {
+        const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
+        history.unshift(historySnapshot('review'));
+        updates.set('3sci_panorama_history', JSON.stringify(history));
+      }
+      writeStorageChanges(updates);
       currentDossier = validated;
       paintDossier(validated);
     }
     function paintDossier(data) {
-      document.getElementById('dossier-theme').textContent = data?.theme || 'Your Connected Thoughts Will Show Up Here';
-      document.getElementById('dossier-narrative').textContent = data?.summary || "Capture a thought, then connect the dots or share with My Dot.";
+      document.getElementById('review-empty').hidden = !!data;
+      document.getElementById('review-content').hidden = !data;
+      document.getElementById('latest-review-link').hidden = !data;
+      const nextSteps = document.getElementById('next-steps');
+      nextSteps.replaceChildren();
+      const moves = [...(data?.workMoves || []), ...(data?.lifeMoves || [])];
+      moves.slice(0, 3).forEach(move => {
+        const item = textElement('li');
+        item.append(textElement('strong', '', move.step), textElement('p', '', move.why));
+        nextSteps.append(item);
+      });
+      if (!moves.length) nextSteps.append(textElement('li', 'muted', 'No next steps suggested in this review.'));
+      document.getElementById('dossier-theme').textContent = data?.theme || 'Your next review will appear here';
+      document.getElementById('dossier-narrative').textContent = data?.summary || "Save a thought, then share with My Dot when you are ready.";
       document.getElementById('chronic-friction-banner').style.display = data?.repeatingSnag?.detected ? 'flex' : 'none';
       document.getElementById('chronic-badge-label').textContent = data?.repeatingSnag?.name || '';
       document.getElementById('chronic-body-text').textContent = data?.repeatingSnag?.explanation || '';
@@ -1772,13 +775,13 @@
       };
       renderList('list-friction', data?.recurringSnags, f => {
         const item = textElement('li', 'insight-item');
-        item.append(textElement('div', '', f), actionButton('Draft Solution', () => generateActionPlan('Fix', f)));
+        item.append(textElement('div', '', f), actionButton('Draft with Gemini', () => generateActionPlan('Fix', f)));
         return item;
       });
       renderList('list-bridges', data?.connectedSparks, b => {
         const item = textElement('div', 'bridge-box');
         item.append(textElement('span', 'bridge-link', b.connection), textElement('div', '', b.idea),
-          actionButton('Outline', () => generateActionPlan('Idea', b.connection + ': ' + b.idea)));
+          actionButton('Draft with Gemini', () => generateActionPlan('Idea', b.connection + ': ' + b.idea)));
         return item;
       }, 'div');
       const move = (m, kind) => {
@@ -1786,8 +789,8 @@
         const description = textElement('div');
         description.append(textElement('strong', '', m.step + ': '), textElement('span', '', m.why));
         const actions = textElement('div', 'card-actions-row');
-        actions.append(actionButton(kind === 'Work' ? 'Draft Plan' : 'Break Down', () => generateActionPlan(kind, m.step)),
-          actionButton('Calendar', () => exportSingleEventICS(m.step, m.why), 'btn-card-action calendar'));
+        actions.append(actionButton('Draft with Gemini', () => generateActionPlan(kind, m.step)),
+          actionButton('Download calendar block', () => exportSingleEventICS(m.step, m.why), 'btn-card-action calendar'));
         item.append(description, actions);
         return item;
       };
@@ -1799,7 +802,9 @@
     async function runHolisticSynthesis() {
       const apiKey = getKey();
       if (!apiKey) {
-        alert("Please paste your Google AI key in the top bar, or use Share with My Dot.");
+        alert('Add a Google API key in Settings, or use Share with My Dot without a Gemini key.');
+        showPage('settings');
+        document.getElementById('gemini-settings').open = true;
         document.getElementById('top-gemini-key').focus();
         return;
       }
@@ -1850,6 +855,7 @@
           const raw = data.candidates[0].content.parts[0].text;
           const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
           renderDossier(JSON.parse(clean));
+          showPage('review');
         } else {
           throw new Error("Empty response from AI model.");
         }
@@ -1863,7 +869,7 @@
       } finally {
         clearTimeout(timeoutId);
         btn.disabled = false;
-        statusText.innerText = "Connect The Dots";
+        statusText.innerText = "Review with Gemini";
       }
     }
     async function generateActionPlan(title, context) {
@@ -1875,7 +881,7 @@
       modal.style.display = 'flex';
 
       const apiKey = getKey();
-      if (!apiKey) { outputEl.innerText = `Please paste your Google AI key in the top bar.`; return; }
+      if (!apiKey) { outputEl.innerText = `Add a Google API key in Settings to use Gemini drafting.`; return; }
 
       const prompt = `Take this goal/problem: "${context}". Draft a short, grounded 1-page action plan with 3 immediate steps and a ready-to-send message if applicable. No buzzwords.`;
       const endpoint = geminiEndpoint(apiKey);
@@ -1915,7 +921,7 @@
       downloadFile(ics, `Focus.ics`, 'text/calendar');
     }
     function exportFullCalendarICS() {
-      if (!currentDossier) { alert("Run Connect The Dots first."); return; }
+      if (!currentDossier) { alert("Save a review first."); return; }
       const now = new Date(); let events = [];
       (currentDossier.workMoves || []).forEach((w, i) => {
         const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + Math.floor(i/2) + 1, (i%2===0?10:14), 0, 0), end = new Date(start.getTime() + 45*60000);
@@ -1925,7 +931,7 @@
       downloadFile(ics, `Panorama_Schedule.ics`, 'text/calendar');
     }
     function copyTaskChecklist(btn) {
-      if (!currentDossier) { alert("Run Connect The Dots first."); return; }
+      if (!currentDossier) { alert("Save a review first."); return; }
       const lines = [`# Action Checklist`, '## Work'];
       (currentDossier.workMoves || []).forEach(w => lines.push(`- [ ] ${w.step}`));
       lines.push('## Life');
@@ -1933,8 +939,8 @@
       navigator.clipboard.writeText(lines.join('\n')).then(() => { const o = btn.innerText; btn.innerText = "Copied Checklist!"; setTimeout(() => btn.innerText = o, 1500); });
     }
 
-    function openVaultModal() { document.getElementById('vault-modal').style.display = 'flex'; }
-    function closeVaultModal() { document.getElementById('vault-modal').style.display = 'none'; }
+    function openVaultModal() { showPage('settings'); }
+    function closeVaultModal() {}
 
     function createVaultBackup() {
       return { notes, activeDossier: currentDossier, history: JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]'), northStar: localStorage.getItem('3sci_panorama_north_star') || '' };
@@ -1953,7 +959,7 @@
       });
     }
     function validateVault(value) {
-      const d = requireObject(value, 'Vault');
+      const d = requireObject(value, 'Backup');
       const result = { ...d, notes: validateNotes(d.notes) };
       if (Object.hasOwn(d, 'activeDossier')) result.activeDossier = d.activeDossier === null ? null : validateDossier(d.activeDossier, true);
       if (Object.hasOwn(d, 'northStar')) requireText(d.northStar, 'northStar');
@@ -1974,17 +980,12 @@
       if (Object.hasOwn(d, 'activeDossier')) updates.set('3sci_panorama_active_dossier', d.activeDossier === null ? null : JSON.stringify(d.activeDossier));
       if (Object.hasOwn(d, 'history')) updates.set('3sci_panorama_history', JSON.stringify(d.history));
       if (Object.hasOwn(d, 'northStar')) updates.set('3sci_panorama_north_star', d.northStar);
-      const previous = new Map([...updates.keys()].map(key => [key, localStorage.getItem(key)]));
-      const write = (key, value) => value === null ? localStorage.removeItem(key) : localStorage.setItem(key, value);
-      try { updates.forEach((value, key) => write(key, value)); }
-      catch (err) {
-        previous.forEach((value, key) => write(key, value));
-        throw err;
-      }
+      writeStorageChanges(updates);
       invalidateDossierReview();
       selectedShareNotes.clear();
       loadNotes();
       renderShareNotes();
+      renderHistory();
     }
     function handleVaultFileSelect(e) {
       const input = e.target;
@@ -1996,49 +997,66 @@
       reader.onload = evt => {
         try {
           const value = validateVault(JSON.parse(evt.target.result));
-          if (!confirm('Restore this backup? Included fields replace your current vault data. Download a backup first if you want to keep it.')) return;
+          if (!confirm('Restore this backup? Its included thoughts, review, history, and today\'s priority will replace your current saved information. Download a backup first if you want to keep it.')) return;
           restoreVault(value);
           closeVaultModal();
-          alert('Vault restored, including its saved dossier and North Star.');
+          alert('Backup restored, including any saved review and today\'s priority.');
         } catch (err) { alert('Could not restore backup: ' + err.message); }
       };
-      reader.onerror = () => alert('Could not read the backup file. Your vault was not changed.');
+      reader.onerror = () => alert('Could not read the backup file. Your saved data was not changed.');
       reader.readAsText(file);
     }
 
+
     function archiveWeekAndStartFresh() {
       if (notes.length === 0 && !currentDossier) return;
-      if (!confirm("Archive this week and start fresh?")) return;
+      if (!confirm('Move your current thoughts and review to History? They will stay there, and your current list will be cleared.')) return;
       const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
-      history.unshift({ id: Date.now(), date: new Date().toLocaleDateString(), theme: currentDossier?.theme || "Week", summary: currentDossier?.summary || "", notes: [...notes], dossier: currentDossier });
-      localStorage.setItem('3sci_panorama_history', JSON.stringify(history));
-      notes = []; currentDossier = null; localStorage.removeItem('3sci_panorama_active_dossier');
+      history.unshift(historySnapshot('archive'));
+      try {
+        writeStorageChanges(new Map([
+          ['3sci_panorama_history', JSON.stringify(history)],
+          ['3sci_panorama_notes', '[]'],
+          ['3sci_panorama_active_dossier', null]
+        ]));
+      } catch (err) { alert('Could not archive. Your thoughts and review were not changed.'); return; }
+      notes = []; currentDossier = null;
       invalidateDossierReview(); paintDossier(null);
-      saveNotes(); alert("Week archived successfully.");
+      renderNotes(); updateTelemetry(); renderShareNotes();
+      showPage('history');
     }
-
-
-    function openHistoryModal() {
+    function renderHistory() {
       const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
+      const query = document.getElementById('history-search').value.toLowerCase().trim();
       const content = document.getElementById('history-content');
       content.replaceChildren();
-      if (!history.length) content.append(textElement('p', '', 'No past weeks saved.'));
-      history.forEach(h => {
-        const card = textElement('div', 'history-card');
-        card.append(textElement('strong', '', h.theme), textElement('span', '', h.date), textElement('p', '', h.summary));
+      const filtered = history.filter(h => !query || JSON.stringify(h).toLowerCase().includes(query));
+      if (!filtered.length) content.append(textElement('p', 'empty-note', history.length ? 'No history matches your search.' : 'Past reviews and archived thoughts will appear here. Nothing is archived automatically until you save a replacement review.'));
+      filtered.forEach(h => {
+        const card = textElement('details', 'history-card');
+        card.append(textElement('summary', '', h.theme || 'Saved thoughts'),
+          textElement('p', 'help-text', h.date + (h.kind === 'review' ? ' · Previous review' : ' · Archived thoughts')),
+          textElement('p', '', h.summary || ''));
+        const body = textElement('div', 'details-body');
+        if (h.dossier) appendReadableReview(body, validateDossier(h.dossier, true));
+        if (h.northStar) body.append(textElement('h4', '', "That day's priority"), textElement('p', '', h.northStar));
+        body.append(textElement('h4', '', 'Saved thoughts'));
+        (h.notes || []).forEach(n => body.append(textElement('p', 'stream-text', n.text)));
+        if (!h.notes?.length) body.append(textElement('p', 'help-text', 'No thoughts in this entry.'));
+        card.append(body);
         content.append(card);
       });
-      document.getElementById('history-modal').style.display = 'flex';
     }
-    function closeHistoryModal() { document.getElementById('history-modal').style.display = 'none'; }
+    function openHistoryModal() { showPage('history'); }
+    function closeHistoryModal() { showPage('notes'); }
     function exportDossierMarkdown() {
-      if (!currentDossier) { alert("Run Connect The Dots first."); return; }
+      if (!currentDossier) { alert("Save a review first."); return; }
       const md = `# PANORAMA SUMMARY\n\n## Summary\n${currentDossier.summary}\n\n## Work Moves\n${(currentDossier.workMoves||[]).map(w=>`- ${w.step}`).join('\n')}`;
       downloadFile(md, `Panorama_Summary.md`, 'text/markdown');
     }
 
     document.getElementById('note-input').addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); addNote(); } });
-    window.onload = () => { checkSecurityLock(); const k = localStorage.getItem('3sci_panorama_key'); if(k) document.getElementById('top-gemini-key').value = k; loadNotes(); if(!localStorage.getItem('3sci_panorama_tour_seen')) setTimeout(openWizardModal, 500); };
+    window.onload = () => { checkSecurityLock(); const k = localStorage.getItem('3sci_panorama_key'); if (k) document.getElementById('top-gemini-key').value = k; loadNotes(); showPage('notes', false); };
   </script>
 </body>
 </html>

@@ -59,6 +59,7 @@ function fixture() {
   };
   const context = vm.createContext({
     document: {
+      body: new Element('body'),
       getElementById(id) { assert.ok(elements.has(id), 'Missing HTML id: ' + id); return elements.get(id); },
       createElement: tag => new Element(tag),
       querySelector: () => shareButton,
@@ -113,7 +114,8 @@ function walk(el) { return [el, ...el.children.flatMap(walk)]; }
 test('inline script parses, initialization and capture execute with synthetic storage', () => {
   const f = fixture();
   f.run('window.onload()');
-  assert.equal(f.run('notes.length'), 5); // Only the checked-in demo notes.
+  assert.equal(f.run('notes.length'), 0); // First use starts empty; never seed private-looking demo notes.
+  assert.equal(f.get('start-dot-share').disabled, true);
   f.get('note-input').value = 'SYNTHETIC new thought';
   f.run('addNote()');
   assert.equal(JSON.parse(f.stored.get('3sci_panorama_notes'))[0].text, 'SYNTHETIC new thought');
@@ -252,7 +254,7 @@ test('full vault export/restore round trip preserves active dossier, archives, I
   assert.equal(f.get('dossier-theme').textContent, original.activeDossier.theme);
   f.run('restoreVault({ notes: [], activeDossier: null, northStar: "", history: [] })');
   assert.equal(f.stored.has('3sci_panorama_active_dossier'), false);
-  assert.match(f.get('dossier-theme').textContent, /Will Show Up Here/);
+  assert.match(f.get('dossier-theme').textContent, /Your next review will appear here/);
 });
 
 test('invalid backups do not partially overwrite storage, legacy notes-only backups remain accepted', () => {
@@ -339,7 +341,7 @@ test('archive clears the visible dossier and exports keep expected data and vali
   f.run('archiveWeekAndStartFresh()');
   assert.equal(f.run('notes.length'), 0);
   assert.equal(f.run('currentDossier'), null);
-  assert.match(f.get('dossier-theme').textContent, /Will Show Up Here/);
+  assert.match(f.get('dossier-theme').textContent, /Your next review will appear here/);
   assert.equal(JSON.parse(f.stored.get('3sci_panorama_history'))[0].notes.length, 2);
 });
 
@@ -376,11 +378,11 @@ test('ChatGPT handoff uses an ordinary safe link without putting selected though
   const f = fixture(); seed(f);
   f.run('togglePromptStudio(); selectShareNotes(true)');
   await f.run('copyCompiledPrompt()');
-  const link = html.match(/<a class="btn-action btn-action-accent" href="([^"]+)" target="_blank" rel="([^"]+)">Open ChatGPT \(new tab\)<\/a>/);
+  const link = html.match(/<a class="btn-action" href="([^"]+)" target="_blank" rel="([^"]+)">Open ChatGPT \(new tab\)<\/a>/);
   assert.ok(link, 'The dialog must provide an accessible ChatGPT link');
   assert.equal(link[1], 'https://chatgpt.com/');
   assert.ok(link[2].includes('noopener') && link[2].includes('noreferrer'));
-  assert.match(html, /Sign in to ChatGPT if prompted/);
+  assert.match(html, /sign in if prompted/);
   assert.match(f.get('share-copy-status').textContent, /your Dot conversation/);
   assert.equal(f.get('dossier-review').hidden, true);
 });
@@ -408,4 +410,146 @@ test('keyboard navigation wraps around the new ChatGPT link without trapping it 
   f.context.document.activeElement = first;
   f.run('handleShareKey(keyEvent)');
   assert.equal(last.focused, true);
+});
+
+test('screen navigation and reloading existing data do not migrate or erase stored content', () => {
+  const f = fixture(); seed(f);
+  f.stored.set('3sci_panorama_key', 'synthetic-old-key');
+  f.stored.set('3sci_panorama_tour_seen', 'true');
+  const before = f.snapshot();
+  f.run('window.onload()');
+  for (const page of ['review', 'history', 'settings', 'notes']) {
+    f.context.targetPage = page;
+    f.run('showPage(targetPage)');
+    for (const name of ['notes', 'review', 'history', 'settings']) {
+      assert.equal(f.get('page-' + name).hidden, name !== page);
+    }
+  }
+  assert.equal(f.snapshot(), before);
+  assert.equal(f.get('north-star-input').value, 'SYNTHETIC priority');
+  assert.equal(f.get('review-content').hidden, false);
+  assert.equal(f.get('review-empty').hidden, true);
+});
+
+test('three-stage journey enforces selection and preserves an interrupted reply across Back', () => {
+  const f = fixture(); seed(f);
+  const before = f.snapshot();
+  f.run('togglePromptStudio(); setShareStep(2)');
+  assert.equal(f.run('shareStep'), 1);
+  assert.equal(f.get('share-continue').disabled, true);
+  f.run('selectedShareNotes.add(1); renderShareNotes(); setShareStep(2)');
+  assert.equal(f.run('shareStep'), 2);
+  assert.equal(f.get('share-stage-1').hidden, true);
+  assert.equal(f.get('share-stage-2').hidden, false);
+  assert.equal(f.get('share-stage-3').hidden, true);
+  f.run('setShareStep(3)');
+  review(f, dossier('Interrupted synthetic reply'));
+  f.run('setShareStep(2); setShareStep(1); setShareStep(2); setShareStep(3)');
+  assert.equal(f.get('dossier-review').hidden, false);
+  assert.match(f.get('external-json-input').value, /Interrupted synthetic reply/);
+  assert.equal(f.snapshot(), before, 'Navigation must not apply a reply');
+  f.run('closePromptStudio(); togglePromptStudio()');
+  assert.equal(f.run('shareStep'), 1);
+  assert.equal(f.get('external-json-input').value, '');
+  assert.equal(f.get('apply-dossier').disabled, true);
+  assert.equal(f.get('dossier-review').hidden, true);
+  assert.equal(f.snapshot(), before);
+});
+
+test('changing selected context after preview requires a fresh preview', () => {
+  const f = fixture(); seed(f);
+  f.run('togglePromptStudio(); selectShareNotes(true); setShareStep(3)');
+  review(f, dossier('Old context'));
+  const before = f.snapshot();
+  f.run('setShareStep(1); selectShareNotes(false); applyExternalDossier()');
+  assert.equal(f.snapshot(), before);
+  assert.equal(f.get('apply-dossier').disabled, true);
+  assert.equal(f.get('share-continue').disabled, true);
+});
+
+test('saving replacement reviews retains prior review, tags, notes and priority in History once', () => {
+  const f = fixture(); seed(f);
+  const next = dossier('New review');
+  next.workMoves = Array.from({ length: 4 }, (_, i) => ({ step: 'Work ' + i, why: 'Reason ' + i }));
+  next.lifeMoves = [{ step: 'Personal step', why: 'Personal reason' }];
+  review(f, next); f.run('applyExternalDossier()');
+  const history = JSON.parse(f.stored.get('3sci_panorama_history'));
+  assert.equal(history.length, 1);
+  assert.equal(history[0].dossier.theme, 'Original');
+  assert.equal(history[0].kind, 'review');
+  assert.deepEqual(history[0].notes, notes);
+  assert.equal(history[0].northStar, 'SYNTHETIC priority');
+  assert.equal(f.get('next-steps').children.length, 3);
+  assert.match(f.get('list-venture').textContent, /Work 3/);
+  assert.match(f.get('list-life').textContent, /Personal step/);
+  assert.equal(f.get('share-success').hidden, false);
+  f.run('finishShare()');
+  assert.equal(f.run('currentPage'), 'review');
+  assert.equal(f.context.document.body.style.overflow, '');
+  review(f, next); f.run('applyExternalDossier()');
+  assert.equal(JSON.parse(f.stored.get('3sci_panorama_history')).length, 1);
+  f.run('showPage("history")');
+  assert.match(f.get('history-content').textContent, /SYNTHETIC selected note/);
+  f.get('history-search').value = 'does not exist';
+  f.run('renderHistory()');
+  assert.match(f.get('history-content').textContent, /No history matches/);
+});
+
+test('archiving can be cancelled and rolls back storage errors before clearing anything', () => {
+  const f = fixture(); seed(f);
+  const before = f.snapshot();
+  f.context.confirm = () => false;
+  f.run('archiveWeekAndStartFresh()');
+  assert.equal(f.snapshot(), before);
+  f.context.confirm = () => true;
+  f.failStorageOnce('3sci_panorama_notes');
+  f.run('archiveWeekAndStartFresh()');
+  assert.equal(f.snapshot(), before);
+  assert.equal(f.run('notes.length'), 2);
+  assert.equal(f.run('currentDossier.theme'), 'Original');
+  f.run('archiveWeekAndStartFresh()');
+  assert.equal(f.run('currentPage'), 'history');
+  assert.equal(f.stored.get('3sci_panorama_north_star'), 'SYNTHETIC priority');
+  assert.equal(JSON.parse(f.stored.get('3sci_panorama_history'))[0].kind, 'archive');
+});
+
+test('backup round trip includes replacement-review history and preserves unrelated credentials/settings', () => {
+  const f = fixture(); seed(f);
+  f.stored.set('3sci_panorama_key', 'synthetic-preserved-key');
+  f.stored.set('3sci_panorama_pin', '9999');
+  review(f, dossier('Second review')); f.run('applyExternalDossier()');
+  f.context.backupText = f.run('JSON.stringify(createVaultBackup())');
+  const expected = JSON.parse(f.context.backupText);
+  assert.ok(!f.context.backupText.includes('synthetic-preserved-key'));
+  assert.ok(!f.context.backupText.includes('9999'));
+  f.run('restoreVault({ notes: [], activeDossier: null, history: [], northStar: "" }); restoreVault(JSON.parse(backupText))');
+  assert.deepEqual(JSON.parse(f.run('JSON.stringify(createVaultBackup())')), expected);
+  assert.equal(f.stored.get('3sci_panorama_key'), 'synthetic-preserved-key');
+  assert.equal(f.stored.get('3sci_panorama_pin'), '9999');
+});
+
+test('first review confirmation does not claim a previous review exists', () => {
+  const f = fixture(); seed(f, { activeDossier: null });
+  review(f, dossier('First synthetic review')); f.run('applyExternalDossier()');
+  assert.equal(f.get('share-import-status').textContent, 'Your first review is saved.');
+  assert.equal(JSON.parse(f.stored.get('3sci_panorama_history')).length, 0);
+  review(f, dossier('Second synthetic review')); f.run('applyExternalDossier()');
+  assert.match(f.get('share-import-status').textContent, /previous review is in History/);
+  assert.equal(JSON.parse(f.stored.get('3sci_panorama_history')).length, 1);
+});
+
+test('backup restore confirmation and success use the new plain-language labels', () => {
+  const f = fixture(); seed(f);
+  let confirmation = '';
+  f.context.confirm = text => { confirmation = text; return true; };
+  f.context.fileEvent = { target: { value: 'synthetic.json', files: [{ size: 100, contents: JSON.stringify({
+    notes: [], activeDossier: null, history: [], northStar: ''
+  }) }] } };
+  f.run('handleVaultFileSelect(fileEvent)');
+  assert.match(confirmation, /Restore this backup/);
+  assert.match(confirmation, /review, history, and today's priority/);
+  assert.doesNotMatch(confirmation, /vault|dossier|North Star/i);
+  assert.match(f.alerts.at(-1), /Backup restored/);
+  assert.match(f.alerts.at(-1), /review and today's priority/);
+  assert.doesNotMatch(f.alerts.at(-1), /vault|dossier|North Star/i);
 });
