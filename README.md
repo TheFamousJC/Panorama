@@ -36,7 +36,7 @@ Review exports are under **Copy or download this review**: copy the action list,
 
 - **Backup & restore:** download notes, active review, history, and priority as a private JSON backup. Restore validates all included fields before replacing them. Empty priority and null review restore correctly; legacy backups retain omitted fields. Storage errors roll back attempted writes before the in-memory view changes.
 - **Privacy:** manage the screen-lock PIN and see storage/voice information. The PIN hides the desk; it does not encrypt notes or protect against someone with access to the browser profile.
-- **Optional Gemini review:** configure the Google API key and explicitly send all current thoughts, today's priority, and recent review context to Gemini. Detailed suggestions also offer optional Gemini drafting. The key is stored unencrypted in this browser. Account quota/access and charges apply. No real key is needed for tests.
+- **Other review options → Review with Google AI:** configure the Google API key and explicitly send all current thoughts, today's priority, and recent review context to Gemini. Detailed suggestions also offer optional Gemini drafting. The key is stored unencrypted in this browser. Account quota/access and charges apply. No real key is needed for tests.
 - **Thought categories & storage:** category distribution and storage footprint.
 - **How Panorama works:** optional guidance, with no mandatory startup tour.
 

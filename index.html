@@ -215,10 +215,10 @@
         <p class="help-text">Restoring replaces the included data. Download a backup first if you want to keep your current version.</p>
       </section>
       <section class="settings-section"><h2>Privacy</h2><p class="help-text">Your data is saved in this browser, not synced between devices. Sharing with My Dot is manual: you choose what to copy and paste. Your assistant's privacy settings apply. Voice input may use an online speech service.</p><p class="help-text">The optional PIN hides your desk; it does not encrypt your data or protect it from someone with access to this browser profile.</p><button class="btn-action" id="btn-lock-status" onclick="openSecuritySettingsModal()">Set a screen-lock PIN</button></section>
-      <details class="settings-section" id="gemini-settings"><summary>Optional: review directly with Gemini</summary><div class="details-body stack">
-        <p class="help-text">An alternative to the manual Dot handoff. Running a review sends all current thoughts, today's priority, and recent review themes to Google. A Google API key and available quota are required.</p>
+      <details class="settings-section" id="gemini-settings"><summary>Other review options</summary><div class="details-body stack">
+        <p class="help-text">Review with Google AI uses Gemini as an alternative to Share with My Dot. Running a review sends all current thoughts, today's priority, and recent review themes to Google. A Google API key and available quota are required.</p>
         <div><label for="top-gemini-key">Google API key</label><input type="password" id="top-gemini-key" placeholder="Your Google API key" oninput="syncKey(this.value)" autocomplete="off"><p class="help-text">Stored unencrypted in this browser. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Get an API key</a></p></div>
-        <button class="btn-action" id="btn-run-synth" onclick="runHolisticSynthesis()"><span id="synth-status">Review with Gemini</span></button>
+        <button class="btn-action" id="btn-run-synth" onclick="runHolisticSynthesis()"><span id="synth-status">Review with Google AI</span></button>
       </div></details>
       <details class="settings-section"><summary>Thought categories &amp; storage</summary><div class="details-body"><p class="help-text">How your saved thoughts are categorized.</p><div class="meter" id="telemetry-bar"></div><div class="telemetry-legend" id="telemetry-legend"></div><p id="storage-footprint" class="help-text"></p></div></details>
       <details class="settings-section" id="help-settings"><summary>How Panorama works</summary><div class="details-body stack"><p>Save whatever is on your mind. When you want a fresh perspective, use Share with My Dot.</p><p>Choose thoughts, copy the prepared message, open ChatGPT, and paste it into your Dot conversation. Sign in if prompted. Then copy Dot's complete reply back to Panorama, preview it, and save the review.</p><p>A new review keeps the previous review in History. Archiving also keeps your thoughts there. Nothing is sent or scheduled automatically.</p></div></details>
@@ -869,7 +869,7 @@
       } finally {
         clearTimeout(timeoutId);
         btn.disabled = false;
-        statusText.innerText = "Review with Gemini";
+        statusText.innerText = "Review with Google AI";
       }
     }
     async function generateActionPlan(title, context) {

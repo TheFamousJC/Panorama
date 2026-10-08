@@ -316,6 +316,7 @@ test('Gemini requests use a real URL, include North Star, and render validated r
   };
   await f.run('runHolisticSynthesis()');
   assert.equal(f.run('currentDossier.theme'), 'Mock Gemini');
+  assert.equal(f.get('synth-status').innerText, 'Review with Google AI');
   await f.run('generateActionPlan("Work", "Synthetic task")');
   assert.equal(requests.length, 2);
   for (const request of requests) {
