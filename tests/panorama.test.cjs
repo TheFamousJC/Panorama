@@ -554,3 +554,120 @@ test('backup restore confirmation and success use the new plain-language labels'
   assert.match(f.alerts.at(-1), /review and today's priority/);
   assert.doesNotMatch(f.alerts.at(-1), /vault|dossier|North Star/i);
 });
+
+test('failed capture and deletion retain saved notes and draft; successful capture reveals the new thought', () => {
+  const f = fixture(); seed(f);
+  const before = f.snapshot();
+  f.get('note-input').value = 'Keep this draft';
+  f.failStorageOnce('3sci_panorama_notes'); f.run('addNote()');
+  assert.equal(f.snapshot(), before);
+  assert.equal(f.get('note-input').value, 'Keep this draft');
+  assert.equal(f.run('notes.length'), 2);
+  f.failStorageOnce('3sci_panorama_notes'); f.run('deleteNote(1)');
+  assert.equal(f.snapshot(), before); assert.equal(f.run('notes.length'), 2);
+  f.get('feed-search').value = 'does not match'; f.run("setFeedFilter('personal'); selectTag('work'); addNote()");
+  assert.equal(f.run('notes[0].tag'), 'work'); assert.equal(f.run('activeTag'), 'other');
+  assert.equal(f.get('note-input').value, ''); assert.equal(f.get('feed-search').value, '');
+  assert.match(f.get('stream-container').textContent, /Keep this draft/);
+  f.run('addNote()'); assert.equal(f.run('notes.length'), 3);
+  assert.match(f.get('note-save-status').textContent, /Write a thought/);
+});
+
+test('preview, edit and save give focus to visible states and require another preview after editing', () => {
+  const f = fixture(); seed(f); f.run('togglePromptStudio(); selectShareNotes(true); setShareStep(3)');
+  const reply = JSON.stringify(dossier('New view'));
+  review(f, reply);
+  assert.equal(f.get('share-reply-entry').hidden, true);
+  assert.equal(f.get('dossier-review-content').focused, true);
+  f.run('editReviewedReply()');
+  assert.equal(f.get('external-json-input').value, reply);
+  assert.equal(f.get('share-reply-entry').hidden, false);
+  assert.equal(f.get('apply-dossier').disabled, true);
+  f.run('loadExternalJson(); applyExternalDossier()');
+  assert.equal(f.get('share-success').focused, true);
+  assert.equal(f.get('share-reply-footer').hidden, true);
+  f.run('closePromptStudio(); togglePromptStudio()');
+  assert.equal(f.get('share-reply-footer').hidden, false);
+});
+
+test('secondary dialogs isolate background, wrap keyboard focus and return to their opener', () => {
+  const f = fixture(); seed(f);
+  const opener = f.get('btn-lock-status'); f.context.document.activeElement = opener;
+  f.run('openSecuritySettingsModal()');
+  assert.equal(f.get('app-layout-main').inert, true);
+  assert.equal(f.get('security-new-pin').focused, true);
+  const first = new Element('button'), last = new Element('button');
+  first.closest = last.closest = () => null;
+  f.get('security-modal').querySelectorAll = () => [first, last];
+  f.context.document.activeElement = last;
+  let prevented = false;
+  f.context.keyEvent = { key: 'Tab', shiftKey: false, preventDefault() { prevented = true; } };
+  f.run("handleSecondaryKey(keyEvent, 'security-modal')");
+  assert.equal(prevented, true); assert.equal(first.focused, true);
+  f.context.keyEvent.key = 'Escape'; f.run("handleSecondaryKey(keyEvent, 'security-modal')");
+  assert.equal(f.get('app-layout-main').inert, false);
+  assert.equal(f.context.document.body.style.overflow, ''); assert.equal(opener.focused, true);
+});
+
+test('closing a pending Google draft prevents a late response from overwriting the next draft', async () => {
+  const f = fixture(); seed(f); f.get('top-gemini-key').value = 'synthetic';
+  let release;
+  f.context.fetch = () => new Promise(resolve => { release = resolve; });
+  const old = f.run('generateActionPlan("Work", "old context")');
+  assert.equal(f.get('copy-draft').disabled, true);
+  f.run('closeDraftModal()');
+  f.context.fetch = async () => ({ ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: 'New draft' }] } }] }) });
+  await f.run('generateActionPlan("Work", "new context")');
+  release({ ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: 'Old draft' }] } }] }) });
+  await old;
+  assert.equal(f.get('draft-output-area').innerText, 'New draft');
+  assert.equal(f.get('copy-draft').disabled, false);
+  f.context.navigator.clipboard.writeText = async () => { throw new Error('Denied'); };
+  await f.run("copyDraftText(document.getElementById('copy-draft'))");
+  assert.match(f.get('draft-copy-status').textContent, /copy it manually/);
+});
+
+test('unavailable share extras are hidden and failed priority save retains stored context', () => {
+  const f = fixture(); seed(f, { northStar: '', history: [] });
+  f.run('togglePromptStudio()');
+  assert.equal(f.get('share-priority-option').hidden, true);
+  assert.equal(f.get('share-history-option').hidden, true);
+  f.failStorageOnce('3sci_panorama_north_star'); f.run("saveNorthStar('Unsaved priority')");
+  assert.equal(f.stored.get('3sci_panorama_north_star'), '');
+  assert.match(f.get('priority-status').textContent, /Could not save/);
+  f.run("saveNorthStar('Saved priority')");
+  assert.equal(f.get('share-priority-option').hidden, false);
+});
+
+test('search reset and archive feedback reveal results without altering unrelated data', () => {
+  const f = fixture(); seed(f);
+  f.get('feed-search').value = 'missing'; f.run('renderNotes()');
+  const clear = walk(f.get('stream-container')).find(e => e.textContent === 'Clear search and filters');
+  assert.ok(clear); clear.click(); assert.equal(f.get('feed-search').value, '');
+  f.get('history-search').value = 'missing'; f.run('archiveWeekAndStartFresh()');
+  assert.equal(f.get('history-search').value, '');
+  assert.match(f.get('history-status').textContent, /archived/);
+  assert.match(f.get('history-content').textContent, /Original/);
+  assert.equal(f.stored.get('3sci_panorama_north_star'), 'SYNTHETIC priority');
+});
+
+test('summary download includes personal suggestions and checklist errors offer a fallback', async () => {
+  const f = fixture(); seed(f);
+  f.context.downloadFile = content => { f.context.exported = content; };
+  f.run('exportDossierMarkdown()');
+  assert.match(f.context.exported, /Write a test/); assert.match(f.context.exported, /Walk outside/);
+  f.context.navigator.clipboard.writeText = async () => { throw new Error('Denied'); };
+  await f.run("copyTaskChecklist(document.getElementById('copy-draft'))");
+  assert.match(f.get('review-export-status').textContent, /Download the summary/);
+});
+
+test('PIN unlock returns to the visible screen and empty calendar exports explain why no download occurs', () => {
+  const f = fixture(); seed(f, { activeDossier: dossier('No work') });
+  f.run("showPage('settings'); localStorage.setItem('3sci_panorama_pin', '1234'); checkSecurityLock()");
+  f.get('pin-entry-input').value = '1234'; f.run('verifyPin()');
+  assert.equal(f.get('settings-title').focused, true); assert.equal(f.get('app-layout-main').inert, false);
+  f.run('currentDossier.workMoves = []');
+  let downloaded = false; f.context.downloadFile = () => { downloaded = true; };
+  f.run('exportFullCalendarICS()');
+  assert.equal(downloaded, false); assert.match(f.get('review-export-status').textContent, /no work suggestions/);
+});

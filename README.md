@@ -8,15 +8,17 @@ Open index.html in a modern browser, or use the existing GitHub Pages site. No b
 
 The **Thoughts** screen starts empty for new users. Write what is on your mind and choose **Save thought** (or Ctrl+Enter). Categories and **Today's priority** are optional. Existing thoughts, tags, priorities, reviews, archives, API keys, and PIN settings retain their original storage keys.
 
+A category applies only to the thought being saved and resets afterward. Today's priority is a separate optional control. Failed capture saves keep the draft and existing thoughts unchanged. Search filters clear after saving so the new thought remains visible.
+
 No example thoughts or compulsory tour are inserted. Voice input is available when the browser supports it.
 
 ## Review with My Dot
 
-Use **Share with My Dot** beside your saved thoughts. Only one stage is shown at a time:
+Use **Share with My Dot** above your saved thoughts. Only one stage is shown at a time:
 
 1. **Choose thoughts.** Select what to share. Today's priority and recent review themes are optional. Review the selected content before continuing.
 2. **Take them to Dot.** Copy the prepared message, open ChatGPT, sign in if prompted, and paste the message into your Dot conversation. **View the full message** reveals exactly what will be copied. If clipboard access fails, the app opens and selects that message for manual copying.
-3. **Bring back a review.** Paste Dot's complete response, including any code block. **Preview review** shows the proposed result; **Save review** saves it. Back keeps an unfinished reply within the open dialog. Cancel, Escape, or closing discards the pending reply without changing saved data. Editing the reply or changing its selected context requires previewing again.
+3. **Bring back a review.** Paste Dot's complete response, including any code block. **Preview review** shows the proposed result; **Save review** saves it. Back keeps an unfinished reply within the open dialog. Discard this reply, Escape, or closing discards the pending reply without changing saved data. Edit reply returns to the retained text; changing the reply or selected context requires previewing again. Successful save removes the Back action and offers View my review.
 
 Panorama cannot detect ChatGPT login state, send a message to Dot, or receive its response automatically. The ChatGPT link is ordinary navigation with no thoughts or credentials in the URL. The structured response format is specified in the copied message; an arbitrary prose reply is not accepted. This handoff needs no API key.
 
@@ -28,9 +30,11 @@ The sharing dialog is the only scroll container in the flow. The thought list ha
 
 Saving a different review retains the prior review and its thought/priority snapshot in **History**. Reapplying the same review does not create a duplicate. **Archive these thoughts**, under Manage saved thoughts, moves the current thoughts/review into History and clears the active list after confirmation. Today's priority remains. Deleting current thoughts is a separate action.
 
+Dialogs support Escape, keyboard focus containment, and return focus to their opener. Preview and success states receive focus. PIN unlock returns to capture. Draft copy is unavailable until a draft is ready, and late responses cannot overwrite a newer draft.
+
 History shows both existing weekly archives and saved previous reviews. Expand an entry to read its review and original thoughts, or search its contents.
 
-Review exports are under **Copy or download this review**: copy the action list, download a Markdown summary, or download calendar blocks at preset times. Calendar exports do not check availability or sync a calendar.
+Review exports are under **Copy or download this review**: copy the action list, download a Markdown summary, or download work calendar blocks at preset times. Calendar exports do not check availability or sync a calendar.
 
 ## Settings
 

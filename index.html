@@ -115,6 +115,12 @@
     .pin-box > * + * { margin-top:16px; }
     .locked { filter:blur(8px); pointer-events:none; user-select:none; }
     .plan-text-area { white-space:pre-wrap; overflow-wrap:anywhere; padding:20px; background:var(--bg); margin-top:16px; }
+    .status:empty,.help-text:empty { display:none; }
+    .btn-link,.btn-del-note,details > summary { min-height:44px; }
+    .priority-details { padding:0 4px; }
+    .meter-slice.question { background:#c29f66; }.meter-slice.chores { background:#77999a; }
+    .share-stage-footer { align-items:center; }
+    .share-review:focus,.notice:focus { outline-offset:5px; }
     @media (max-width:600px) {
       .site-header { padding:20px 16px 0; }.brand-row { align-items:flex-start; }
       .saved-local { max-width:100px; text-align:right; }
@@ -148,22 +154,24 @@
       <div class="card">
         <label for="note-input" class="help-text">A thought, an idea, or something to sort out</label>
         <textarea id="note-input" class="entry-textarea" placeholder="Start anywhere. You don't need to organize it yet."></textarea>
+        <details class="optional-details"><summary>Add a category (optional)</summary><div class="details-body"><div><label for="note-category">Category for this thought</label><select id="note-category" onchange="selectTag(this.value)"><option value="other">No category</option><option value="work">Work</option><option value="personal">Personal</option><option value="annoyance">Something in the way</option><option value="spark">Idea</option><option value="question">Question</option><option value="chores">Errand</option></select></div></div></details>
         <div class="row spread entry-actions">
           <button class="btn-add-entry" onclick="addNote()">Save thought</button>
-          <button class="btn-voice" id="btn-voice-dictate" onclick="toggleVoiceDictation()"><span id="voice-icon" aria-hidden="true">◉</span><span id="voice-label">Use my voice</span></button>
+          <button class="btn-voice" id="btn-voice-dictate" onclick="toggleVoiceDictation()"><span id="voice-label">Use my voice</span></button>
         </div>
         <p id="note-save-status" class="status" role="status"></p>
-        <details class="optional-details">
-          <summary>Add a category or today's priority <span class="muted">(optional)</span></summary>
-          <div class="details-body stack">
-            <div><label for="note-category">Category for this thought</label><select id="note-category" onchange="selectTag(this.value)"><option value="other">No category</option><option value="work">Work</option><option value="personal">Personal</option><option value="annoyance">Something in the way</option><option value="spark">Idea</option><option value="question">Question</option><option value="chores">Errand</option></select></div>
-            <div><label for="north-star-input">Today's priority</label><input type="text" id="north-star-input" placeholder="What matters most today?" oninput="saveNorthStar(this.value)"><p class="help-text">Saves as you type. You can choose to include this when sharing.</p></div>
-          </div>
-        </details>
+
       </div>
+      <details class="priority-details"><summary>Today's priority (optional)</summary><div class="details-body"><div><label for="north-star-input">Today's priority</label><input type="text" id="north-star-input" placeholder="What matters most today?" oninput="saveNorthStar(this.value)"><p class="help-text">Saves as you type. You can choose to include this when sharing.</p><p id="priority-status" class="status" role="status"></p></div></div></details>
       <section aria-labelledby="saved-thoughts-title">
-        <div class="row spread"><h2 id="saved-thoughts-title">Your saved thoughts</h2><span class="help-text" id="notes-count">0 thoughts</span></div>
+        <div class="row spread"><h2 id="saved-thoughts-title" tabindex="-1">Your saved thoughts</h2><span class="help-text" id="notes-count">0 thoughts</span></div>
         <p id="priority-preview" class="help-text"></p>
+        <div class="dot-share-panel">
+          <button class="btn-copy-prompt" id="start-dot-share" onclick="togglePromptStudio()" aria-label="Share with My Dot" aria-describedby="dot-share-hint">
+            <img class="dot-share-logo" src="assets/dot-default.png" width="56" height="56" alt=""><span class="dot-share-label">Share with My Dot</span>
+          </button>
+          <p class="dot-share-hint" id="dot-share-hint">Choose thoughts, take them to your Dot in ChatGPT, and bring back a review.</p>
+        </div>
         <details class="thought-tools" id="thought-tools" hidden>
           <summary>Find a thought</summary>
           <div class="details-body stack">
@@ -172,15 +180,10 @@
           </div>
         </details>
         <div class="thought-list" id="stream-container"></div>
-        <div class="dot-share-panel">
-          <button class="btn-copy-prompt" id="start-dot-share" onclick="togglePromptStudio()" aria-label="Share with My Dot" aria-describedby="dot-share-hint">
-            <img class="dot-share-logo" src="assets/dot-default.png" width="56" height="56" alt=""><span class="dot-share-label">Share with My Dot</span>
-          </button>
-          <p class="dot-share-hint" id="dot-share-hint">Choose thoughts, take them to your Dot in ChatGPT, and bring back a review.</p>
-        </div>
+
       </section>
       <div id="latest-review-link" class="latest-review-link" hidden><button class="btn-link" onclick="showPage('review')">View your latest review</button></div>
-      <details><summary>Manage saved thoughts</summary><div class="details-body stack"><p class="help-text">Archiving keeps your thoughts and current review in History, then gives you a fresh list.</p><button class="btn-action" onclick="archiveWeekAndStartFresh()">Archive these thoughts</button><br><button class="btn-link danger" onclick="clearAllNotes()">Delete all current thoughts</button></div></details>
+      <details id="manage-thoughts"><summary>Manage saved thoughts</summary><div class="details-body stack"><p class="help-text">Archiving keeps your thoughts and current review in History, then gives you a fresh list.</p><button class="btn-action" onclick="archiveWeekAndStartFresh()">Archive these thoughts</button><br><button class="btn-link danger" onclick="clearAllNotes()">Delete all current thoughts</button></div></details>
     </section>
 
     <section class="page" id="page-review" hidden aria-labelledby="review-title">
@@ -188,30 +191,30 @@
       <div id="review-empty" class="card stack"><h2>No review yet</h2><p>Add a few thoughts, then share them with My Dot. Your review will appear here after you bring back and save the reply.</p><button class="btn-action btn-action-accent" onclick="showPage('notes')">Back to my thoughts</button></div>
       <div id="review-content" class="stack" hidden>
         <article class="card"><p class="help-text">The big picture</p><h2 id="dossier-theme"></h2><p id="dossier-narrative" class="macro-narrative review-summary"></p></article>
-        <section class="card"><h2>Three suggested next steps</h2><ol id="next-steps" class="next-steps"></ol><p class="help-text">Suggestions to consider. Nothing has been scheduled or sent.</p></section>
+        <section class="card"><h2>Suggested next steps</h2><ol id="next-steps" class="next-steps"></ol><p class="help-text">Start with whichever feels useful. Explore all suggestions below. Nothing has been scheduled or sent.</p></section>
         <details class="card"><summary>Explore the patterns and all suggestions</summary><div class="details-body">
           <div id="chronic-friction-banner" class="chronic-alert"><strong id="chronic-badge-label"></strong><p id="chronic-body-text" class="chronic-body"></p></div>
           <h3>What keeps getting in your way</h3><ul id="list-friction" class="insight-list"></ul>
           <h3>Connections worth exploring</h3><div id="list-bridges" class="insight-list"></div>
           <h3>Work suggestions</h3><ul id="list-venture" class="insight-list"></ul>
           <h3>Personal suggestions</h3><ul id="list-life" class="insight-list"></ul>
-          <p class="help-text">Optional drafting uses Gemini, configured in Settings.</p>
+          <p class="help-text">Draft with Google AI sends that suggestion to Gemini. Configure your key under Settings → Other review options.</p>
         </div></details>
-        <details><summary>Copy or download this review</summary><div class="details-body row"><button class="btn-action" onclick="copyTaskChecklist(this)">Copy action list</button><button class="btn-action" onclick="exportDossierMarkdown()">Download summary</button><button class="btn-action" onclick="exportFullCalendarICS()">Download calendar blocks</button></div><p class="help-text">Calendar blocks use preset times. Check them in your calendar before adding them.</p></details>
-        <div class="row"><button class="btn-action" onclick="showPage('notes')">Back to my thoughts</button><button class="btn-link" onclick="togglePromptStudio()">Start another review</button></div>
+        <details><summary>Copy or download this review</summary><div class="details-body row"><button class="btn-action" onclick="copyTaskChecklist(this)">Copy action list</button><button class="btn-action" onclick="exportDossierMarkdown()">Download summary</button><button class="btn-action" onclick="exportFullCalendarICS()">Download work calendar blocks</button></div><p class="help-text">Work suggestions become 45-minute blocks starting tomorrow at 10 am and 2 pm. Check the times before importing; nothing is added automatically.</p></details>
+        <p id="review-export-status" class="status" role="status"></p><div class="row"><button class="btn-action" onclick="showPage('notes')">Back to my thoughts</button><button class="btn-link" onclick="togglePromptStudio()">Share with My Dot</button></div>
       </div>
     </section>
 
     <section class="page" id="page-history" hidden aria-labelledby="history-title">
       <div class="page-intro"><h1 id="history-title" tabindex="-1">History</h1><p class="muted">Your past reviews and archived thoughts, kept for later.</p></div>
-      <label for="history-search">Find a past review or thought<input type="search" id="history-search" placeholder="Search history" oninput="renderHistory()"></label>
-      <div id="history-content"></div>
+      <label id="history-search-label" for="history-search">Find a past review or thought<input type="search" id="history-search" placeholder="Search history" oninput="renderHistory()"></label>
+      <p id="history-status" class="status" role="status"></p><div id="history-content"></div>
     </section>
 
     <section class="page" id="page-settings" hidden aria-labelledby="settings-title">
       <div class="page-intro"><h1 id="settings-title" tabindex="-1">Settings</h1><p class="muted">Your data, privacy, and optional tools.</p></div>
       <section class="settings-section" id="backup-settings"><h2>Backup &amp; restore</h2><p class="help-text">Download a private copy of your thoughts, reviews, history, and priority. Backups do not include your API key or PIN.</p>
-        <div class="row"><button class="btn-action" onclick="downloadVaultBackup()">Download backup</button><button class="btn-action" onclick="document.getElementById('vault-file-input').click()">Restore a backup</button><input type="file" id="vault-file-input" accept=".json" hidden onchange="handleVaultFileSelect(event)"></div>
+        <p id="backup-status" class="status" role="status"></p><div class="row"><button class="btn-action" onclick="downloadVaultBackup()">Download backup</button><button class="btn-action" onclick="document.getElementById('vault-file-input').click()">Restore a backup</button><input type="file" id="vault-file-input" accept=".json" hidden onchange="handleVaultFileSelect(event)"></div>
         <p class="help-text">Restoring replaces the included data. Download a backup first if you want to keep your current version.</p>
       </section>
       <section class="settings-section"><h2>Privacy</h2><p class="help-text">Your data is saved in this browser, not synced between devices. Sharing with My Dot is manual: you choose what to copy and paste. Your assistant's privacy settings apply. Voice input may use an online speech service.</p><p class="help-text">The optional PIN hides your desk; it does not encrypt your data or protect it from someone with access to this browser profile.</p><button class="btn-action" id="btn-lock-status" onclick="openSecuritySettingsModal()">Set a screen-lock PIN</button></section>
@@ -227,16 +230,16 @@
 
   <div class="modal-backdrop" id="prompt-studio-drawer" onkeydown="handleShareKey(event)">
     <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="share-title">
-      <div class="modal-head"><strong id="share-title" tabindex="-1">Share with My Dot</strong><button class="btn-action" onclick="closePromptStudio()">Cancel</button></div>
+      <div class="modal-head"><strong id="share-title" tabindex="-1">Share with My Dot</strong><button class="btn-action" id="share-close" onclick="closePromptStudio()">Close</button></div>
       <div class="modal-body">
         <ol class="share-progress" aria-label="Review progress"><li id="share-progress-1" aria-current="step">1. Choose thoughts</li><li id="share-progress-2">2. Take them to Dot</li><li id="share-progress-3">3. Bring back a review</li></ol>
         <section class="share-stage" id="share-stage-1" aria-labelledby="share-stage-title-1">
           <h2 id="share-stage-title-1" tabindex="-1">What would you like help with?</h2><p class="muted">Choose the thoughts you want your Dot to consider. Nothing is sent automatically.</p>
           <div class="share-actions"><button class="btn-action" onclick="selectShareNotes(true)">Select all</button><button class="btn-link" onclick="selectShareNotes(false)">Clear selection</button><span id="share-note-count" class="help-text"></span></div>
           <div id="share-note-list" class="share-note-list"></div>
-          <label class="check-label"><input type="checkbox" id="share-north-star" checked onchange="changeShareContext()">Include today's priority</label>
-          <label class="check-label"><input type="checkbox" id="share-history" onchange="changeShareContext()">Include themes and recurring problems from the last 3 reviews</label>
-          <div class="share-stage-footer"><button class="btn-action" onclick="closePromptStudio()">Cancel</button><button class="btn-action btn-action-accent" id="share-continue" onclick="setShareStep(2)" disabled>Continue</button></div>
+          <label id="share-priority-option" class="check-label"><input type="checkbox" id="share-north-star" checked onchange="changeShareContext()">Include today's priority</label>
+          <label id="share-history-option" class="check-label"><input type="checkbox" id="share-history" onchange="changeShareContext()">Include themes and recurring problems from the last 3 reviews</label>
+          <div class="share-stage-footer"><span class="help-text">You choose what to share.</span><button class="btn-action btn-action-accent" id="share-continue" onclick="setShareStep(2)" disabled>Continue</button></div>
         </section>
         <section class="share-stage" id="share-stage-2" hidden aria-labelledby="share-stage-title-2">
           <h2 id="share-stage-title-2" tabindex="-1">Take your thoughts to My Dot</h2><p id="share-context-summary" class="notice"></p>
@@ -251,17 +254,17 @@
           <h2 id="share-stage-title-3" tabindex="-1">Bring back your review</h2><p class="muted">Paste Dot's complete reply, including any code block. You'll see a readable preview before saving.</p>
           <div id="share-reply-entry"><label for="external-json-input">Dot's reply</label><textarea id="external-json-input" class="entry-textarea" placeholder="Paste the complete reply here" oninput="invalidateDossierReview()"></textarea><button class="btn-action btn-action-accent" style="margin-top:16px" onclick="loadExternalJson()">Preview review</button></div>
           <p id="share-import-status" class="status" role="status" aria-live="polite"></p>
-          <section id="dossier-review" hidden class="stack"><div id="dossier-review-content" class="share-review"></div><p class="help-text">Saving updates your latest review. Your previous review stays in History; your thoughts and priority stay as they are.</p><div class="share-actions"><button class="btn-action btn-action-accent" id="apply-dossier" onclick="applyExternalDossier()" disabled>Save review</button><button class="btn-action" onclick="cancelDossierReview()">Discard this reply</button></div></section>
-          <div id="share-success" hidden class="notice stack"><strong>Ready when you are.</strong><p>Your review is saved. Nothing has been scheduled or sent.</p><button class="btn-action btn-action-accent" onclick="finishShare()">View my review</button></div>
-          <div class="share-stage-footer"><button class="btn-action" onclick="setShareStep(2)">Back</button><button class="btn-action" onclick="closePromptStudio()">Close</button></div>
+          <section id="dossier-review" hidden class="stack"><div id="dossier-review-content" class="share-review" tabindex="-1"></div><p class="help-text">Saving updates your latest review and keeps any previous review in History. Your thoughts and priority stay as they are.</p><div class="share-actions"><button class="btn-action btn-action-accent" id="apply-dossier" onclick="applyExternalDossier()" disabled>Save review</button><button class="btn-action" onclick="editReviewedReply()">Edit reply</button><button class="btn-link" onclick="cancelDossierReview()">Discard this reply</button></div></section>
+          <div id="share-success" hidden class="notice stack" tabindex="-1"><strong>Ready when you are.</strong><p>Your review is saved. Nothing has been scheduled or sent.</p><button class="btn-action btn-action-accent" onclick="finishShare()">View my review</button></div>
+          <div id="share-reply-footer" class="share-stage-footer"><button class="btn-action" onclick="setShareStep(2)">Back to the message</button></div>
         </section>
       </div>
     </div>
   </div>
 
-  <div class="pin-lock-overlay" id="pin-lock-screen"><div class="pin-box" role="dialog" aria-modal="true" aria-labelledby="pin-title"><h2 id="pin-title">Your Panorama is locked</h2><p class="muted">Enter your screen-lock PIN.</p><label for="pin-entry-input">PIN</label><input type="password" id="pin-entry-input" maxlength="8" inputmode="numeric" onkeydown="handlePinKey(event)"><button class="btn-action btn-action-accent" onclick="verifyPin()">Unlock</button><p id="pin-error-msg" class="danger" style="display:none" role="alert">That PIN doesn't match. Try again.</p></div></div>
-  <div class="modal-backdrop" id="security-modal"><div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="security-title"><div class="modal-head"><strong id="security-title">Screen-lock PIN</strong><button class="btn-action" onclick="closeSecurityModal()">Close</button></div><div class="modal-body stack"><p>This hides your desk when you reopen it. It does not encrypt your data.</p><label for="security-new-pin">Choose a 4–8 digit PIN</label><input type="password" id="security-new-pin" maxlength="8" inputmode="numeric"><div class="row"><button class="btn-action btn-action-accent" onclick="saveNewPin()">Save PIN</button><button class="btn-action danger" onclick="removePin()">Remove PIN</button></div></div></div></div>
-  <div class="modal-backdrop" id="draft-modal"><div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="draft-modal-title"><div class="modal-head"><strong id="draft-modal-title">Draft next steps</strong><button class="btn-action" onclick="closeDraftModal()">Close</button></div><div class="modal-body"><p id="draft-context-label" class="help-text"></p><div id="draft-output-area" class="plan-text-area"></div><button class="btn-action" style="margin-top:16px" onclick="copyDraftText(this)">Copy draft</button></div></div></div>
+  <div class="pin-lock-overlay" id="pin-lock-screen" onkeydown="trapDialogTab(event, 'pin-lock-screen')"><div class="pin-box" role="dialog" aria-modal="true" aria-labelledby="pin-title"><h2 id="pin-title">Your Panorama is locked</h2><p class="muted">Enter your screen-lock PIN.</p><label for="pin-entry-input">PIN</label><input type="password" id="pin-entry-input" maxlength="8" inputmode="numeric" onkeydown="handlePinKey(event)"><button class="btn-action btn-action-accent" onclick="verifyPin()">Unlock</button><p id="pin-error-msg" class="danger" style="display:none" role="alert">That PIN doesn't match. Try again.</p></div></div>
+  <div class="modal-backdrop" id="security-modal" onkeydown="handleSecondaryKey(event, 'security-modal')"><div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="security-title"><div class="modal-head"><strong id="security-title">Screen-lock PIN</strong><button class="btn-action" onclick="closeSecurityModal()">Close</button></div><div class="modal-body stack"><p>This hides your desk when you reopen it. It does not encrypt your data.</p><label for="security-new-pin">Choose a 4–8 digit PIN</label><input type="password" id="security-new-pin" maxlength="8" inputmode="numeric"><div class="row"><button class="btn-action btn-action-accent" onclick="saveNewPin()">Save PIN</button><button class="btn-action danger" onclick="removePin()">Remove PIN</button></div></div></div></div>
+  <div class="modal-backdrop" id="draft-modal" onkeydown="handleSecondaryKey(event, 'draft-modal')"><div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="draft-modal-title"><div class="modal-head"><strong id="draft-modal-title" tabindex="-1">Draft next steps</strong><button class="btn-action" onclick="closeDraftModal()">Close</button></div><div class="modal-body"><p id="draft-context-label" class="help-text"></p><div id="draft-output-area" class="plan-text-area" role="status"></div><p id="draft-copy-status" class="status" role="status"></p><button class="btn-action" style="margin-top:16px" id="copy-draft" onclick="copyDraftText(this)" disabled>Copy draft</button></div></div></div>
   <script>
     let activeTag = 'other';
     let feedFilter = 'all';
@@ -271,6 +274,8 @@
     let isRecording = false;
     let currentPage = 'notes';
     let shareStep = 1;
+    let dialogReturnFocus = null;
+    let draftRequest = 0;
     let pendingDossier = null;
     let reviewedReply = '';
     const selectedShareNotes = new Set();
@@ -342,7 +347,8 @@
         document.getElementById('page-' + name).hidden = name !== page;
         document.getElementById('nav-' + name).setAttribute('aria-current', name === page ? 'page' : 'false');
       });
-      if (page === 'history') renderHistory();
+      if (page === 'history') { document.getElementById('history-status').textContent = ''; renderHistory(); }
+      if (page !== 'notes' && isRecording && recognition) recognition.stop();
       if (focus) {
         document.getElementById((page === 'notes' ? 'notes' : page) + '-title').focus();
         window.scrollTo?.({ top: 0 });
@@ -398,6 +404,7 @@
         document.querySelector('header').inert = false;
         document.getElementById('pin-entry-input').value = '';
         err.style.display = 'none';
+        document.getElementById(currentPage === 'notes' ? 'note-input' : currentPage + '-title').focus();
       } else {
         err.style.display = 'block';
         document.getElementById('pin-entry-input').value = '';
@@ -406,11 +413,39 @@
     }
 
     function handlePinKey(e) { if (e.key === 'Enter') verifyPin(); }
-    function openSecuritySettingsModal() {
-      document.getElementById('security-new-pin').value = localStorage.getItem('3sci_panorama_pin') || '';
-      document.getElementById('security-modal').style.display = 'flex';
+    function openSecondaryModal(id, focusId) {
+      dialogReturnFocus = document.activeElement;
+      document.getElementById(id).style.display = 'flex';
+      document.getElementById('app-layout-main').inert = true;
+      document.querySelector('header').inert = true;
+      document.body.style.overflow = 'hidden';
+      document.getElementById(focusId).focus();
     }
-    function closeSecurityModal() { document.getElementById('security-modal').style.display = 'none'; }
+    function closeSecondaryModal(id) {
+      document.getElementById(id).style.display = 'none';
+      document.getElementById('app-layout-main').inert = false;
+      document.querySelector('header').inert = false;
+      document.body.style.overflow = '';
+      (dialogReturnFocus || document.getElementById('nav-' + currentPage)).focus();
+    }
+    function trapDialogTab(event, id) {
+      if (event.key !== 'Tab') return;
+      const controls = [...document.getElementById(id).querySelectorAll('button, input, textarea, a[href], summary')]
+        .filter(el => !el.disabled && !el.closest('[hidden]') && !el.closest('details:not([open]) > :not(summary)'));
+      const first = controls[0], last = controls[controls.length - 1];
+      if (!first) return;
+      if (event.shiftKey && (document.activeElement === first || !controls.includes(document.activeElement))) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+    function handleSecondaryKey(event, id) {
+      if (event.key === 'Escape') { event.preventDefault(); id === 'draft-modal' ? closeDraftModal() : closeSecurityModal(); }
+      else trapDialogTab(event, id);
+    }
+    function openSecuritySettingsModal() {
+      document.getElementById('security-new-pin').value = '';
+      openSecondaryModal('security-modal', 'security-new-pin');
+    }
+    function closeSecurityModal() { closeSecondaryModal('security-modal'); }
     function saveNewPin() {
       const val = document.getElementById('security-new-pin').value.trim();
       if (!/^\d{4,8}$/.test(val)) { alert("Please enter 4 to 8 digits."); return; }
@@ -438,14 +473,14 @@
       recognizer.continuous = true;
       recognizer.interimResults = true;
       recognizer.lang = 'en-US';
-      recognizer.onstart = () => { isRecording = true; document.getElementById('btn-voice-dictate').classList.add('recording'); document.getElementById('voice-icon').innerText = '🔴'; document.getElementById('voice-label').innerText = 'Listening...'; };
+      recognizer.onstart = () => { isRecording = true; document.getElementById('btn-voice-dictate').classList.add('recording'); document.getElementById('voice-label').innerText = 'Stop listening'; };
       recognizer.onresult = (e) => {
         let t = '';
         for (let i = e.resultIndex; i < e.results.length; ++i) t += e.results[i][0].transcript;
         const input = document.getElementById('note-input');
         if (e.results[e.results.length - 1].isFinal) input.value = input.value ? input.value + ' ' + t.trim() : t.trim();
       };
-      recognizer.onerror = () => stopVoiceDictation();
+      recognizer.onerror = () => { stopVoiceDictation(); document.getElementById('note-save-status').textContent = 'Voice input stopped. Check microphone access, or type your thought instead.'; };
       recognizer.onend = () => stopVoiceDictation();
       return recognizer;
     }
@@ -456,7 +491,7 @@
     function stopVoiceDictation() {
       isRecording = false;
       const btn = document.getElementById('btn-voice-dictate');
-      if (btn) { btn.classList.remove('recording'); document.getElementById('voice-icon').innerText = '🎙️'; document.getElementById('voice-label').innerText = 'Use my voice'; }
+      if (btn) { btn.classList.remove('recording'); document.getElementById('voice-label').innerText = 'Use my voice'; }
     }
 
     /* Storage & Telemetry */
@@ -471,7 +506,12 @@
     }
     function syncKey(val) { localStorage.setItem('3sci_panorama_key', val.trim()); }
     function getKey() { return document.getElementById('top-gemini-key').value.trim() || localStorage.getItem('3sci_panorama_key') || ''; }
-    function saveNorthStar(val) { localStorage.setItem('3sci_panorama_north_star', val); updatePriorityPreview(); changeShareContext(); }
+    function saveNorthStar(val) {
+      try { localStorage.setItem('3sci_panorama_north_star', val); }
+      catch (err) { document.getElementById('priority-status').textContent = 'Could not save this priority. Your previous saved priority is unchanged. Keep this text and try again.'; return; }
+      document.getElementById('priority-status').textContent = val ? 'Priority saved.' : 'Priority cleared.';
+      updatePriorityPreview(); changeShareContext();
+    }
 
     function loadNotes() {
       notes = validateNotes(JSON.parse(localStorage.getItem('3sci_panorama_notes') || '[]'));
@@ -483,41 +523,58 @@
       renderNotes();
       updateTelemetry();
     }
-    function saveNotes() { localStorage.setItem('3sci_panorama_notes', JSON.stringify(notes)); renderNotes(); updateTelemetry(); renderShareNotes(); }
+    function saveNotes(next = notes) {
+      try { localStorage.setItem('3sci_panorama_notes', JSON.stringify(next)); }
+      catch (err) {
+        document.getElementById('note-save-status').textContent = 'Could not save in this browser. Your draft and saved thoughts are unchanged. Download a backup in Settings to keep a copy.';
+        return false;
+      }
+      notes = next; renderNotes(); updateTelemetry(); renderShareNotes(); return true;
+    }
     function addNote() {
       const input = document.getElementById('note-input');
       const text = input.value.trim();
-      if (!text) return;
+      if (!text) { document.getElementById('note-save-status').textContent = 'Write a thought first, then save it.'; input.focus(); return; }
       if (isRecording && recognition) recognition.stop();
-      const now = new Date();
-      let noteId = Date.now();
+      const now = new Date(); let noteId = Date.now();
       while (notes.some(note => note.id === noteId)) noteId++;
-      notes.unshift({ id: noteId, tag: activeTag, text: text, date: now.toLocaleDateString(undefined, {weekday:'short'}) + ' ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) });
-      input.value = '';
-      saveNotes();
-      document.getElementById('note-save-status').textContent = 'Thought saved in this browser.';
+      const next = [{ id: noteId, tag: activeTag, text, date: now.toLocaleDateString(undefined, {weekday:'short'}) + ' ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) }, ...notes];
+      if (!saveNotes(next)) { input.focus(); return; }
+      input.value = ''; activeTag = 'other'; document.getElementById('note-category').value = 'other';
+      resetThoughtFilters();
+      document.getElementById('note-save-status').textContent = 'Thought saved. Add another, or choose thoughts to share with My Dot.';
+      input.focus();
     }
-    function deleteNote(id) { if (confirm('Delete this thought? This cannot be undone.')) { notes = notes.filter(n => n.id !== id); saveNotes(); } }
-    function clearAllNotes() { if (confirm('Delete all current thoughts? This cannot be undone. Your reviews and history will stay.')) { notes = []; saveNotes(); } }
+    function deleteNote(id) {
+      if (confirm('Delete this thought? This cannot be undone.') && saveNotes(notes.filter(n => n.id !== id))) {
+        document.getElementById('note-save-status').textContent = 'Thought deleted. Your reviews and history are unchanged.';
+        document.getElementById('saved-thoughts-title').focus();
+      }
+    }
+    function clearAllNotes() {
+      if (confirm('Delete all current thoughts? This cannot be undone. Your reviews and history will stay.') && saveNotes([])) {
+        document.getElementById('note-save-status').textContent = 'Current thoughts deleted. Your reviews and history are unchanged.';
+        document.getElementById('note-input').focus();
+      }
+    }
+    function resetThoughtFilters() {
+      feedFilter = 'all'; document.getElementById('feed-search').value = ''; document.getElementById('feed-category').value = 'all'; renderNotes();
+    }
 
     function updateTelemetry() {
       const total = notes.length;
       const bar = document.getElementById('telemetry-bar');
       const legend = document.getElementById('telemetry-legend');
-      document.getElementById('storage-footprint').innerText = (JSON.stringify(localStorage).length / 1024).toFixed(1) + ' KB in Vault';
+      document.getElementById('storage-footprint').innerText = (JSON.stringify(localStorage).length / 1024).toFixed(1) + ' KB saved in this browser';
 
-      if (total === 0) { bar.innerHTML = `<div class="meter-slice other" style="width: 100%;"></div>`; legend.innerHTML = `<span>No thoughts</span>`; return; }
-      const counts = { work: 0, annoyance: 0, personal: 0, spark: 0, other: 0 };
-      notes.forEach(n => {
-        if (n.tag === 'work') counts.work++;
-        else if (n.tag === 'annoyance') counts.annoyance++;
-        else if (n.tag === 'personal') counts.personal++;
-        else if (n.tag === 'spark') counts.spark++;
-        else counts.other++;
+      bar.replaceChildren(); legend.replaceChildren();
+      if (!total) { legend.append(textElement('span', '', 'No thoughts saved yet.')); return; }
+      [...new Set(notes.map(n => n.tag))].forEach(tag => {
+        const count = notes.filter(n => n.tag === tag).length;
+        const slice = textElement('div', 'meter-slice ' + (NOTE_TAGS.includes(tag) ? tag : 'other'));
+        slice.style.width = (count / total * 100) + '%'; bar.append(slice);
+        legend.append(textElement('span', '', categoryName(tag) + ': ' + count));
       });
-      const pw = ((counts.work/total)*100).toFixed(0), pa = ((counts.annoyance/total)*100).toFixed(0), pp = ((counts.personal/total)*100).toFixed(0), ps = ((counts.spark/total)*100).toFixed(0);
-      bar.innerHTML = `<div class="meter-slice work" style="width:${pw}%"></div><div class="meter-slice annoyance" style="width:${pa}%"></div><div class="meter-slice personal" style="width:${pp}%"></div><div class="meter-slice spark" style="width:${ps}%"></div>`;
-      legend.innerHTML = `<span class="legend-item"><span class="legend-dot" style="background:var(--primary-blue)"></span>Work ${pw}%</span><span class="legend-item"><span class="legend-dot" style="background:var(--accent-rose)"></span>Snags ${pa}%</span><span class="legend-item"><span class="legend-dot" style="background:var(--accent-emerald)"></span>Life ${pp}%</span><span class="legend-item"><span class="legend-dot" style="background:var(--accent-purple)"></span>Sparks ${ps}%</span>`;
     }
 
 
@@ -527,10 +584,12 @@
       const filtered = notes.filter(n => (feedFilter === 'all' || n.tag === feedFilter) && n.text.toLowerCase().includes(searchTerm));
       document.getElementById('notes-count').textContent = notes.length + (notes.length === 1 ? ' thought' : ' thoughts');
       document.getElementById('thought-tools').hidden = notes.length === 0;
+      document.getElementById('manage-thoughts').hidden = notes.length === 0 && !currentDossier;
       document.getElementById('start-dot-share').disabled = notes.length === 0;
       document.getElementById('dot-share-hint').textContent = notes.length ? 'Choose thoughts, take them to your Dot in ChatGPT, and bring back a review.' : 'Save a thought above to start a review with My Dot.';
       container.replaceChildren();
       if (!filtered.length) container.append(textElement('p', 'empty-note', notes.length ? 'No thoughts match your search.' : 'Your saved thoughts will appear here. Start with one thing on your mind.'));
+      if (!filtered.length && notes.length) container.append(actionButton('Clear search and filters', resetThoughtFilters));
       filtered.forEach(n => {
         const item = textElement('div', 'stream-item ' + (NOTE_TAGS.includes(n.tag) ? n.tag : ''));
         const meta = textElement('div', 'stream-meta');
@@ -585,6 +644,11 @@
     }
     function updateSharePrompt() {
       const selected = notes.filter(n => selectedShareNotes.has(n.id));
+      const hasPriority = !!localStorage.getItem('3sci_panorama_north_star');
+      const hasHistory = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]').length > 0;
+      document.getElementById('share-priority-option').hidden = !hasPriority;
+      document.getElementById('share-history-option').hidden = !hasHistory;
+      if (!hasHistory) document.getElementById('share-history').checked = false;
       document.getElementById('share-note-count').textContent = selected.length + ' of ' + notes.length + ' selected';
       document.getElementById('prompt-preview-box').value = selected.length
         ? compilePrompt(selected, document.getElementById('share-north-star').checked, document.getElementById('share-history').checked)
@@ -626,6 +690,7 @@
         document.getElementById('note-input').focus();
         return;
       }
+      dialogReturnFocus = document.activeElement;
       cancelDossierReview();
       document.getElementById('share-import-status').textContent = '';
       renderShareNotes();
@@ -655,7 +720,7 @@
       document.getElementById('app-layout-main').inert = false;
       document.querySelector('header').inert = false;
       document.body.style.overflow = '';
-      document.getElementById('nav-' + currentPage).focus();
+      (dialogReturnFocus || document.getElementById('nav-' + currentPage)).focus();
     }
     function finishShare() { closePromptStudio(); showPage('review'); }
     async function copyCompiledPrompt() {
@@ -664,11 +729,11 @@
       const preview = document.getElementById('prompt-preview-box');
       try {
         await navigator.clipboard.writeText(preview.value);
-        document.getElementById('share-copy-status').textContent = "Copied. Open ChatGPT, sign in if prompted, and paste into your Dot conversation. Bring its JSON reply back here.";
+        document.getElementById('share-copy-status').textContent = "Copied. Open ChatGPT, sign in if prompted, and paste into your Dot conversation. Bring its complete reply back here.";
       } catch (err) {
         document.getElementById('full-message-details').open = true;
         preview.focus(); preview.select();
-        document.getElementById('share-copy-status').textContent = 'Clipboard access is unavailable. Copy the selected prompt manually.';
+        document.getElementById('share-copy-status').textContent = 'Clipboard access is unavailable. Copy the selected message manually, then paste it into your Dot conversation.';
       }
     }
     function invalidateDossierReview() {
@@ -678,13 +743,16 @@
       document.getElementById('dossier-review-content').replaceChildren();
       document.getElementById('apply-dossier').disabled = true;
       document.getElementById('share-success').hidden = true;
+      document.getElementById('share-reply-footer').hidden = false;
       document.getElementById('share-reply-entry').hidden = false;
       document.getElementById('share-import-status').textContent = '';
     }
+    function editReviewedReply() { invalidateDossierReview(); document.getElementById('external-json-input').focus(); }
     function cancelDossierReview() {
       invalidateDossierReview();
       document.getElementById('external-json-input').value = '';
       document.getElementById('share-import-status').textContent = 'Reply discarded. Your saved review was not changed.';
+      document.getElementById('external-json-input').focus();
     }
 
     function appendReadableReview(content, data) {
@@ -709,10 +777,13 @@
         pendingDossier = data;
         reviewedReply = reply;
         document.getElementById('dossier-review').hidden = false;
+        document.getElementById('share-reply-entry').hidden = true;
         document.getElementById('apply-dossier').disabled = false;
         document.getElementById('share-import-status').textContent = 'Here is your preview. Nothing changes until you save.';
+        document.getElementById('dossier-review-content').focus();
       } catch (err) {
         document.getElementById('share-import-status').textContent = "We couldn't read that reply. Copy Dot's complete response, including any code block, and try again.";
+        document.getElementById('external-json-input').focus();
       }
     }
     function applyExternalDossier() {
@@ -729,6 +800,8 @@
         invalidateDossierReview();
         document.getElementById('external-json-input').value = '';
         document.getElementById('share-success').hidden = false;
+        document.getElementById('share-reply-footer').hidden = true;
+        document.getElementById('share-success').focus();
         document.getElementById('share-reply-entry').hidden = true;
         document.getElementById('share-import-status').textContent = duplicate ? 'This review is already current. Nothing changed.' : (hadPreviousReview ? 'Review saved. Your previous review is in History.' : 'Your first review is saved.');
       } catch (err) {
@@ -770,18 +843,18 @@
       const renderList = (id, items, create, emptyTag = 'li') => {
         const target = document.getElementById(id);
         target.replaceChildren();
-        if (!items?.length) target.append(textElement(emptyTag, 'insight-item', 'None.'));
+        if (!items?.length) target.append(textElement(emptyTag, 'insight-item', 'Nothing suggested in this section.'));
         else items.forEach(item => target.append(create(item)));
       };
       renderList('list-friction', data?.recurringSnags, f => {
         const item = textElement('li', 'insight-item');
-        item.append(textElement('div', '', f), actionButton('Draft with Gemini', () => generateActionPlan('Fix', f)));
+        item.append(textElement('div', '', f), actionButton('Draft with Google AI', () => generateActionPlan('Fix', f)));
         return item;
       });
       renderList('list-bridges', data?.connectedSparks, b => {
         const item = textElement('div', 'bridge-box');
         item.append(textElement('span', 'bridge-link', b.connection), textElement('div', '', b.idea),
-          actionButton('Draft with Gemini', () => generateActionPlan('Idea', b.connection + ': ' + b.idea)));
+          actionButton('Draft with Google AI', () => generateActionPlan('Idea', b.connection + ': ' + b.idea)));
         return item;
       }, 'div');
       const move = (m, kind) => {
@@ -789,7 +862,7 @@
         const description = textElement('div');
         description.append(textElement('strong', '', m.step + ': '), textElement('span', '', m.why));
         const actions = textElement('div', 'card-actions-row');
-        actions.append(actionButton('Draft with Gemini', () => generateActionPlan(kind, m.step)),
+        actions.append(actionButton('Draft with Google AI', () => generateActionPlan(kind, m.step)),
           actionButton('Download calendar block', () => exportSingleEventICS(m.step, m.why), 'btn-card-action calendar'));
         item.append(description, actions);
         return item;
@@ -810,7 +883,7 @@
       }
 
       if (notes.length === 0) {
-        alert("Please add at least one thought on the left first.");
+        alert("Save at least one thought in Thoughts before starting a Google AI review.");
         return;
       }
 
@@ -819,7 +892,7 @@
       const statusText = document.getElementById('synth-status');
 
       btn.disabled = true;
-      statusText.innerText = "Connecting thoughts...";
+      statusText.innerText = "Reviewing with Google AI...";
 
       const endpoint = geminiEndpoint(apiKey);
       
@@ -873,12 +946,14 @@
       }
     }
     async function generateActionPlan(title, context) {
-      const modal = document.getElementById('draft-modal');
-      document.getElementById('draft-modal-title').innerText = title.toUpperCase();
+      const request = ++draftRequest;
+      document.getElementById('copy-draft').disabled = true;
+      document.getElementById('draft-copy-status').textContent = '';
+      document.getElementById('draft-modal-title').innerText = 'Draft with Google AI';
       document.getElementById('draft-context-label').innerText = context;
       const outputEl = document.getElementById('draft-output-area');
       outputEl.innerText = "Drafting practical steps...";
-      modal.style.display = 'flex';
+      openSecondaryModal('draft-modal', 'draft-modal-title');
 
       const apiKey = getKey();
       if (!apiKey) { outputEl.innerText = `Add a Google API key in Settings to use Gemini drafting.`; return; }
@@ -894,15 +969,20 @@
         });
         const data = await res.json();
         if (!res.ok || data.error) throw new Error(data.error?.message || 'Request failed.');
-        outputEl.innerText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate draft.";
-      } catch (e) { outputEl.innerText = "Error: " + e.message; }
+        if (request !== draftRequest) return;
+        const draft = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        outputEl.innerText = draft || 'No draft was returned. Close this window and try again.';
+        document.getElementById('copy-draft').disabled = !draft;
+      } catch (e) { if (request === draftRequest) outputEl.innerText = "Could not create a draft. Check your Google API key and connection, then try again."; }
     }
 
-    function closeDraftModal() { document.getElementById('draft-modal').style.display = 'none'; }
-    function copyDraftText(btn) {
-      navigator.clipboard.writeText(document.getElementById('draft-output-area').innerText).then(() => {
-        const orig = btn.innerText; btn.innerText = "Copied!"; setTimeout(() => btn.innerText = orig, 1500);
-      });
+    function closeDraftModal() { draftRequest++; closeSecondaryModal('draft-modal'); }
+    async function copyDraftText(btn) {
+      if (btn.disabled) return;
+      try {
+        await navigator.clipboard.writeText(document.getElementById('draft-output-area').innerText);
+        document.getElementById('draft-copy-status').textContent = 'Draft copied.';
+      } catch (err) { document.getElementById('draft-copy-status').textContent = 'Clipboard unavailable. Select the draft text above and copy it manually.'; }
     }
 
     /* ICS & Vault Helpers */
@@ -922,6 +1002,7 @@
     }
     function exportFullCalendarICS() {
       if (!currentDossier) { alert("Save a review first."); return; }
+      if (!currentDossier.workMoves?.length) { document.getElementById('review-export-status').textContent = 'This review has no work suggestions to turn into calendar blocks.'; return; }
       const now = new Date(); let events = [];
       (currentDossier.workMoves || []).forEach((w, i) => {
         const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + Math.floor(i/2) + 1, (i%2===0?10:14), 0, 0), end = new Date(start.getTime() + 45*60000);
@@ -930,13 +1011,14 @@
       const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', ...events, 'END:VCALENDAR'].join('\r\n');
       downloadFile(ics, `Panorama_Schedule.ics`, 'text/calendar');
     }
-    function copyTaskChecklist(btn) {
+    async function copyTaskChecklist(btn) {
       if (!currentDossier) { alert("Save a review first."); return; }
       const lines = [`# Action Checklist`, '## Work'];
       (currentDossier.workMoves || []).forEach(w => lines.push(`- [ ] ${w.step}`));
       lines.push('## Life');
       (currentDossier.lifeMoves || []).forEach(l => lines.push(`- [ ] ${l.step}`));
-      navigator.clipboard.writeText(lines.join('\n')).then(() => { const o = btn.innerText; btn.innerText = "Copied Checklist!"; setTimeout(() => btn.innerText = o, 1500); });
+      try { await navigator.clipboard.writeText(lines.join('\n')); document.getElementById('review-export-status').textContent = 'Action list copied.'; }
+      catch (err) { document.getElementById('review-export-status').textContent = 'Clipboard unavailable. Download the summary to keep a copy of your suggestions.'; }
     }
 
     function openVaultModal() { showPage('settings'); }
@@ -947,6 +1029,7 @@
     }
     function downloadVaultBackup() {
       downloadFile(JSON.stringify(createVaultBackup(), null, 2), 'Panorama_Backup.json', 'application/json');
+      document.getElementById('backup-status').textContent = 'Backup download started. Keep it somewhere private; it contains your saved thoughts and reviews.';
     }
     function validateNotes(value) {
       const ids = new Set();
@@ -985,6 +1068,9 @@
       selectedShareNotes.clear();
       loadNotes();
       renderShareNotes();
+      resetThoughtFilters();
+      document.getElementById('history-search').value = '';
+      document.getElementById('history-status').textContent = '';
       renderHistory();
     }
     function handleVaultFileSelect(e) {
@@ -1023,19 +1109,23 @@
       notes = []; currentDossier = null;
       invalidateDossierReview(); paintDossier(null);
       renderNotes(); updateTelemetry(); renderShareNotes();
+      document.getElementById('history-search').value = '';
       showPage('history');
+      document.getElementById('history-status').textContent = 'Thoughts and review archived. Your current list is ready for a fresh start.';
     }
     function renderHistory() {
       const history = JSON.parse(localStorage.getItem('3sci_panorama_history') || '[]');
       const query = document.getElementById('history-search').value.toLowerCase().trim();
       const content = document.getElementById('history-content');
       content.replaceChildren();
+      document.getElementById('history-search-label').hidden = history.length === 0;
       const filtered = history.filter(h => !query || JSON.stringify(h).toLowerCase().includes(query));
-      if (!filtered.length) content.append(textElement('p', 'empty-note', history.length ? 'No history matches your search.' : 'Past reviews and archived thoughts will appear here. Nothing is archived automatically until you save a replacement review.'));
+      if (!filtered.length) content.append(textElement('p', 'empty-note', history.length ? 'No history matches your search.' : 'Earlier reviews appear here when you save a new one. You can also archive thoughts from the Thoughts screen.'));
+      if (!filtered.length && history.length) content.append(actionButton('Clear history search', () => { document.getElementById('history-search').value = ''; renderHistory(); document.getElementById('history-search').focus(); }));
       filtered.forEach(h => {
         const card = textElement('details', 'history-card');
         card.append(textElement('summary', '', h.theme || 'Saved thoughts'),
-          textElement('p', 'help-text', h.date + (h.kind === 'review' ? ' · Previous review' : ' · Archived thoughts')),
+          textElement('p', 'help-text', h.date + (h.kind === 'review' ? ' — Previous review' : ' — Archived thoughts')),
           textElement('p', '', h.summary || ''));
         const body = textElement('div', 'details-body');
         if (h.dossier) appendReadableReview(body, validateDossier(h.dossier, true));
@@ -1051,10 +1141,16 @@
     function closeHistoryModal() { showPage('notes'); }
     function exportDossierMarkdown() {
       if (!currentDossier) { alert("Save a review first."); return; }
-      const md = `# PANORAMA SUMMARY\n\n## Summary\n${currentDossier.summary}\n\n## Work Moves\n${(currentDossier.workMoves||[]).map(w=>`- ${w.step}`).join('\n')}`;
+      const md = ['# ' + currentDossier.theme, currentDossier.summary,
+        ...(currentDossier.repeatingSnag?.detected ? ['## A repeating problem', currentDossier.repeatingSnag.name + ': ' + currentDossier.repeatingSnag.explanation] : []),
+        '## What keeps getting in your way', ...(currentDossier.recurringSnags || []).map(x => '- ' + x),
+        '## Connections worth exploring', ...(currentDossier.connectedSparks || []).map(x => '- ' + x.connection + ': ' + x.idea),
+        '## Work suggestions', ...(currentDossier.workMoves || []).map(x => '- ' + x.step + ': ' + x.why),
+        '## Personal suggestions', ...(currentDossier.lifeMoves || []).map(x => '- ' + x.step + ': ' + x.why)].join('\n\n');
       downloadFile(md, `Panorama_Summary.md`, 'text/markdown');
     }
 
+    document.getElementById('note-input').addEventListener('input', () => { document.getElementById('note-save-status').textContent = ''; });
     document.getElementById('note-input').addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); addNote(); } });
     window.onload = () => { checkSecurityLock(); const k = localStorage.getItem('3sci_panorama_key'); if (k) document.getElementById('top-gemini-key').value = k; loadNotes(); showPage('notes', false); };
   </script>
